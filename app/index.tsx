@@ -1,6 +1,5 @@
 import { View, Text, Pressable } from "react-native";
 import { Link } from "expo-router";
-import "../global.css";
 
 export default function Home() {
   return (
@@ -10,6 +9,11 @@ export default function Home() {
       <Link href="/about" asChild>
         <Pressable className="mt-4 bg-white px-4 py-2 rounded-xl">
           <Text className="text-blue-500 font-semibold">Ir para About</Text>
+        </Pressable>
+      </Link>
+      <Link href="/week" asChild>
+        <Pressable className="mt-4 bg-white px-4 py-2 rounded-xl">
+          <Text className="text-blue-500 font-semibold">Ir para Semana</Text>
         </Pressable>
       </Link>
     </View>
