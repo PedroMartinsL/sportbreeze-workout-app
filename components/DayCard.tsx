@@ -6,8 +6,6 @@ type DayCardProps = {
   day: string;
 };
 
-
-
 export default function DayCard({ day }: DayCardProps) {
   return (
     <Link

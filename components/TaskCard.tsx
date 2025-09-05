@@ -3,7 +3,7 @@ import { View, Text, Switch } from "react-native";
 import { WeatherIcon } from "./WeatherIcon";
 
 
-type TaskCardProps = {
+export type TaskCardProps = {
   id: number,
   day: number,
   weather: string,

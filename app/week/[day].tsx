@@ -1,13 +1,28 @@
-import { View, FlatList } from "react-native";
+import { View, FlatList, Pressable } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import TaskCard from "@/components/TaskCard";
+import TaskCard, { TaskCardProps } from "@/components/TaskCard";
+import { useState } from "react";
+import ModalTask from "@/components/ModalTask";
 
 export default function DayScreen() {
   const { day } = useLocalSearchParams(); // "Monday", "Tuesday", etc.
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState<TaskCardProps | null>(null);
+
+  function populateModal(taskData: TaskCardProps) {
+    setModalVisible(true);
+    setModalData(taskData);
+  }
 
   return (
-    <View className="flex-1 items-center justify-center bg-gray">
-      <FlatList data={require("@/data/tasks.json")} renderItem={({ item }) => <TaskCard
+    <View className="flex-1 items-center justify-center bg-gray ">
+      <FlatList data={require("@/data/tasks.json")} renderItem={({ item }) => 
+      
+      <Pressable
+        onPress={() => populateModal(item)}
+        android_ripple={{ color: 'gray' }}
+      >
+        <TaskCard
         id={item.id}
         day={item.day}
         weather={item.weather}
@@ -19,7 +34,13 @@ export default function DayScreen() {
         hour={item.hour}
         date={item.date}
         sport={item.sport}
-      />}></FlatList>
+      />
+      </Pressable>
+      }>
+      </FlatList>
+      {modalData && (
+        <ModalTask task={modalData} modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      )}
     </View>
   );
 }
