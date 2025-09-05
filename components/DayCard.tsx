@@ -15,8 +15,8 @@ export default function DayCard({ day }: DayCardProps) {
       asChild
     >
       <Pressable android_ripple={{ color: "lightgray" }}>
-        <View className="border-4 border-black rounded-lg p-4 mb-2">
-          <Text>{day}</Text>
+        <View className="w-60 rounded-full p-4 mb-2 bg-gray-200 items-center justify-center">
+          <Text className="text-lg font-bold">{day}</Text>
         </View>
       </Pressable>
     </Link>

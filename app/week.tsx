@@ -12,14 +12,17 @@ export default function Week() {
         "Sunday",
     ]
     return (
-        <View className="flex-1 items-center justify-center bg-white border border-black p-4 border-rounded">
+        <View className="flex-1 items-center justify-center bg-gray-150">
+            <View className="w-100 h-50 items-center justify-center bg-white border-1 border-black p-10 rounded-2xl">
             <Text className="text-2xl font-bold">Routine</Text>
-            <Text className="text-2xl font-bold">What was planned for you</Text>
+            <Text className="text-base text-gray-500">What was planned for you</Text>
+
             <ScrollView className="flex-1 bg-white p-4">
                 {days.map((day, index) => (
-                    <DayCard key={day} day={day} />
+                <DayCard key={day} day={day} />
                 ))}
             </ScrollView>
+            </View>
         </View>
     );
 }

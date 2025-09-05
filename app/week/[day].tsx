@@ -6,20 +6,20 @@ export default function DayScreen() {
   const { day } = useLocalSearchParams(); // "Monday", "Tuesday", etc.
 
   return (
-    <View className="flex-1 items-center justify-center bg-white">
+    <View className="flex-1 items-center justify-center bg-gray">
       <FlatList data={require("@/data/tasks.json")} renderItem={({ item }) => <TaskCard
-                  id={item.id}
-                  day={item.day}
-                  weather={item.weather}
-                  kcal={item.kcal}
-                  routine={item.routine}
-                  temp={item.temp}
-                  duration={item.duration}
-                  planner={item.planner}
-                  hora={item.hora}
-                  date={item.date}
-                  sport={item.sport}
-                />}></FlatList>
+        id={item.id}
+        day={item.day}
+        weather={item.weather}
+        kcal={item.kcal}
+        routine={item.routine}
+        temp={item.temp}
+        duration={item.duration}
+        planner={item.planner}
+        hour={item.hour}
+        date={item.date}
+        sport={item.sport}
+      />}></FlatList>
     </View>
   );
 }
