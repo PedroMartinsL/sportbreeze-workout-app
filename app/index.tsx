@@ -6,18 +6,24 @@ export default function Home() {
     <View className="flex-1 items-center justify-center bg-[#d9f99d] px-6">
       <Text className="text-[#0a0a0a] text-3xl font-extrabold">Sportsbrezze</Text>
       <Text className="text-[#475569] text-center mt-2">
-        Rotina de treinos com IA baseada no clima dos próximos 7 dias.
+        AI-powered training routine based on the next 7 days of local weather.
       </Text>
 
-      <Link href="/about" asChild>
+      <Link href="/registration" asChild>
         <Pressable className="mt-6 w-full max-w-xs bg-black px-4 py-3 rounded-xl">
-          <Text className="text-white text-center font-semibold">Ir para About</Text>
+          <Text className="text-white text-center font-semibold">Registration Portal</Text>
+        </Pressable>
+      </Link>
+
+      <Link href="/about" asChild>
+        <Pressable className="mt-3 w-full max-w-xs bg-white px-4 py-3 rounded-xl border border-[#c5e1a5]">
+          <Text className="text-[#0a0a0a] text-center font-semibold">About</Text>
         </Pressable>
       </Link>
 
       <Link href="/week" asChild>
         <Pressable className="mt-3 w-full max-w-xs bg-white px-4 py-3 rounded-xl border border-[#c5e1a5]">
-          <Text className="text-[#0a0a0a] text-center font-semibold">Ir para Semana</Text>
+          <Text className="text-[#0a0a0a] text-center font-semibold">Week</Text>
         </Pressable>
       </Link>
     </View>
