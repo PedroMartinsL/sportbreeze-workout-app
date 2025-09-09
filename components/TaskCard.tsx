@@ -17,10 +17,14 @@ export type TaskCardProps = {
   sport: string
 };
 
-export function DetachedData(props: { data: string }) {
+type DetachedDataProps = {
+  children: React.ReactNode;
+};
+
+export function DetachedData({ children }: DetachedDataProps) {
   return (
     <View className="bg-gray-200 rounded-full px-2 py-1">
-      <Text>{props.data}</Text>
+      <Text>{children}</Text>
     </View>
   );
 }
@@ -53,8 +57,8 @@ export default function TaskCard(props: TaskCardProps) {
     {/* Top row: date/hour + warn */}
     <View className="flex-row justify-between items-center mb-3">
       <View className="flex-row gap-3">
-        <DetachedData data={props.date} />
-        <DetachedData data={props.hour} />
+        <DetachedData>{props.date}</DetachedData>
+        <DetachedData>{props.hour}</DetachedData>
       </View>
       {warn && (
         <View className="bg-red-600 rounded-2xl py-1 px-3">

@@ -1,5 +1,5 @@
-import { View, Text, Modal, Pressable } from "react-native";
-import { TaskCardProps } from "./TaskCard";
+ import { View, Text, Modal, Pressable } from "react-native";
+import { DetachedData, TaskCardProps } from "./TaskCard";
 import { WeatherIcon } from "./WeatherIcon";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
@@ -20,9 +20,9 @@ export default function ModalTask({ task, modalVisible, setModalVisible }: TaskP
             onRequestClose={() => setModalVisible(false)}
         >
             {/* Fundo semitransparente */}
-            <View className="flex-1 bg-opacity-50 justify-end"
+            <View className="flex-1 bg-opacity-50"
             >
-
+                
                 <View className="bg-white w-full h-full rounded-t-xl p-6 shadow-lg">
 
                     {/* Botão de fechar no canto */}
@@ -31,27 +31,72 @@ export default function ModalTask({ task, modalVisible, setModalVisible }: TaskP
                             <MaterialIcons name="cancel" size={28} color="black" />
                         </Pressable>
                     </View>
-
+                    
                     {/* Conteúdo centralizado */}
-                    <View className="items-center space-y-3 mt-2">
-                        <WeatherIcon weather={task.weather} size={40} />
+                    <View className="mt-10 gap-10">
+                         <View className="flex-row justify-around w-full items-end">
+                            <Text className="text-6xl font-bold text-gray-800">{task.sport}</Text>
 
-                        <View className="flex-row justify-between w-full px-2">
-                            <Text className="text-lg font-bold">{task.kcal} kcal</Text>
-                            <Text className="text-lg font-bold">{task.temp}°C</Text>
+                            <Text className="text-lg text-gray-800">{task.hour}</Text>
                         </View>
 
+                        
+
                         <View className="flex-row justify-between w-full px-2">
-                            <Text className="text-lg font-bold">Duration: {task.duration} min</Text>
-                            <Text className="text-lg font-bold">{task.hour}</Text>
+                            <View className="w-full">
+
+                            
+                            <DetachedData>
+                                Duration:
+                            </DetachedData>
+                            
+                            <Text className="text-lg font-light ml-5 mt-5">{task.duration} min</Text>
+                            </View>
+                            <View>
+                
+                            </View>
                         </View>
 
-                        <Text className="text-lg font-bold">{task.routine}</Text>
-                        <Text className="text-lg font-bold">{task.planner}</Text>
-                        <Text className="text-lg font-bold">{task.date}</Text>
-                        <Text className="text-lg font-bold">{task.sport}</Text>
+                        <View className="border-b border-gray-200 mb-4" />
+
+                        <View className="flex-row justify-between w-full px-2 mt-10">
+                            <DetachedData>
+                                Thoughtput:
+                            </DetachedData>
+                            
+                            <Text className="text-lg font-light">{task.kcal} kcal</Text>
+
+                             <DetachedData>
+                                Temperature:
+                            </DetachedData>
+
+                            <Text className="text-lg font-light">{task.temp}°C</Text>
+                        </View>
+                        <View className="border-b border-gray-200 mb-4" />
+
+                        <View className="justify-center items-center">
+
+                            <View className="border rounded-md p-4 border-1 border-gray-500">
+
+                            <Text className="text-lg font-light">{task.routine}</Text>
+                            </View>
+                        </View>
+
+                        
+                        
+                        <View className="flex-row justify-around">
+                            <View>
+                                <Text className="text-lg font-medium">
+                                Planner:
+                                </Text>
+                                <Text className="text-lg font-light">{task.planner}</Text>
+                            </View>
+
+                            <WeatherIcon weather={task.weather} size={100} />
+                        </View>
+                        
+                              
                     </View>
-
                 </View>
             </View>
         </Modal>
