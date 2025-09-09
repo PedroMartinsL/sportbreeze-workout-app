@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
   return (
@@ -10,21 +10,21 @@ export default function Home() {
       </Text>
 
       <Link href="/registration" asChild>
-        <Pressable className="mt-6 w-full max-w-xs bg-black px-4 py-3 rounded-xl">
+        <TouchableOpacity className="mt-6 w-full max-w-xs bg-black px-4 py-3 rounded-xl">
           <Text className="text-white text-center font-semibold">Registration Portal</Text>
-        </Pressable>
+        </TouchableOpacity>
       </Link>
 
       <Link href="/about" asChild>
-        <Pressable className="mt-3 w-full max-w-xs bg-white px-4 py-3 rounded-xl border border-[#c5e1a5]">
+        <TouchableOpacity className="mt-3 w-full max-w-xs bg-white px-4 py-3 rounded-xl border border-[#c5e1a5]">
           <Text className="text-[#0a0a0a] text-center font-semibold">About</Text>
-        </Pressable>
+        </TouchableOpacity>
       </Link>
 
       <Link href="/week" asChild>
-        <Pressable className="mt-3 w-full max-w-xs bg-white px-4 py-3 rounded-xl border border-[#c5e1a5]">
+        <TouchableOpacity className="mt-3 w-full max-w-xs bg-white px-4 py-3 rounded-xl border border-[#c5e1a5]">
           <Text className="text-[#0a0a0a] text-center font-semibold">Week</Text>
-        </Pressable>
+        </TouchableOpacity>
       </Link>
     </View>
   );

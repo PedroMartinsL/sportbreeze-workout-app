@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
-import { Alert, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 type Day = typeof DAYS[number];
@@ -129,9 +129,9 @@ export default function Registration() {
         })}
       </View>
 
-      <Pressable onPress={save} className="mt-5 bg-black py-3 rounded-xl items-center">
+      <TouchableOpacity onPress={save} className="mt-5 bg-black py-3 rounded-xl items-center">
         <Text className="text-white font-semibold">Save</Text>
-      </Pressable>
+      </TouchableOpacity>
 
       <View className="h-6" />
     </ScrollView>

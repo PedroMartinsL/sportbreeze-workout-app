@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { CalendarDays, Dumbbell, MapPin, Umbrella, Wind } from "lucide-react-native";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function About() {
   return (
@@ -26,20 +26,20 @@ export default function About() {
       </View>
 
       <View className="mt-5">
+        
         <Link href="/" asChild>
-          <Pressable className="w-full max-w-xs mx-auto bg-black py-3 rounded-xl">
+          <TouchableOpacity className="w-full max-w-xs mx-auto bg-black py-3 rounded-xl">
             <Text className="text-white text-center font-semibold">Back</Text>
-          </Pressable>
+          </TouchableOpacity>
         </Link>
 
         <Link href="/week" asChild>
-          <Pressable className="mt-3 w-full max-w-xs mx-auto bg-white py-3 rounded-xl border border-[#c5e1a5]">
+          <TouchableOpacity className="mt-3 w-full max-w-xs mx-auto bg-white py-3 rounded-xl border border-[#c5e1a5]">
             <Text className="text-[#0a0a0a] text-center font-semibold">View Week</Text>
-          </Pressable>
+          </TouchableOpacity>
         </Link>
-      </View>
 
-      <View className="h-8" />
+      </View>
     </ScrollView>
   );
 }
