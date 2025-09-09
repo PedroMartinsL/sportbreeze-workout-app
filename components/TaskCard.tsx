@@ -45,7 +45,7 @@ export default function TaskCard(props: TaskCardProps) {
 
   return (
     <View
-    className="bg-white rounded-xl p-6 mb-4 w-11/12 max-w-md shadow-lg mt-4"
+    className="bg-white rounded-xl p-6 mb-4 w-full max-w-md shadow-lg mt-4"
     style={{
       elevation: 5,
       shadowColor: "#000",
@@ -68,19 +68,25 @@ export default function TaskCard(props: TaskCardProps) {
     </View>
 
     {/* Divider */}
-    <View className="border-b border-gray-200 mb-4" />
+    <View className="border-b border-gray-200 mb-5" />
 
     {/* Bottom row: WeatherIcon + info + switch */}
-    <View className="flex-row items-center justify-between">
-      <View className="bg-gray-300 rounded-full px-4 py-2">
+    <View className="flex-row items-center justify-between gap-6 my-10">
+      <View className="flex-row">
+
+      <View className="flex-row gap-5">
+        <View className="bg-gray-300 rounded-full px-4 py-2">
         <Text className="text-lg font-bold">{props.temp}°C</Text>
       </View>
 
       <WeatherIcon weather={props.weather} size={50} />
+      </View>
+      
 
       <View className="px-2">
         <Text className="text-lg font-bold">{props.sport}</Text>
         <Text className="text-sm text-gray-500">{props.hour}</Text>
+      </View>
       </View>
 
       <Switch
