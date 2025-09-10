@@ -1,6 +1,8 @@
 import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Pressable, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 type Day = typeof DAYS[number];
@@ -24,17 +26,30 @@ export default function Registration() {
   const toggleDay = (d: Day) =>
     setForm((f) => ({ ...f, days: { ...f.days, [d]: !f.days[d] } }));
 
-  const save = () => {
-    if (!form.name.trim()) {
-      Alert.alert("Attention", "Please enter your name.");
-      return;
-    }
-    const selectedDays = DAYS.filter(d => form.days[d]).join(", ") || "none";
-    Alert.alert(
-      "Saved ✅",
-      `Name: ${form.name}\nSport: ${SPORT_LABEL[form.sport]}\nDays: ${selectedDays}`
-    );
-  };
+
+const save = () => {
+  if (!form.name.trim()) {
+    Alert.alert("Attention", "Please enter your name.");
+    return;
+  }
+  const selectedDays = DAYS.filter(d => form.days[d]).join(", ") || "none";
+
+  Alert.alert(
+    "Saved ✅",
+    `Name: ${form.name}\nSport: ${SPORT_LABEL[form.sport]}\nDays: ${selectedDays}`,
+    [
+      { text: "Edit", style: "cancel" },
+      {
+        text: "Continue",
+        onPress: () =>
+          router.replace({
+            pathname: "/routine",
+            params: { name: form.name, sport: form.sport, days: selectedDays },
+          }),
+      },
+    ]
+  );
+};
 
   return (
     <ScrollView className="flex-1 bg-[#d9f99d] px-5">
