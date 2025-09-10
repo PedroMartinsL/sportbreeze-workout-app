@@ -9,6 +9,7 @@ export default function About() {
     <ScrollView className="flex-1 bg-[#d9f99d] px-6">
 
       {/* Header */}
+      
       <View className="h-5" />
       <Text className="text-3xl font-extrabold text-[#0a0a0a]">Sportsbrezze</Text>
       <Text className="text-[#475569] mt-0.5">How it works</Text>

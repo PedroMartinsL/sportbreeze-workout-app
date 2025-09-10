@@ -1,10 +1,22 @@
 import { Link } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
   return (
     <View className="flex-1 items-center justify-center bg-[#d9f99d] px-6">
-      <Text className="text-[#0a0a0a] text-3xl font-extrabold">Sportsbrezze</Text>
+
+      <View className="flex-row items-center">  // Logo e nome do app 
+        <View className="h-15 w-15 rounded-xl bg-white border border-[#c5e1a5] items-center justify-center mr-2"> 
+          <Image
+            source={require("../assets/images/Sportsbrezze-logo-1.png")}
+            style={{ width: 40, height: 40 }}
+            resizeMode="contain"
+          />
+        </View>
+        <Text className="text-[#0a0a0a] text-3xl font-extrabold">Sportsbrezze</Text>
+      </View>
+
+
       <Text className="text-[#475569] text-center mt-2">
         AI-powered training routine based on the next 7 days of local weather.
       </Text>
