@@ -42,10 +42,10 @@ export default function TaskCard(props: TaskCardProps) {
 
   return (
     <LinearGradient
-      colors={warn ? ['#564770', '#FFFFFF'] : ['#FFFFFF', '#FFFFFF']} // vermelho intenso para amarelo
+      colors={warn ? ['#bcc3cd', '#FFFFFF'] : ['#FFFFFF', '#FFFFFF']} // vermelho intenso para amarelo
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      className="p-6 mb-4 w-full max-w-md mt-4 shadow-lg"
+      className="p-6 mb-2 w-full max-w-md mt-2 shadow-lg"
       style={styles.componentCard}
     >
       {/* Top row: date/hour + warn */}
@@ -71,13 +71,13 @@ export default function TaskCard(props: TaskCardProps) {
       </View>
 
       {/* Divider */}
-      <View className="border-b border-gray-200 mb-5" />
+      <View className="border-b border-gray-400 mb-5" />
 
       {/* Bottom row: WeatherIcon + info + switch */}
       <View className="flex-row items-center justify-between gap-6 my-10">
         <View className="flex-row">
           <View className="flex-row gap-5">
-            <View className="bg-gray-300 rounded-full px-4 py-2">
+            <View className="bg-gray-300 rounded-full px-4 py-2 justify-center">
               <Text className="text-lg font-bold">{props.temp}°C</Text>
             </View>
 

@@ -10,7 +10,10 @@ type AlertModalProps = {
 export default function AlertModal({ visible, onClose, title, message }: AlertModalProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
-      <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+      <View
+          className="flex-1 justify-center items-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }} // fundo semi-transparente
+        >
         <View className="bg-white p-6 rounded-lg w-80">
           <Text className="text-lg font-bold mb-4">{title}</Text>
           <Text className="mb-6">{message}</Text>

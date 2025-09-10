@@ -1,5 +1,5 @@
 // components/DayCard.tsx
-import { View, Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Link } from "expo-router";
 
 type DayCardProps = {
@@ -8,15 +8,19 @@ type DayCardProps = {
 
 export default function DayCard({ day }: DayCardProps) {
   return (
+    
+  <View className="w-60 rounded-full overflow-hidden mb-2">
     <Link
-      href={{ pathname: "/week/[day]", params: { day } }}
-      asChild
+  href={{ pathname: "/week/[day]", params: { day } }}
+  asChild
+>
+    <Pressable
+      android_ripple={{ color: "black" }}
+      className="w-full p-4 bg-gray-200 items-center justify-center"
     >
-      <Pressable android_ripple={{ color: "lightgray" }}>
-        <View className="w-60 rounded-full p-4 mb-2 bg-gray-200 items-center justify-center">
-          <Text className="text-lg font-bold">{day}</Text>
-        </View>
-      </Pressable>
+      <Text className="text-lg font-bold">{day}</Text>
+    </Pressable>
     </Link>
+  </View>
   );
 }

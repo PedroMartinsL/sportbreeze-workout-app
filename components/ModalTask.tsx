@@ -17,23 +17,29 @@ export default function ModalTask({
   return (
     <Modal
       animationType="slide"
-      transparent={true}
       visible={modalVisible}
+      transparent
       onRequestClose={() => setModalVisible(false)}
     >
-      {/* Fundo semitransparente */}
-      <ScrollView>
-        <View className="flex-1 bg-opacity-50">
-          <View className="bg-white w-full h-full rounded-t-xl p-6 shadow-lg">
+      {/* Conteúdo do modal */}
+      <View className="flex-1 justify-end ">
+        <View className="w-full h-4/5 rounded-t-xl p-6 shadow-lg bg-white">
             {/* Botão de fechar no canto */}
-            <View className="flex-row justify-end">
+            <View className="flex-row justify-between">
+
+              {/* Atualizar */}
+                  <Pressable className="items-center">
+                    <MaterialIcons name="edit" size={28} color="black" />
+                  </Pressable>
+
               <Pressable onPress={() => setModalVisible(false)}>
                 <MaterialIcons name="cancel" size={28} color="black" />
               </Pressable>
             </View>
-
+            <ScrollView>
             {/* Conteúdo centralizado */}
             <View className="mt-10 gap-10">
+              
               <View className="flex-row justify-around w-full items-end">
                 <Text className="text-6xl font-bold text-gray-800">
                   {task.sport}
@@ -49,10 +55,9 @@ export default function ModalTask({
               </View>
 
               <View className="flex-row justify-around">
-                <View>
-                  <Text className="text-lg font-medium">Planner:</Text>
-                  <Text className="text-lg font-light w-40">
-                    {task.planner}
+                <View className="w-20 h-20 bg-white rounded-full shadow-lg items-center justify-center">
+                  <Text className="text-xl font-semibold text-gray-800">
+                    {task.temp}°C
                   </Text>
                 </View>
 
@@ -61,10 +66,14 @@ export default function ModalTask({
 
               <View className="flex-row justify-between w-full px-2">
                 <View className="w-full">
-                  <DetachedData>Duration:</DetachedData>
+                  <View className="bg-blue-500 rounded-full px-2 py-1">
+                    <Text className="text-white font-bold">
+                      Planner:
+                    </Text>
+                  </View>
 
                   <Text className="text-lg font-light ml-5 mt-5">
-                    {task.duration} min
+                    {task.planner}
                   </Text>
                 </View>
                 <View></View>
@@ -84,31 +93,19 @@ export default function ModalTask({
 
                   {/* Coluna 2 */}
                   <View className="flex-1 ml-2">
-                    <DetachedData>Temperature:</DetachedData>
+                    <DetachedData>Duration:</DetachedData>
                     <Text className="text-lg font-light ml-5 mt-5">
-                      {task.temp}°C
+                      {task.duration}
                     </Text>
                   </View>
                 </View>
 
                 <View className="border-b border-gray-200" />
-
-                <View className="flex-row justify-between w-full px-4 mt-4">
-                  {/* Atualizar */}
-                  <Pressable className="items-center">
-                    <MaterialIcons name="edit" size={28} color="black" />
-                  </Pressable>
-
-                  {/* Deletar */}
-                  <Pressable className="items-center">
-                    <MaterialIcons name="delete" size={28} color="black" />
-                  </Pressable>
-                </View>
               </View>
             </View>
+      </ScrollView>
           </View>
         </View>
-      </ScrollView>
     </Modal>
   );
 }

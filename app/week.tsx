@@ -12,7 +12,7 @@ export default function Week() {
         "Sunday",
     ]
     return (
-        <View className="flex-1 items-center justify-center bg-gray-150">
+        <View className="flex-1 items-center justify-center bg-gray-150 mt-5">
             <View className="w-100 h-50 items-center justify-center bg-white border-1 border-black p-10 rounded-2xl">
             <Text className="text-2xl font-bold">Routine</Text>
             <Text className="text-base text-gray-500">What was planned for you</Text>
