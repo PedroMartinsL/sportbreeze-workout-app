@@ -47,8 +47,23 @@ export function WeatherIcon({ weather, size }: WeatherIconProps) {
             default:
                 return (
                     <View>
-                        <AntDesign name="questioncircleo" size={size} color="black" />
+                        <FontAwesome5 name="question-circle" size={24} color="black" />
                     </View>
                 )
             }
     }
+
+type ToolsIconsProps = {
+    tool: string;
+};
+
+export function ToolsIcons({ tool }: ToolsIconsProps) {
+    switch (tool) {
+        case "create":
+            return (
+                <AntDesign name="plus" size={40} color="black" />
+            )
+        default:
+            return null;
+    }
+}

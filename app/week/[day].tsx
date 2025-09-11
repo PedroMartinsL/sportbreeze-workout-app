@@ -1,10 +1,12 @@
 import { View, FlatList, Pressable } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import TaskCard, { TaskCardProps } from "@/components/TaskCard";
 import { useState } from "react";
 import ModalTask from "@/components/ModalTask";
+import { ToolsIcons } from "@/components/WeatherIcon";
 
 export default function DayScreen() {
+  const router = useRouter();
   const { day } = useLocalSearchParams(); // "Monday", "Tuesday", etc.
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<TaskCardProps | null>(null);
@@ -15,32 +17,35 @@ export default function DayScreen() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-gray ">
-      <FlatList data={require("@/data/tasks.json")} renderItem={({ item }) => 
-      
+    <View className="flex-1 bg-gray">
+  <FlatList
+    data={require("@/data/tasks.json")}
+    renderItem={({ item }) => (
       <Pressable
         onPress={() => populateModal(item)}
         android_ripple={{ color: 'gray' }}
       >
-        <TaskCard
-        id={item.id}
-        day={item.day}
-        weather={item.weather}
-        kcal={item.kcal}
-        routine={item.routine}
-        temp={item.temp}
-        duration={item.duration}
-        planner={item.planner}
-        hour={item.hour}
-        date={item.date}
-        sport={item.sport}
-      />
+        <TaskCard {...item} />
       </Pressable>
-      }>
-      </FlatList>
-      {modalData && (
-        <ModalTask task={modalData} modalVisible={modalVisible} setModalVisible={setModalVisible} />
-      )}
-    </View>
+    )}
+  />
+
+  {/* Botão flutuante */}
+  <Pressable
+    onPress={() => router.push('./create')}
+    className="absolute bottom-20 right-10 bg-slate-50 rounded-full border border-gray-200 p-3"
+  >
+    <ToolsIcons tool="create" />
+  </Pressable>
+
+  {modalData && (
+    <ModalTask
+      task={modalData}
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
+    />
+  )}
+</View>
+
   );
 }
