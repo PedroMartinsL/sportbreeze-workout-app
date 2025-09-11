@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
 import "../global.css";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider  } from "react-native-safe-area-context";
 
 export default function Layout() {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider >
       <Stack />
-    </SafeAreaProvider>
+    </SafeAreaProvider >
 );
 }
     

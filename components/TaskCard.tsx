@@ -52,7 +52,6 @@ export default function TaskCard(props: TaskCardProps) {
       <View className="flex-row justify-between items-center mb-3">
         <View className="flex-row gap-3">
           <DetachedData>{props.date}</DetachedData>
-          <DetachedData>{props.hour}</DetachedData>
         </View>
         {warn && (
           <View className="bg-red-600 rounded-2xl py-1 px-3">
