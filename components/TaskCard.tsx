@@ -90,7 +90,7 @@ export default function TaskCard(props: TaskCardProps) {
         </View>
 
         <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          trackColor={{ false: "#767577", true: "#2B526D" }}
           thumbColor={isEnabled ? "#81C5C5" : "#f4f3f4"}
           ios_backgroundColor="#3e3e3e"
           onValueChange={toggleSwitch}
