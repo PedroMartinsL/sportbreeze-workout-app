@@ -1,50 +1,163 @@
-# Welcome to your Expo app 👋
+# Sportsbreeze App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+O **Sportsbreeze** é um aplicativo mobile inteligente desenvolvido em **React Native (Expo)** que auxilia usuários a organizarem suas rotinas esportivas de forma prática e eficiente.  
+O app combina **seleção personalizada de esportes**, **gestão de tempo disponível** e **planejamento inteligente via IA**, proporcionando uma experiência única para quem busca equilibrar saúde, bem-estar e desempenho.  
 
-## Get started
 
-1. Install dependencies
+## ✨ Funcionalidades
 
-   ```bash
-   npm install
-   ```
+- ✅ Seleção de **múltiplos esportes** com ícones ilustrativos (Lucide Icons)  
+- ✅ Definição de **horas semanais** disponíveis para treino  
+- ✅ **Planejamento automatizado**: a IA divide as atividades proporcionalmente  
+- ✅ Interface **intuitiva, minimalista e responsiva**  
+- ✅ Compatível com diferentes perfis e níveis de experiência esportiva  
+- ✅ Possibilidade de expansão futura para monitoramento de progresso e notificações inteligentes  
 
-2. Start the app
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+## 🚀 Tecnologias Utilizadas
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [React Native](https://reactnative.dev/) – Base do desenvolvimento mobile  
+- [Expo](https://expo.dev/) – Ambiente de desenvolvimento ágil  
+- [Lucide Icons](https://lucide.dev/) – Ícones modernos e leves  
+- [Expo Router](https://expo.github.io/router/docs) – Navegação simplificada e organizada  
+- [TypeScript (opcional)](https://www.typescriptlang.org/) – Tipagem estática para maior robustez  
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## 📦 Instalação
 
-When you're ready, run:
+1. Clone o repositório:
 
+```bash
+git clone https://github.com/seu-usuario/sportsbreeze.git
+cd sportsbreeze
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+# ou
+yarn install
+```
+
+3. Execute o projeto:
+
+```bash
+npx expo start
+```
+
+4. Escaneie o QR Code com o aplicativo **Expo Go** no seu celular para visualizar o app em tempo real.
+
+
+## 📲 Uso
+
+1. **Selecione os esportes** que deseja praticar durante a semana.  
+2. **Informe as horas semanais** que possui disponíveis para treinos.  
+3. **Deixe a IA organizar** sua agenda de atividades de forma proporcional.  
+4. **Acompanhe sua rotina** através da interface do app e mantenha sua disciplina esportiva.  
+
+
+## 📂 Estrutura do Projeto
+
+```
+sportsbreeze/
+│── app/               # Rotas e telas principais
+│── assets/            # Imagens, ícones e fontes
+│── components/        # Componentes reutilizáveis
+│── hooks/             # Hooks customizados
+│── utils/             # Funções auxiliares
+│── package.json
+│── README.md
+```
+
+
+
+## 📈 Roadmap
+
+-  Seleção de múltiplos esportes  
+-  Definição de horas semanais  
+-  Planejamento automático com IA  
+-  Implementar histórico de treinos  
+-  Notificações push de lembrete  
+-  Integração com wearables (ex.: smartwatch, pulseiras fitness)  
+-  Painel de estatísticas de desempenho  
+
+
+## 📊 Diagrama de Casos de Uso
+
+O diagrama abaixo representa os principais casos de uso do **Sportsbreeze**.  
+
+<img width="1365" height="758" alt="image" src="https://github.com/user-attachments/assets/b91f49ea-fd82-4406-a6e9-d190123a2d22" />
+
+
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas!  
+Para colaborar:  
+
+1. Faça um **fork** do projeto  
+2. Crie uma **branch** com sua feature (`git checkout -b feature/nova-feature`)  
+3. Realize os **commits** necessários (`git commit -m 'Adiciona nova feature'`)  
+4. **Push** para a branch (`git push origin feature/nova-feature`)  
+5. Abra um **Pull Request**  
+
+
+## 👨‍💻 Desenvolvedores
+
+O **Sportsbreeze** foi desenvolvido com dedicação e profissionalismo pelos Estudantes de Engenharia de Software:  
+
+- [Pedro Martins de Lemos](https://github.com/PedroMartinsL)
+- [Gabriel Lopes de Albuquerque](https://github.com/gabriellopes-eng)
+
+
+## 📚 Guia Rápido Expo
+
+Bem-vindo ao seu app Expo 👋  
+Este é um projeto criado com **create-expo-app**.  
+
+### 🔹 Início rápido
+
+#### Instalar dependências
+```bash
+npm install
+```
+
+#### Rodar o app
+```bash
+npx expo start
+```
+
+No output, você encontrará opções para abrir o app em:  
+- **Development build**  
+- **Android emulator**  
+- **iOS simulator**  
+- **Expo Go**, um sandbox limitado para testes rápidos  
+
+Você pode começar a desenvolver editando os arquivos dentro do diretório `app`.  
+Este projeto utiliza **file-based routing** para navegação.  
+
+
+### 🔹 Novo projeto limpo
+Quando estiver pronto para reiniciar:  
 ```bash
 npm run reset-project
 ```
+Esse comando moverá o código inicial para o diretório `app-example` e criará um `app` vazio.  
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
+### 🔹 Aprenda mais
+- 📘 [Documentação Expo](https://docs.expo.dev/)  
+- 🎓 [Tutorial Expo](https://docs.expo.dev/tutorial/introduction/)  
+- 💬 [Comunidade no Discord](https://chat.expo.dev/)  
+- 🛠 [Expo no GitHub](https://github.com/expo/expo)  
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+⚡ **Sportsbreeze** – Traga leveza, disciplina e inteligência para sua rotina esportiva!
 
-## Join the community
 
-Join our community of developers creating universal apps.
+## 📜 Licença
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Este projeto está sob a licença **MIT**.  
+Veja o arquivo [LICENSE](LICENSE) para mais detalhes.  
