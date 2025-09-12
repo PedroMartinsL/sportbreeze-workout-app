@@ -4,7 +4,7 @@ import { WeatherIcon } from "./WeatherIcon";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 interface TaskProps {
-  task: TaskCardProps;
+  task?: TaskCardProps;
   modalVisible: boolean;
   setModalVisible: Function;
 }
@@ -14,6 +14,7 @@ export default function ModalTask({
   modalVisible,
   setModalVisible,
 }: TaskProps) {
+  if (!task) return null;
   return (
     <Modal
       animationType="slide"
