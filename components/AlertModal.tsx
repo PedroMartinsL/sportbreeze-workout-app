@@ -21,7 +21,7 @@ export default function AlertModal({ visible, onClose, title, message }: AlertMo
             onPress={onClose}
             className="bg-blue-500 px-4 py-2 rounded"
           >
-            <Text className="text-white font-bold text-center">Fechar</Text>
+            <Text className="text-white font-bold text-center">Close</Text>
           </Pressable>
         </View>
       </View>

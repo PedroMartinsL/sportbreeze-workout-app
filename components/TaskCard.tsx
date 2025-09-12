@@ -62,8 +62,8 @@ export default function TaskCard(props: TaskCardProps) {
             <AlertModal
               visible={warnModalVisible}
               onClose={() => setWarnModalVisible(false)}
-              title="Aviso"
-              message="As condições de clima indicam um grau de risco, evite atividades nesse período!"
+              title="Warn"
+              message="The weather conditions present a certain risk, avoid such activities during this time."
             />
           </View>
         )}

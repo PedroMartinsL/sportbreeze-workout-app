@@ -1,7 +1,6 @@
 [
   {
     "id": 0,
-    "day": 0,
     "weather": "sunny",
     "kcal": 500,
     "routine": "Cardio and stretching",
@@ -14,7 +13,6 @@
   },
   {
     "id": 1,
-    "day": 1,
     "weather": "rainy",
     "kcal": 400,
     "routine": "Upper body strength",

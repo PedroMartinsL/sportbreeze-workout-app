@@ -1,5 +1,5 @@
 import { View, FlatList, Pressable, Text, Modal } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import TaskCard, { TaskCardProps } from "@/components/TaskCard";
 import { useState } from "react";
 import { ToolsIcons } from "@/components/WeatherIcon";
@@ -7,6 +7,17 @@ import ModalTask from "@/components/ModalTask";
 
 export default function DayScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ taskList: string }>();
+  let taskList: TaskCardProps[] = [];
+
+  if (params.taskList) {
+    try {
+      taskList = JSON.parse(params.taskList);
+    } catch (e) {
+      console.error("Falha ao parsear tasks:", e);
+      taskList = [];
+    }
+  }
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<TaskCardProps>();
@@ -14,9 +25,7 @@ export default function DayScreen() {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [deleteData, setDeleteData] = useState<TaskCardProps>();
 
-  const [tasks, setTasks] = useState<TaskCardProps[]>(
-    require("@/data/tasks.json")
-  );
+  const [tasks, setTasks] = useState<TaskCardProps[]>(taskList);
 
   function populateModal(taskData: TaskCardProps) {
     setModalVisible(true);
