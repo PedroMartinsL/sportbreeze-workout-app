@@ -1,9 +1,21 @@
 import DayCard from "@/components/DayCard";
 import { TaskCardProps } from "@/components/TaskCard";
-import { useState } from "react";
+import { useNavigation } from "expo-router";
+import { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
 
 export default function Week() {
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({
+          title: "Weekly plans",
+          headerStyle: { backgroundColor: "#f0f0f0" },
+          headerTintColor: "#333",
+          headerTitleAlign: "center"
+        });
+      }, []);
 
     const [tasks, setTasks] = useState<TaskCardProps[]>(
         require("@/data/tasks.json")

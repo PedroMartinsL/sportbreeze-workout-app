@@ -1,5 +1,5 @@
 import { DetachedData } from "@/components/TaskCard";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,9 +11,22 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 
 export default function CreateTask() {
+
+  const navigation = useNavigation();
+  
+    useEffect(() => {
+      navigation.setOptions({
+        title: "Schedule",
+        headerStyle: { backgroundColor: "#f0f0f0" },
+        headerTintColor: "#333",
+        headerTitleAlign: "center"
+      });
+    }, []);
+
+  
   const router = useRouter();
   const [kcalValue, setValue] = useState<string>("0");
   const [selectedSport, setSelectedSport] = useState<string>("");
@@ -132,11 +145,6 @@ export default function CreateTask() {
               ))}
             </Picker>
           </View>
-          {selectedSport !== "" && (
-            <Text className="mt-2 text-gray-600">
-              Selected: {selectedSport}
-            </Text>
-          )}
 
           <View className="border-b border-gray-200 mb-4" />
           <View className="flex-row justify-center gap-5 pb-20">

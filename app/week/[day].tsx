@@ -1,11 +1,23 @@
 import { View, FlatList, Pressable, Text, Modal } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import TaskCard, { TaskCardProps } from "@/components/TaskCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToolsIcons } from "@/components/WeatherIcon";
 import ModalTask from "@/components/ModalTask";
 
+
 export default function DayScreen() {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Daily tasks",
+      headerStyle: { backgroundColor: "#f0f0f0" },
+      headerTintColor: "#333",
+      headerTitleAlign: "center"
+    });
+  }, []);
+  
   const router = useRouter();
   const params = useLocalSearchParams<{ taskList: string }>();
   let taskList: TaskCardProps[] = [];
