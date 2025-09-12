@@ -1,27 +1,25 @@
 [
   {
     "id": 0,
-    "day": 0,
     "weather": "sunny",
     "kcal": 500,
     "routine": "Cardio and stretching",
     "temp": 25,
     "duration": 60,
     "planner": "Morning run and yoga",
-    "hora": "07:00",
+    "hour": "07:00",
     "date": "2025-09-01",
     "sport": "RUNNING"
   },
   {
     "id": 1,
-    "day": 1,
     "weather": "rainy",
     "kcal": 400,
     "routine": "Upper body strength",
     "temp": 20,
     "duration": 50,
     "planner": "Dumbbells and push-ups",
-    "hora": "18:00",
+    "hour": "18:00",
     "date": "2025-09-02",
     "sport": "GYM"
   },
@@ -34,7 +32,7 @@
     "temp": -2,
     "duration": 45,
     "planner": "Planks, crunches, and bridges",
-    "hora": "08:30",
+    "hour": "08:30",
     "date": "2025-09-03",
     "sport": "HIKING"
   },
@@ -47,7 +45,7 @@
     "temp": 15,
     "duration": 70,
     "planner": "Squats, lunges, and cycling",
-    "hora": "17:00",
+    "hour": "17:00",
     "date": "2025-09-04",
     "sport": "CYCLING"
   },
@@ -60,7 +58,7 @@
     "temp": 18,
     "duration": 55,
     "planner": "Burpees, jumping jacks, mountain climbers",
-    "hora": "06:30",
+    "hour": "06:30",
     "date": "2025-09-05",
     "sport": "GYM"
   },
@@ -73,7 +71,7 @@
     "temp": 22,
     "duration": 40,
     "planner": "Stretching and meditation",
-    "hora": "19:00",
+    "hour": "19:00",
     "date": "2025-09-06",
     "sport": "SWIMMING"
   },
@@ -86,7 +84,7 @@
     "temp": 26,
     "duration": 60,
     "planner": "Trail running and light cardio",
-    "hora": "07:30",
+    "hour": "07:30",
     "date": "2025-09-07",
     "sport": "RUNNING"
   }

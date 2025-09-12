@@ -9,45 +9,61 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 type WeatherIconProps = {
   weather: string;
+  size: number;
 };
 
-export function WeatherIcon({ weather }: WeatherIconProps) {
+export function WeatherIcon({ weather, size }: WeatherIconProps) {
         switch (weather) {
             case "sunny":
                 return (
                     <View>
-                        <MaterialIcons name="sunny" size={24} color="black" />
+                        <MaterialIcons name="sunny" size={size} color="black" />
                     </View>
                 )
             case "rainy":
                 return (
                     <View>
-                        <Ionicons name="rainy-outline" size={24} color="black" />
+                        <Ionicons name="rainy-outline" size={size} color="black" />
                     </View>
                 )
             case "thundering":
                 return (
                     <View>
-                        <Entypo name="thunder-cloud" size={24} color="black" />
+                        <Entypo name="thunder-cloud" size={size} color="black" />
                     </View>
                 )
             case "cloudy":
                 return (
                     <View>
-                        <Fontisto name="cloudy" size={24} color="black" />
+                        <Fontisto name="cloudy" size={size} color="black" />
                     </View>
                 )
             case "frosty":
                 return (
                     <View>
-                        <FontAwesome5 name="snowflake" size={24} color="black" />
+                        <FontAwesome5 name="snowflake" size={size} color="black" />
                     </View>
                 )
             default:
                 return (
                     <View>
-                        <AntDesign name="questioncircleo" size={24} color="black" />
+                        <FontAwesome5 name="question-circle" size={24} color="black" />
                     </View>
                 )
             }
     }
+
+type ToolsIconsProps = {
+    tool: string;
+};
+
+export function ToolsIcons({ tool }: ToolsIconsProps) {
+    switch (tool) {
+        case "create":
+            return (
+                <AntDesign name="plus" size={40} color="black" />
+            )
+        default:
+            return null;
+    }
+}
