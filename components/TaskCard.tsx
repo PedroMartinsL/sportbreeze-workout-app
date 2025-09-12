@@ -40,6 +40,15 @@ export default function TaskCard(props: TaskCardProps) {
 
   const warn = warn_days.includes(props.weather);
 
+  // Changing Date format to American
+  const dateObj = new Date(props.date);
+
+  const formattedDate: string = dateObj.toLocaleDateString("en-US", {
+    month: "long",   // April
+    day: "numeric",  // 12
+    year: "numeric", // 2025
+  });
+
   return (
     <LinearGradient
       colors={warn ? ['#bcc3cd', '#FFFFFF'] : ['#FFFFFF', '#FFFFFF']} // vermelho intenso para amarelo
@@ -51,7 +60,7 @@ export default function TaskCard(props: TaskCardProps) {
       {/* Top row: date/hour + warn */}
       <View className="flex-row justify-between items-center mb-3">
         <View className="flex-row gap-3">
-          <DetachedData>{props.date}</DetachedData>
+          <DetachedData>{formattedDate}</DetachedData>
         </View>
         {warn && (
           <View className="bg-red-600 rounded-2xl py-1 px-3">
