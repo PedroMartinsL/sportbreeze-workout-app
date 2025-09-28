@@ -26,3 +26,7 @@ android
 
 expo-env.d.ts
 # @end expo-cli
+
+
+#Python
+venv/
