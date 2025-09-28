@@ -5,7 +5,6 @@ import {
   Text,
   TextInput,
   Pressable,
-  Button,
   Platform,
   ScrollView,
 } from "react-native";
@@ -24,7 +23,7 @@ export default function CreateTask() {
         headerTintColor: "#333",
         headerTitleAlign: "center"
       });
-    }, []);
+    }, [navigation]);
 
   
   const router = useRouter();
