@@ -21,7 +21,7 @@ class User(Base):
     username = Column("username", String)
     email = Column("email", String, nullable=False)
     password = Column("password", String, nullable=False)
-    active = Column("password", Boolean, default=True)
+    active = Column("active", Boolean, default=True)
 
     def __init__(self, username, email, password, active=True):
         self.username = username
@@ -35,7 +35,7 @@ class RoutinePlain(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("Users.id"), nullable=False)
 
     # Relacionamento opcional com tarefas
     tasks = relationship("Task", back_populates="routine_plain")
