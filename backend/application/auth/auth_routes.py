@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from dependencies import get_session, verify_token
-from domain.entities.models import User
+from domain.entities.user import User
 from main import bcrypt_context, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY
 from schemas import LoginSchema, UserSchema
 from sqlalchemy.orm import Session
@@ -20,8 +20,6 @@ def create_token(user_id, token_duration=timedelta(minutes=ACCESS_TOKEN_EXPIRE_M
     }
     encoded_jwt = jwt.encode(dic_info, SECRET_KEY, ALGORITHM)
     return encoded_jwt
-
-
 
 @auth_router.get("/")
 async def home():

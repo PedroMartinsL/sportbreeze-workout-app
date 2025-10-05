@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException
-from domain.entities.models import User, db
+from domain.entities.user import User
+from infrastructure.database.connection import db
 from sqlalchemy.orm import sessionmaker, Session 
 from jose import jwt, JWTError
 
