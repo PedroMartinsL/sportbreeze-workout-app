@@ -14,6 +14,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # access to the values within the .ini file in use.
 config = context.config
 
+from infrastructure.database.connection import DATABASE_URL
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -21,7 +24,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from domain.entities.models import Base
+from domain.entities import Base
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 

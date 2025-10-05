@@ -3,7 +3,7 @@ from infrastructure.database.connection import Base
 from sqlalchemy.orm import relationship
 
 class Routine(Base):
-    __tablename__ = "routine"
+    __tablename__ = "Routines"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)

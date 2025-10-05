@@ -1,14 +1,13 @@
-from enum import Enum
-from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Time
+from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Time, Enum
 from domain.entities.enums.sports import SportEnum
 from infrastructure.database.connection import Base
 from sqlalchemy.orm import relationship
 
 class Workout(Base):
-    __tablename__ = "workout"
+    __tablename__ = "Workouts"
 
     id = Column(Integer, primary_key=True, index=True)
-    routine_id = Column(Integer, ForeignKey("routine.id"), nullable=False)
+    routine_id = Column(Integer, ForeignKey("Routines.id"), nullable=False)
     weather = Column(String, nullable=True)
     kcal = Column(Integer, nullable=True)
     title = Column(String, nullable=True)
