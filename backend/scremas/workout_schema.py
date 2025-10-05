@@ -19,4 +19,4 @@ class WorkoutResponse(WorkoutBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_atributes = True

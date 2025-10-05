@@ -15,5 +15,5 @@ class RoutineRepository:
         self.db.refresh(routine)
         return routine
 
-    def find_by_id(self, routine_id: int) -> Routine | None:
-        return self.db.query(Routine).filter(Routine.id == routine_id).first()
+    def find_by_user(self, user_id: int) -> Routine | None:
+        return self.db.query(Routine).filter(Routine.user_id == user_id)

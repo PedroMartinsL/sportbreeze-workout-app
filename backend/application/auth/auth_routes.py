@@ -40,11 +40,17 @@ async def create_account(user_schema: UserSchema, session: Session = Depends(get
     if user:
         raise HTTPException(status_code=400, detail="E-mail already registered")
     else:
-        crypt_password = bcrypt_context.hash(user_schema.password)
-        new_user = User(user_schema.username, user_schema.email, crypt_password, user_schema.active, user_schema.admin)
-        session.add(new_user)
-        session.commit()
-        return {"message": f"user registered successfully {user_schema.email}"}
+        try:
+            # crypt_password = bcrypt_context.hash(user_schema.password)
+            new_user = User(user_schema.username, user_schema.email, user_schema.password, user_schema.active, user_schema.admin)
+            print("user: ", new_user)
+            session.add(new_user)
+            session.commit()
+            print("chegou")
+            return {"message": f"user registered successfully {user_schema.email}"}
+        except Exception as e:
+            print(e)
+        
     
 @auth_router.post("/login")
 async def login(login_schema: LoginSchema,session: Session = Depends(get_session)):

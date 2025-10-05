@@ -3,23 +3,23 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
-from application.use_cases.workout.get_all_workouts import GetAllWorkoutsUseCase
+from application.use_cases.workout.find_workouts_by_routine import FindWorkoutsByRoutineUseCase
 from dependencies import get_session
 from scremas.workout_schema import WorkoutCreate, WorkoutResponse
 
-router = APIRouter(prefix="/workouts", tags=["Workouts"])
+workout_router = APIRouter(prefix="/workouts", tags=["Workouts"])
 
 
-@router.post("/", response_model=WorkoutResponse)
-def create_workout(workout: WorkoutCreate, db: Session = Depends(get_session)):
+@workout_router.post("/", response_model=WorkoutResponse)
+def create_workout(workout: WorkoutCreate, use_case: CreateWorkoutUseCase = Depends()):
     try:
-        usecase = CreateWorkoutUseCase(db)
-        return usecase.execute(workout)
+        return use_case.execute(workout)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@router.get("/", response_model=List[WorkoutResponse])
-def list_workouts(db: Session = Depends(get_session)):
-    usecase = GetAllWorkoutsUseCase(db)
-    return usecase.execute()
+@workout_router.get("/{routine_id}", response_model=List[WorkoutResponse])
+def get_workouts_by_routine(routine_id: int, use_case: FindWorkoutsByRoutineUseCase = Depends()):
+    result = use_case.execute(routine_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="User workouts not founded")
+    return result

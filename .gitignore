@@ -37,4 +37,4 @@ __pycache__/
 *.py[cod]
 
 # Alembic migrations (versions)
-alembic/versions/
+alembic/

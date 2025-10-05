@@ -1,24 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
 from application.use_cases.routine.create_routine import CreateRoutineUseCase
-from application.use_cases.routine.get_routine_by_id import GetRoutineByIdUseCase
-from dependencies import get_session
-from domain.repositories.routine_repository import RoutineRepository
+from application.use_cases.routine.find_routines_by_user import FindRoutinesByUserUseCase
 from scremas.routine_schema import RoutineCreate, RoutineResponse
 
+routine_router = APIRouter(prefix="/routines", tags=["Routines"])
 
-router = APIRouter(prefix="/routines", tags=["Routines"])
+@routine_router.post("/", response_model=RoutineResponse)
+def create_routine(routine: RoutineCreate, use_case: CreateRoutineUseCase = Depends()):
+    return use_case.execute(routine)
 
-@router.post("/", response_model=RoutineResponse)
-def create_routine(routine: RoutineCreate):
-    usecase = CreateRoutineUseCase(RoutineRepository())
-    return usecase.execute(routine)
-
-@router.get("/{routine_id}", response_model=RoutineResponse)
-def get_routine_by_id(routine_id: int):
-    usecase = GetRoutineByIdUseCase(RoutineRepository())
-    result = usecase.execute(routine_id)
+@routine_router.get("/{user_id}", response_model=RoutineResponse)
+def get_routine_by_user(user_id: int, use_case: FindRoutinesByUserUseCase = Depends()):
+    result = use_case.execute(user_id)
     if not result:
         raise HTTPException(status_code=404, detail="Routine not found")
     return result
