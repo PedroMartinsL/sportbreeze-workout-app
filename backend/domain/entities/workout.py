@@ -4,8 +4,8 @@ from domain.entities.enums.sports import SportEnum
 from infrastructure.database.connection import Base
 from sqlalchemy.orm import relationship
 
-class Task(Base):
-    __tablename__ = "task"
+class Workout(Base):
+    __tablename__ = "workout"
 
     id = Column(Integer, primary_key=True, index=True)
     routine_plain_id = Column(Integer, ForeignKey("routine_plain.id"), nullable=False)
@@ -20,4 +20,4 @@ class Task(Base):
     sport = Column(Enum(SportEnum), nullable=True)
 
     # Relacionamento com RoutinePlain
-    routine_plain = relationship("RoutinePlain", back_populates="tasks")
+    routine_plain = relationship("RoutinePlain", back_populates="workouts")

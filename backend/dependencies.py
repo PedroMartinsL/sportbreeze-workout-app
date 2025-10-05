@@ -14,6 +14,14 @@ def get_session():
     finally:
         session.close()
 
+# def get_db() -> Session:
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
+
+
 def verify_token(token: str = Depends(oauth2_schema), session: Session = Depends(get_session)):
     try:
         dic_info = jwt.decode(token, SECRET_KEY, ALGORITHM)

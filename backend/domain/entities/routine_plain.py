@@ -10,6 +10,6 @@ class RoutinePlan(Base):
     user_id = Column(Integer, ForeignKey("Users.id"), nullable=False)
 
     # Relacionamento opcional com tarefas
-    tasks = relationship("Task", back_populates="routine_plain")
+    workouts = relationship("Workout", back_populates="routine_plain")
 
 
