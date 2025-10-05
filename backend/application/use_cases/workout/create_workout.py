@@ -17,4 +17,4 @@ class CreateWorkoutUseCase:
     def execute(self, workout_data: WorkoutCreate):
         if workout_data.kcal <= 0:
             raise ValueError("Kcal deve ser maior que zero")
-        return self.repository.create(self.db, workout_data)
+        return self.repository.create(workout_data)

@@ -16,18 +16,3 @@ def build_gemini_payload(profile: dict, prompt_text: str) -> dict:
         ]
     }
     return payload
-
-# ======= Exemplo de uso =======
-profile = {
-    "esportes_praticados": ["natação", "corrida"],
-    "peso": 75,
-    "idade": 28,
-    "altura": 1.75,
-    "frequencia": "3x por semana",
-    "usa_drogas": False
-}
-
-prompt_text = "Gere uma rotina de treino amigável para humanos com base neste perfil:"
-
-payload_json = build_gemini_payload(profile, prompt_text)
-print(payload_json)
