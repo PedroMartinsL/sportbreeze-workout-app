@@ -8,7 +8,7 @@ class Workout(Base):
     __tablename__ = "workout"
 
     id = Column(Integer, primary_key=True, index=True)
-    routine_plain_id = Column(Integer, ForeignKey("routine_plain.id"), nullable=False)
+    routine_id = Column(Integer, ForeignKey("routine.id"), nullable=False)
     weather = Column(String, nullable=True)
     kcal = Column(Integer, nullable=True)
     title = Column(String, nullable=True)
@@ -19,5 +19,5 @@ class Workout(Base):
     date = Column(Date, nullable=True)
     sport = Column(Enum(SportEnum), nullable=True)
 
-    # Relacionamento com RoutinePlain
-    routine_plain = relationship("RoutinePlain", back_populates="workouts")
+    # Relacionamento com Routine
+    routine = relationship("Routine", back_populates="workouts")
