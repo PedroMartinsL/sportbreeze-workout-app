@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordRequestForm
 
 
-auth_router = APIRouter(prefix="auth", tags=["auth"])
+auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def create_token(user_id, token_duration=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
