@@ -1,10 +1,10 @@
 from fastapi import requests
 
+from core.settings import WEATHER_API
 
-def fetch_weather():
-    api_key = "887280a7615f89462a4840db38463efa"  # substitua pela sua chave
-    lat = -23.5505  # São Paulo
-    lon = -46.6333
+
+def fetch_weather(lat, lon):
+    api_key = WEATHER_API
 
     url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={api_key}"
 
