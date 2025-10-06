@@ -35,18 +35,15 @@ def authenticate_user(email, password, session):
 
 @auth_router.post("/sing_up")
 async def create_account(user_schema: UserSchema, session: Session = Depends(get_session)):
-    
     user = session.query(User).filter(User.email==user_schema.email).first()
     if user:
         raise HTTPException(status_code=400, detail="E-mail already registered")
     else:
         try:
-            # crypt_password = bcrypt_context.hash(user_schema.password)
-            new_user = User(user_schema.username, user_schema.email, user_schema.password, user_schema.active, user_schema.admin)
-            print("user: ", new_user)
+            crypt_password = bcrypt_context.hash(user_schema.password)
+            new_user = User(user_schema.username, user_schema.email, crypt_password, user_schema.active, user_schema.admin)
             session.add(new_user)
             session.commit()
-            print("chegou")
             return {"message": f"user registered successfully {user_schema.email}"}
         except Exception as e:
             print(e)
