@@ -1,5 +1,7 @@
 import { View, Text, FlatList, Dimensions, ScrollView, TouchableOpacity, Image } from "react-native";
 import React from "react";
+import { router } from "expo-router";
+
 
 const { width } = Dimensions.get("window");
 
@@ -18,7 +20,7 @@ export default function Home() {
     <View className="flex-1 bg-[#d9f99d] px-6 pt-10">
       {/* Usamos apenas um ScrollView para todo o conteúdo */}
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        
+
         {/* Header */}
         <View className="flex-row items-center justify-center mb-6 mt-4">
           <View className="h-12 w-12 rounded-xl bg-white border border-[#c5e1a5] items-center justify-center mr-3">
@@ -35,6 +37,24 @@ export default function Home() {
         <Text className="text-[#334155] text-center mb-8 px-4 text-base">
           AI-powered training routine based on the next 7 days of local weather. Get personalized recommendations for outdoor sports!
         </Text>
+
+        {/* Ações: Login / Registro */}
+        <View className="flex-row justify-center mb-8">
+          <TouchableOpacity
+            onPress={() => router.push("/login")}
+            className="bg-black px-6 py-3 rounded-xl mr-3"
+          >
+            <Text className="text-white font-bold text-base">Entrar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/register")}
+            className="bg-white px-6 py-3 rounded-xl border border-gray-300"
+          >
+            <Text className="text-black font-bold text-base">Criar conta</Text>
+          </TouchableOpacity>
+        </View>
+
 
         {/* Horizontal Sports Carousel */}
         <FlatList

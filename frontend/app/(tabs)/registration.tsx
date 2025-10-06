@@ -171,15 +171,13 @@ export default function Registration() {
             <Pressable
               key={String(value)}
               onPress={() => toggleSport(value as Sport)}
-              className={`flex-row items-center gap-2 px-3 py-2 rounded-xl border border-[#c5e1a5] ${
-                sel ? "bg-black" : "bg-white"
-              }`}
+              className={`flex-row items-center gap-2 px-3 py-2 rounded-xl border border-[#c5e1a5] ${sel ? "bg-black" : "bg-white"
+                }`}
             >
               <Icon size={16} color={sel ? "#fff" : "#0a0a0a"} />
               <Text
-                className={`font-semibold ${
-                  sel ? "text-white" : "text-[#0a0a0a]"
-                }`}
+                className={`font-semibold ${sel ? "text-white" : "text-[#0a0a0a]"
+                  }`}
               >
                 {label}
               </Text>
@@ -196,14 +194,12 @@ export default function Registration() {
             <Pressable
               key={d}
               onPress={() => toggleDay(d)}
-              className={`px-3 py-2 rounded-xl border border-[#c5e1a5] ${
-                sel ? "bg-black" : "bg-white"
-              }`}
+              className={`px-3 py-2 rounded-xl border border-[#c5e1a5] ${sel ? "bg-black" : "bg-white"
+                }`}
             >
               <Text
-                className={`font-semibold ${
-                  sel ? "text-white" : "text-[#0a0a0a]"
-                }`}
+                className={`font-semibold ${sel ? "text-white" : "text-[#0a0a0a]"
+                  }`}
               >
                 {d}
               </Text>

@@ -1,4 +1,3 @@
-// app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -10,8 +9,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: "black",
         tabBarInactiveTintColor: "#94a3b8",
         tabBarStyle: {
-            position: "absolute",
-            borderRadius: 30,
+          position: "absolute",
+          borderRadius: 30,
           backgroundColor: "#fff",
           height: 60,
           paddingBottom: 20,
