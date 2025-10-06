@@ -1,9 +1,11 @@
+import json
 from fastapi import Depends
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from domain.repositories.routine_repository import RoutineRepository
 from infrastructure.services.ai_api import call_gemini
 from infrastructure.services.weather_api import fetch_weather
 from scremas.routine_schema import RoutineCreate
+from scremas.workout_schema import WorkoutCreate
 
 
 class CreateRoutineUseCase:
@@ -11,7 +13,7 @@ class CreateRoutineUseCase:
                  repository: RoutineRepository = Depends()):
         self.repository = repository
 
-    def execute(self, data: RoutineCreate):
+    def execute(self, data: RoutineCreate, create_workout_use_case: CreateWorkoutUseCase):
         routine = self.repository.create(data.model_dump())
         # return RoutineResponse.model_validate(routine)
 
@@ -25,11 +27,18 @@ class CreateRoutineUseCase:
             "disponibilidade": "todos os finais de semana as 15h e 18h"
         }
 
-        weather_json = fetch_weather()
-        payload_json = call_gemini(profile, f"Generate a plain to workout based on these info for the next 7 days: weather {weather_json}")
+        gps = {
+            "lat": -23.5505,
+            "lon": -46.6333
+        }
 
-        for workout in payload_json:
+        # weather_json = fetch_weather(**gps)
+        # payload_json = call_gemini(profile, f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}")
+        payload_json = call_gemini(profile, f"Generate a plan")
+        workouts = json.loads(payload_json)
+
+        for workout in workouts:
             workout['routine_id'] = routine.id
-            use_case = CreateWorkoutUseCase()
-            use_case.execute(**workout)
+            workout_schema = WorkoutCreate(**workout)
+            create_workout_use_case.execute(workout_schema)
 

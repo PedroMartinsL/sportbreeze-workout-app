@@ -11,6 +11,7 @@ class WorkoutBase(BaseModel):
     hour: str
     date: str
     sport: str
+    routine_id: int
 
 class WorkoutCreate(WorkoutBase):
     pass

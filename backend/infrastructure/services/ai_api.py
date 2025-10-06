@@ -8,13 +8,16 @@ from core.settings import GEMINI_API_KEY
 client = genai.Client(api_key=GEMINI_API_KEY)
 # client = genai.Client(api_key="AIzaSyDrHLLjruJ3yEF-pvLSvnYTF-Y_FjNkWuU")
 
+
 def call_gemini(profile: dict, prompt_text: str):
     full_prompt = (
-        "Você é um agente de treino para pessoas que desejam treinar atividades físicas ao ar livre. "
-        "Organize rotinas de treino detalhadas de acordo com a previsão do tempo para os próximos 7 dias. Se puder, para atividades que não envolvam um estabelecimento escreva a rota e pontos turísticos para fazer a atividade em planner\n\n"
-        "Retorne a resposta em JSON com o formato:\n"
-        "Rules: weather can only be one from: SUNNY, RAINY, THUNDERING, CLOUDY, FROSTY\n"
-        "Rules: sports can only be one from: SWIMMING, RUNNING, CYCLING, TRAIL, WALKING, GYM, MARATHON\n"
+        "You are a fitness agent for people who want to exercise outdoors. "
+        "Organize detailed workout routines based on the weather forecast for the next 7 days. "
+        "If possible, for activities that do not involve a facility, include the route and points of interest in the planner.\n\n"
+        "Return the response in JSON with the following format:\n"
+        "Rules: weather can only be one of: SUNNY, RAINY, THUNDERING, CLOUDY, FROSTY\n"
+        "Rules: sports can only be one of: SWIMMING, RUNNING, CYCLING, TRAIL, WALKING, GYM, MARATHON\n"
+        "Return pure JSON only, without ```json or ```\n"
         "{\n"
         "  'weather': 'Weather condition at the time of the workout',\n"
         "  'kcal': 'Calories burned',\n"

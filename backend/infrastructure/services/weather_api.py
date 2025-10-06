@@ -3,7 +3,7 @@ from fastapi import requests
 from core.settings import WEATHER_API
 
 
-def fetch_weather(lat, lon):
+def fetch_weather(lat: float, lon: float):
     api_key = WEATHER_API
 
     url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={api_key}"
