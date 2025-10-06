@@ -4,7 +4,7 @@ from typing import Optional
 class WorkoutBase(BaseModel):
     weather: str
     kcal: float
-    routine: str
+    title: str
     temp: float
     duration: int
     planner: str

@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Time, Enum
-from domain.entities.enums.sports import SportEnum
 from infrastructure.database.connection import Base
 from sqlalchemy.orm import relationship
 
@@ -16,7 +15,7 @@ class Workout(Base):
     planner = Column(String, nullable=True)
     hour = Column(Time, nullable=True)
     date = Column(Date, nullable=True)
-    sport = Column(Enum(SportEnum), nullable=True)
+    sport = Column(String, nullable=True)
 
     # Relacionamento com Routine
     routine = relationship("Routine", back_populates="workouts")
