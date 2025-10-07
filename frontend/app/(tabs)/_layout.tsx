@@ -55,6 +55,15 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <FontAwesome name="info-circle" color={color} size={size} />,
         }}
       />
+
+      <Tabs.Screen
+        name="gps"
+        options={{
+          title: "GPS",
+          tabBarIcon: ({ color, size }) => <FontAwesome name="location-arrow" color={color} size={size} />,
+
+        }}
+      />
     </Tabs>
   );
 }
