@@ -1,7 +1,6 @@
 import { View, Text, FlatList, Dimensions, ScrollView, TouchableOpacity, Image } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { router } from "expo-router";
-import * as Location from "expo-location";
 
 const { width } = Dimensions.get("window");
 
@@ -16,35 +15,8 @@ const sports = [
 const cardColors = ["#dcfce7", "#bbf7d0", "#86efac"];
 
 export default function Home() {
-  // ⬇️ estado para guardar coordenadas
-  const [coords, setCoords] = useState<{ lat?: number; lon?: number }>({});
-
-  // ⬇️ função para solicitar permissão e pegar localização atual
-  async function handleGetGPS() {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.warn("Permissão de localização negada.");
-        return;
-      }
-
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.LocationAccuracy.Balanced,
-      });
-
-      const { latitude, longitude } = pos.coords;
-      setCoords({ lat: latitude, lon: longitude });
-
-      // imprime no console (o professor quer ver isso)
-      console.log("GPS → latitude:", latitude, "longitude:", longitude);
-    } catch (e) {
-      console.warn("Erro ao obter localização:", e);
-    }
-  }
-
   return (
     <View className="flex-1 bg-[#d9f99d] px-6 pt-10">
-      {/* Usamos apenas um ScrollView para todo o conteúdo */}
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {/* Header */}
         <View className="flex-row items-center justify-center mb-6 mt-4">
@@ -79,21 +51,6 @@ export default function Home() {
             <Text className="text-black font-bold text-base">Criar conta</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Botão de teste do GPS */}
-        <TouchableOpacity
-          onPress={handleGetGPS}
-          className="bg-black px-6 py-3 rounded-xl self-center mb-4"
-        >
-          <Text className="text-white font-bold text-base">Testar GPS</Text>
-        </TouchableOpacity>
-
-        {/* Exibir resultado (além do console) */}
-        {coords.lat && coords.lon ? (
-          <Text className="text-center text-[#0a0a0a] mb-4">
-            Lat: {coords.lat.toFixed(6)} | Lon: {coords.lon.toFixed(6)}
-          </Text>
-        ) : null}
 
         {/* Horizontal Sports Carousel */}
         <FlatList
