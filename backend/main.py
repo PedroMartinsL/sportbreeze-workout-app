@@ -17,7 +17,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl="auth/login-form")
 
 from api.controllers.routine_controller import routine_router
 from api.controllers.workout_controller import workout_router
-from application.auth.auth_routes import auth_router
+from api.controllers.auth_controller import auth_router
 
 # Run to execute: 
 # uvicorn main:app --reload
