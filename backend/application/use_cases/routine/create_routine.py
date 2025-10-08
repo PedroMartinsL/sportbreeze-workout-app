@@ -27,14 +27,9 @@ class CreateRoutineUseCase:
             "disponibilidade": "todos os finais de semana as 15h e 18h"
         }
 
-        gps = {
-            "lat": -23.5505,
-            "lon": -46.6333
-        }
-
-        # weather_json = fetch_weather(**gps)
-        # payload_json = call_gemini(profile, f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}")
-        payload_json = call_gemini(profile, f"Generate a plan")
+        weather_json = fetch_weather(**data.location)
+        payload_json = call_gemini(profile, f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}")
+        # payload_json = call_gemini(profile, f"Generate a plan")
         workouts = json.loads(payload_json)
 
         for workout in workouts:
