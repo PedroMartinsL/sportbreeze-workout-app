@@ -2,6 +2,7 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { apiFetch } from "@/api";
 
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -81,6 +82,40 @@ export default function Routine() {
           <ChevronRight size={18} color="#0a0a0a" />
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        className="mt-6 w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
+        onPress={async () => {
+          const fakeWorkout = {
+            routine: {
+              name: "Fiction Train for Woman - Pink October",
+              user_id: 1
+            },
+            location: {
+              latitude: -8.11389,
+              longitude: -35.2915
+            },
+            profile: {
+              "sports": "Running, Marathon",
+              "peso": "43 kg",
+              "altura": "1,57",
+              "frequency": "run all Sundays and thursdays"
+            }
+          };
+
+          try {
+            const result = await apiFetch("/routines", "POST", fakeWorkout as any);
+            console.log("Workout criado:", result);
+            alert(`routine criado: ${result.name}`);
+          } catch (err: any) {
+            console.error(err);
+            alert(`Erro ao criar routine: ${err.message}`);
+          }
+        }}
+      >
+  <Text className="text-white text-center font-semibold">Criar Workout Fictício</Text>
+</TouchableOpacity>
+
 
       {/* CTA opcional */}
       <Link href="/registration" asChild>

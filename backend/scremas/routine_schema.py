@@ -18,6 +18,7 @@ class ProfileSchema(BaseModel):
     #This will receive values soon
     pass
 
-class RoutineCreate(RoutineBase):
+class RoutineCreate(BaseModel):
+    routine: RoutineBase
     location: LocationSchema
     profile: ProfileSchema

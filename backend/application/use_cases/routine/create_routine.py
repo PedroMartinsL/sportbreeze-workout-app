@@ -14,22 +14,13 @@ class CreateRoutineUseCase:
         self.repository = repository
 
     def execute(self, data: RoutineCreate, create_workout_use_case: CreateWorkoutUseCase):
-        routine = self.repository.create(data.model_dump())
+        routine = self.repository.create(data.routine.model_dump())
         # return RoutineResponse.model_validate(routine)
 
-        profile = {
-            "esportes_praticados": ["natação", "corrida"],
-            "peso": 75,
-            "idade": 28,
-            "altura": 1.75,
-            "frequencia": "3x por semana",
-            "usa_drogas": False,
-            "disponibilidade": "todos os finais de semana as 15h e 18h"
-        }
+        location = data.location
 
-        weather_json = fetch_weather(**data.location)
-        payload_json = call_gemini(profile, f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}")
-        # payload_json = call_gemini(profile, f"Generate a plan")
+        weather_json = fetch_weather(location.latitude, location.longitude)
+        payload_json = call_gemini(data.profile.model_dump(), f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}")
         workouts = json.loads(payload_json)
 
         for workout in workouts:
