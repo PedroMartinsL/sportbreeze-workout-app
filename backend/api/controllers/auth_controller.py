@@ -5,7 +5,7 @@ from application.use_cases.user.find_user_by_email import FindUserByEmailUseCase
 from dependencies import verify_token
 from domain.entities.user import User
 from infrastructure.security.jwt_handler import create_token, use_token
-from scremas.user_schema import UserBase, UserLogin
+from scremas.user_schema import UserCreate, UserLogin
 
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 @auth_router.post("/sing_up")
-async def create_account(user_schema: UserBase, create_user_use_case: CreateUserUseCase = Depends(), find_user_by_email_use_case: FindUserByEmailUseCase = Depends()):
+async def create_account(user_schema: UserCreate, create_user_use_case: CreateUserUseCase = Depends(), find_user_by_email_use_case: FindUserByEmailUseCase = Depends()):
     user = find_user_by_email_use_case.execute(user_schema.email)
     if user:
         raise HTTPException(status_code=400, detail="E-mail already registered")

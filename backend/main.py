@@ -21,8 +21,7 @@ from api.controllers.workout_controller import workout_router
 from api.controllers.auth_controller import auth_router
 
 # Run to execute: 
-# uvicorn main:app --reload
-# uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# uvicorn main:app --reload --host 0.0.0.0 --port 8000 #Rodo esse pq o outro nao funciona.
 app.include_router(auth_router)
 app.include_router(routine_router)
 app.include_router(workout_router)
