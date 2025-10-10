@@ -5,16 +5,59 @@
 # @workout_router.get("/")
 # async def getWorkout():
 #     return {}
-from fastapi import Depends
+from datetime import datetime, timedelta
+from typing import List
+from fastapi import Depends, HTTPException
 
+from application.use_cases.workout.find_workouts_by_routine import FindWorkoutsByRoutineUseCase
+from domain.entities.workout import Workout
 from domain.repositories.workout_repository import WorkoutRepository
 from schemas.workout_schema import WorkoutCreate
 
 class CreateWorkoutUseCase:
-    def __init__(self, repository: WorkoutRepository = Depends()):
+    def __init__(self, repository: WorkoutRepository = Depends(), find_workouts_by_routine_use_case: FindWorkoutsByRoutineUseCase = Depends()):
         self.repository = repository
+        self.find_workouts_by_routine_use_case = find_workouts_by_routine_use_case
 
     def execute(self, workout_data: WorkoutCreate):
-        if workout_data.kcal <= 0:
-            raise ValueError("Kcal deve ser maior que zero")
-        return self.repository.create(workout_data)
+        # Junta data + hora
+        date_str = f"{workout_data.date} {workout_data.hour}"
+        workout_datetime = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+
+        # Verifica se é no passado
+        if workout_datetime < datetime.now():
+            raise HTTPException(status_code=400, detail="A data e hora do treino não podem estar no passado.")
+
+        # Busca os treinos da rotina
+        existing_workouts = self.find_workouts_by_routine_use_case(workout_data.routine_id)
+
+        # Chama a função de verificação
+        self.check_workout_conflicts(workout_data, existing_workouts)
+
+        # Se passou, cria o treino
+        return self.workout_repository.create(workout_data)
+    
+
+    def check_workout_conflicts(new_workout: WorkoutCreate, existing_workouts: List[Workout]):
+        """
+        Verifica se o novo treino conflita em data/hora com algum treino existente.
+        Levanta HTTPException(400) em caso de conflito.
+        """
+
+        # Define início e fim do novo treino
+        new_start = datetime.strptime(f"{new_workout.date} {new_workout.hour}", "%Y-%m-%d %H:%M")
+        new_end = new_start + timedelta(minutes=new_workout.duration)
+
+        for w in existing_workouts:
+            existing_start = datetime.strptime(f"{w.date} {w.hour}", "%Y-%m-%d %H:%M")
+            existing_end = existing_start + timedelta(minutes=w.duration)
+
+            # Se há sobreposição
+            if (new_start < existing_end) and (new_end > existing_start):
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        f"Conflito de horário: já existe um treino "
+                        f"de {existing_start.strftime('%H:%M')} até {existing_end.strftime('%H:%M')}."
+                    )
+                )
