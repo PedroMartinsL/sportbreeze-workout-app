@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class RoutineBase(BaseModel):
     name: str
@@ -7,8 +7,10 @@ class RoutineBase(BaseModel):
 class RoutineResponse(RoutineBase):
     id: int
 
-    class Config:
-        from_attributes = True  # pydantic v2
+    model_config = ConfigDict(
+        from_attributes=True,
+        validate_assignment=True
+    )
 
 class LocationSchema(BaseModel):
     latitude: float

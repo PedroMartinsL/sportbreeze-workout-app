@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional
 
 # 🔹 Base — usada por outros esquemas
@@ -21,8 +21,10 @@ class UserLogin(BaseModel):
 class UserResponse(UserBase):
     id: int
 
-    class Config:
-        from_attributes = True  # <- permite converter diretamente de objetos SQLAlchemy
+    model_config = ConfigDict(
+        from_attributes=True,
+        validate_assignment=True
+    )
 
 class UserFindByEmail(UserBase):
     email: str

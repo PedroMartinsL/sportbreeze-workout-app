@@ -32,9 +32,10 @@ expo-env.d.ts
 venv/
 .env
 
-# Ignore Python bytecode
-__pycache__/
+# Ignorar caches do Python
+**/__pycache__/
 *.py[cod]
+*$py.class
 
 # Alembic migrations (versions)
 alembic/
