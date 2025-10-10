@@ -1,5 +1,5 @@
 import json
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from domain.repositories.routine_repository import RoutineRepository
 from infrastructure.services.ai_api import call_gemini
@@ -14,17 +14,39 @@ class CreateRoutineUseCase:
         self.repository = repository
 
     def execute(self, data: RoutineCreate, create_workout_use_case: CreateWorkoutUseCase):
+        # Cria a rotina
         routine = self.repository.create(data.routine.model_dump())
-        # return RoutineResponse.model_validate(routine)
 
         location = data.location
+        if not location:
+            raise HTTPException(status_code=400, detail="Location not provided")
 
+        # Busca informações do clima
         weather_json = fetch_weather(location.latitude, location.longitude)
-        payload_json = call_gemini(data.profile.model_dump(), f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}")
-        workouts = json.loads(payload_json)
+        if not weather_json:
+            raise HTTPException(status_code=404, detail="Weather information not found")
+
+        # Chamada ao Gemini AI
+        payload_json = call_gemini(
+            data.profile.model_dump(),
+            f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}"
+        )
+        if not payload_json:
+            raise HTTPException(status_code=500, detail="Failed to generate workouts")
+
+        try:
+            workouts = json.loads(payload_json)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=500, detail="Invalid JSON from Gemini API")
 
         for workout in workouts:
             workout['routine_id'] = routine.id
             workout_schema = WorkoutCreate(**workout)
-            create_workout_use_case.execute(workout_schema)
+            try:
+                create_workout_use_case.execute(workout_schema)
+            except Exception as e:
+                # Log do erro e continua com os próximos workouts
+                continue
+
+        return routine
 
