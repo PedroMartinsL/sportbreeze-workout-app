@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException
 from application.use_cases.user.find_user_by_email import FindUserByEmailUseCase
 from domain.entities.user import User
 from infrastructure.security.jwt_handler import create_token
-from scremas.user_schema import UserLogin
+from schemas.user_schema import UserLogin
 from main import bcrypt_context
 
 class AuthService:

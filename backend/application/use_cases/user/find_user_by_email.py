@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from domain.repositories.user_repository import UserRepository
-from scremas.user_schema import UserFindByEmail
+from schemas.user_schema import UserFindByEmail
 
 class FindUserByEmailUseCase:
     def __init__(self, repository: UserRepository = Depends()):

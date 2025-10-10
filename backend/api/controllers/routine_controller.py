@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from application.use_cases.routine.create_routine import CreateRoutineUseCase
 from application.use_cases.routine.find_routines_by_user import FindRoutinesByUserUseCase
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
-from scremas.routine_schema import RoutineCreate, RoutineResponse
+from schemas.routine_schema import RoutineCreate, RoutineResponse
 
 routine_router = APIRouter(prefix="/routines", tags=["Routines"])
 

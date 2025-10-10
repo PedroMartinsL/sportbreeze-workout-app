@@ -4,7 +4,7 @@ from fastapi import Depends
 from dependencies import get_session
 from domain.entities.routine import Routine
 from domain.entities.user import User
-from scremas.user_schema import UserCreate
+from schemas.user_schema import UserCreate
 
 class UserRepository:
     def __init__(self, db: Session = Depends(get_session)):

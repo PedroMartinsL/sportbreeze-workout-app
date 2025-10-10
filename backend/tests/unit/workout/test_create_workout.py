@@ -1,6 +1,7 @@
+from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 import pytest
 from unittest.mock import MagicMock
-from application.use_cases.workout.create_workout import CreateWorkoutUseCase
+
 
 class WorkoutCreate:
     def __init__(self, name, kcal):

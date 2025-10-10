@@ -4,8 +4,8 @@ from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from domain.repositories.routine_repository import RoutineRepository
 from infrastructure.services.ai_api import call_gemini
 from infrastructure.services.weather_api import fetch_weather
-from scremas.routine_schema import RoutineCreate
-from scremas.workout_schema import WorkoutCreate
+from schemas.routine_schema import RoutineCreate
+from schemas.workout_schema import WorkoutCreate
 
 
 class CreateRoutineUseCase:

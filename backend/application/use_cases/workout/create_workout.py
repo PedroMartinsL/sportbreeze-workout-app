@@ -8,7 +8,7 @@
 from fastapi import Depends
 
 from domain.repositories.workout_repository import WorkoutRepository
-from scremas.workout_schema import WorkoutCreate
+from schemas.workout_schema import WorkoutCreate
 
 class CreateWorkoutUseCase:
     def __init__(self, repository: WorkoutRepository = Depends()):

@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from domain.repositories.workout_repository import WorkoutRepository
-from scremas.workout_schema import WorkoutResponse
+from schemas.workout_schema import WorkoutResponse
 
 
 class FindWorkoutsByRoutineUseCase:

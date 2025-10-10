@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from domain.repositories.routine_repository import RoutineRepository
-from scremas.routine_schema import RoutineResponse
+from schemas.routine_schema import RoutineResponse
 
 
 class FindRoutinesByUserUseCase:

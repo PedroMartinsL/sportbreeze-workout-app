@@ -3,7 +3,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from dependencies import get_session
 from domain.entities.workout import Workout
-from scremas.workout_schema import WorkoutCreate
+from schemas.workout_schema import WorkoutCreate
 
 class WorkoutRepository:
     def __init__(self, db: Session = Depends(get_session)):
