@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 from domain.repositories.user_repository import UserRepository
 from schemas.user_schema import UserFindByEmail
@@ -8,4 +8,7 @@ class FindUserByEmailUseCase:
         self.repository = repository
 
     def execute(self, request: UserFindByEmail):
-        return self.repository.findByEmail(request)
+        user = self.repository.findByEmail(request)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user

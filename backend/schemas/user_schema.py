@@ -5,7 +5,7 @@ from typing import Optional
 # 🔹 Base — usada por outros esquemas
 class UserBase(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     active: Optional[bool] = True
     admin: Optional[bool] = False
 
@@ -37,7 +37,7 @@ class UserResponse(UserBase):
         validate_assignment=True
     )
 
-class UserFindByEmail(UserBase):
-    email: str
+class UserFindByEmail(BaseModel):
+    email: EmailStr
 
     # raise ImportError('email-validator is not installed, run `pip install pydantic[email]`')
