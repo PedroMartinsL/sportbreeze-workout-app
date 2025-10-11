@@ -35,10 +35,10 @@ class CreateWorkoutUseCase:
         self.check_workout_conflicts(workout_data, existing_workouts)
 
         # Se passou, cria o treino
-        return self.workout_repository.create(workout_data)
+        return self.repository.create(workout_data)
     
 
-    def check_workout_conflicts(new_workout: WorkoutCreate, existing_workouts: List[Workout]):
+    def check_workout_conflicts(self, new_workout: WorkoutCreate, existing_workouts: List[Workout]):
         """
         Verifica se o novo treino conflita em data/hora com algum treino existente.
         Levanta HTTPException(400) em caso de conflito.

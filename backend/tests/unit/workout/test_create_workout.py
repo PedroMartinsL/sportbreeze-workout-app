@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from fastapi import HTTPException
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from schemas.workout_schema import WorkoutCreate
 import pytest
@@ -21,8 +22,11 @@ def fake_repo():
     }
     return repo
 
+
 def test_create_workout_success(fake_repo):
     use_case = CreateWorkoutUseCase(repository=fake_repo)
+    use_case.find_workouts_by_routine_use_case = MagicMock(return_value=[])
+
     new_workout = WorkoutCreate(
         weather="Cloudy",
         kcal=300,
@@ -35,11 +39,38 @@ def test_create_workout_success(fake_repo):
         sport="Running",
         routine_id=1
     )
+
     result = use_case.execute(new_workout)
+
     assert result["title"] == "Running"
     fake_repo.create.assert_called_once_with(new_workout)
 
-def test_create_workout_valid_data(fake_repo):
+
+def test_create_workout_with_past_date(fake_repo):
+    use_case = CreateWorkoutUseCase(repository=fake_repo)
+    use_case.find_workouts_by_routine_use_case = MagicMock(return_value=[])
+
+    past_workout = WorkoutCreate(
+        weather="Rainy",
+        kcal=200,
+        title="Past Run",
+        temp=18.0,
+        duration=45,
+        planner="John",
+        hour=(datetime.now() - timedelta(hours=1)).strftime("%H:%M"),
+        date=(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d"),
+        sport="Running",
+        routine_id=1
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        use_case.execute(past_workout)
+
+    assert exc_info.value.status_code == 400
+    assert "A data e hora do treino não podem estar no passado" in exc_info.value.detail
+
+
+def test_create_workout_conflict(fake_repo):
     existing_workout = WorkoutCreate(
         weather="Sunny",
         kcal=300,
@@ -56,7 +87,8 @@ def test_create_workout_valid_data(fake_repo):
     def fake_find(routine_id):
         return [existing_workout]
 
-    use_case = CreateWorkoutUseCase(repository=fake_repo, find_workouts_by_routine_use_case=fake_find)
+    use_case = CreateWorkoutUseCase(repository=fake_repo)
+    use_case.find_workouts_by_routine_use_case = fake_find
 
     new_workout = WorkoutCreate(
         weather="Cloudy",
@@ -74,6 +106,5 @@ def test_create_workout_valid_data(fake_repo):
     with pytest.raises(Exception) as exc_info:
         use_case.execute(new_workout)
 
-    assert "Time conflict" in str(exc_info.value)
+    assert "Conflito de horário" in str(exc_info.value)
     fake_repo.create.assert_not_called()
-

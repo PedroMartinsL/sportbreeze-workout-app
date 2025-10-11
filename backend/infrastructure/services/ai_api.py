@@ -5,8 +5,10 @@ from google.genai import types
 from core.settings import GEMINI_API_KEY
 
 # Inicializa o cliente Gemini
-client = genai.Client(api_key=GEMINI_API_KEY)
-# client = genai.Client(api_key="AIzaSyDrHLLjruJ3yEF-pvLSvnYTF-Y_FjNkWuU")
+def get_client():
+    if not GEMINI_API_KEY:
+        raise ValueError("Missing GEMINI_API_KEY")
+    return genai.Client(api_key=GEMINI_API_KEY)
 
 
 def call_gemini(profile: dict, prompt_text: str):
@@ -33,7 +35,7 @@ def call_gemini(profile: dict, prompt_text: str):
         f"Profile: {json.dumps(profile, ensure_ascii=False)}"
     )
 
-    response = client.models.generate_content(
+    response = get_client().models.generate_content(
         model="gemini-2.5-flash",
         contents=full_prompt,
         config=types.GenerateContentConfig(
