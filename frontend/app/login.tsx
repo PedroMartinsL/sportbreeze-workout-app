@@ -1,13 +1,34 @@
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
+import { apiFetch } from "@/api"; // mantém como está
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = () => {
-    if (!email || !password) return Alert.alert("Atenção", "Preencha e-mail e senha.");
-    Alert.alert("Login", `E-mail: ${email}`);
+  const onSubmit = async () => {
+    if (!email || !password) {
+      return Alert.alert("Atenção", "Preencha e-mail e senha.");
+    }
+
+    try {
+      setLoading(true);
+
+      // ✅ Forçamos o tipo com “as any” para não alterar o api.js
+      const resp = await apiFetch("/auth/login", "POST", { email, password } as any);
+
+      const token = resp?.access_token || resp?.token;
+      if (!token) throw new Error("Token não retornado pelo servidor.");
+
+      console.log("LOGIN OK → token:", token);
+      Alert.alert("Sucesso", "Login realizado!");
+    } catch (e: any) {
+      console.error(e);
+      Alert.alert("Erro no login", e.message ?? "Falha na requisição");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,8 +55,8 @@ export default function LoginScreen() {
         style={{ backgroundColor: "white", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, padding: 12, marginBottom: 16 }}
       />
 
-      <TouchableOpacity onPress={onSubmit} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
-        <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Entrar</Text>
+      <TouchableOpacity onPress={onSubmit} disabled={loading} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Entrar</Text>}
       </TouchableOpacity>
     </View>
   );

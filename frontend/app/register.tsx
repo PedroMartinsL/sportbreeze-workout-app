@@ -1,16 +1,31 @@
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
+import { apiFetch } from "@/api"; 
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading]   = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!username || !email || !password) {
       return Alert.alert("Atenção", "Preencha username, e-mail e senha.");
     }
-    Alert.alert("Cadastro", `Usuário: ${username}\nE-mail: ${email}`);
+
+    try {
+      setLoading(true);
+      const resp = await apiFetch("/auth/sing_up", "POST", { username, email, password } as any);
+
+      console.log("CADASTRO OK →", resp);
+      Alert.alert("Sucesso", "Conta criada! Agora faça login.");
+
+    } catch (e: any) {
+      console.error(e);
+      Alert.alert("Erro no cadastro", e.message ?? "Falha na requisição");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,6 +38,7 @@ export default function RegisterScreen() {
         placeholder="seu_usuario"
         value={username}
         onChangeText={setUsername}
+        autoCapitalize="none"
         style={{ backgroundColor: "white", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, padding: 12, marginBottom: 12 }}
       />
 
@@ -45,8 +61,8 @@ export default function RegisterScreen() {
         style={{ backgroundColor: "white", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, padding: 12, marginBottom: 16 }}
       />
 
-      <TouchableOpacity onPress={onSubmit} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
-        <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Cadastrar</Text>
+      <TouchableOpacity onPress={onSubmit} disabled={loading} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Cadastrar</Text>}
       </TouchableOpacity>
     </View>
   );
