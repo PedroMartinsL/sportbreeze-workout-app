@@ -88,7 +88,7 @@ sportsbreeze/
 
 O diagrama abaixo representa os principais casos de uso do **Sportsbreeze**.  
 
-<img width="1365" height="758" alt="image" src="https://github.com/user-attachments/assets/b91f49ea-fd82-4406-a6e9-d190123a2d22" />
+<img width="560" height="495" alt="image" src="https://github.com/user-attachments/assets/99560cfe-7802-489a-afe7-9eb89c38054d" />
 
 
 
