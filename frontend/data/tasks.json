@@ -1,0 +1,91 @@
+[
+  {
+    "id": 0,
+    "weather": "sunny",
+    "kcal": 500,
+    "routine": "Cardio and stretching",
+    "temp": 25,
+    "duration": 60,
+    "planner": "Morning run and yoga",
+    "hour": "07:00",
+    "date": "2025-09-01",
+    "sport": "RUNNING"
+  },
+  {
+    "id": 1,
+    "weather": "rainy",
+    "kcal": 400,
+    "routine": "Upper body strength",
+    "temp": 20,
+    "duration": 50,
+    "planner": "Dumbbells and push-ups",
+    "hour": "18:00",
+    "date": "2025-09-02",
+    "sport": "GYM"
+  },
+  {
+    "id": 2,
+    "day": 2,
+    "weather": "frosty",
+    "kcal": 350,
+    "routine": "Core workout",
+    "temp": -2,
+    "duration": 45,
+    "planner": "Planks, crunches, and bridges",
+    "hour": "08:30",
+    "date": "2025-09-03",
+    "sport": "HIKING"
+  },
+  {
+    "id": 3,
+    "day": 3,
+    "weather": "cloudy",
+    "kcal": 500,
+    "routine": "Leg day",
+    "temp": 15,
+    "duration": 70,
+    "planner": "Squats, lunges, and cycling",
+    "hour": "17:00",
+    "date": "2025-09-04",
+    "sport": "CYCLING"
+  },
+  {
+    "id": 4,
+    "day": 4,
+    "weather": "cloudy",
+    "kcal": 420,
+    "routine": "Full body HIIT",
+    "temp": 18,
+    "duration": 55,
+    "planner": "Burpees, jumping jacks, mountain climbers",
+    "hour": "06:30",
+    "date": "2025-09-05",
+    "sport": "GYM"
+  },
+  {
+    "id": 5,
+    "day": 5,
+    "weather": "thundering",
+    "kcal": 300,
+    "routine": "Restorative session",
+    "temp": 22,
+    "duration": 40,
+    "planner": "Stretching and meditation",
+    "hour": "19:00",
+    "date": "2025-09-06",
+    "sport": "SWIMMING"
+  },
+  {
+    "id": 6,
+    "day": 6,
+    "weather": "sunny",
+    "kcal": 480,
+    "routine": "Outdoor run",
+    "temp": 26,
+    "duration": 60,
+    "planner": "Trail running and light cardio",
+    "hour": "07:30",
+    "date": "2025-09-07",
+    "sport": "RUNNING"
+  }
+]
