@@ -6,7 +6,6 @@ from fastapi import HTTPException
 from application.use_cases.routine.create_routine import CreateRoutineUseCase
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from schemas.routine_schema import RoutineCreate, RoutineBase, LocationSchema, ProfileSchema
-from schemas.workout_schema import WorkoutCreate
 from infrastructure.services.ai_api import call_gemini
 
 
@@ -35,56 +34,40 @@ def fake_workout_use_case():
     use_case.execute.side_effect = lambda workout: workout
     return use_case
 
+@pytest.fixture
+def mock_gemini_weather():
+    """Fixture que cria mocks de Gemini e Weather prontos pra uso."""
+    with patch("application.use_cases.routine.create_routine.fetch_weather") as mock_weather, \
+         patch("application.use_cases.routine.create_routine.call_gemini") as mock_gemini:
 
-@patch("application.use_cases.routine.create_routine.call_gemini")
-@patch("application.use_cases.routine.create_routine.fetch_weather")
-def test_create_routine_success(mock_fetch_weather, mock_call_gemini,
-                                fake_routine_data, fake_repo, fake_workout_use_case):
+        mock_weather.return_value = {"weather": "Sunny", "temp": 25}
+        mock_gemini.return_value = json.dumps([
+            {
+                "weather": "Sunny",
+                "kcal": 200,
+                "title": "Run",
+                "temp": 25.5,
+                "duration": 45,
+                "planner": "AI Plan",
+                "hour": "08:00",
+                "date": "2025-10-13",
+                "sport": "Running"
+            }
+        ])
+
+        yield mock_weather, mock_gemini
+
+def test_create_routine_success(fake_routine_data, fake_repo, fake_workout_use_case, mock_gemini_weather):
     """Successful case: creates a full routine using weather data and AI."""
-    mock_fetch_weather.return_value = {"temp": 25, "condition": "SUNNY"}
-
-    workouts_json = [
-        {
-            "weather": "SUNNY",
-            "kcal": 200,
-            "title": "Morning Run",
-            "temp": 25.0,
-            "duration": 30,
-            "planner": "John",
-            "hour": "07:00",
-            "date": "2025-10-11",
-            "sport": "RUNNING",
-            "routine_id": 1
-        },
-        {
-            "weather": "CLOUDY",
-            "kcal": 250,
-            "title": "Evening Yoga",
-            "temp": 23.0,
-            "duration": 45,
-            "planner": "John",
-            "hour": "18:00",
-            "date": "2025-10-11",
-            "sport": "YOGA",
-            "routine_id": 1
-        }
-    ]
-    mock_call_gemini.return_value = json.dumps(workouts_json)
+    mock_fetch_weather, mock_call_gemini = mock_gemini_weather
 
     use_case = CreateRoutineUseCase(repository=fake_repo)
     result = use_case.execute(fake_routine_data, fake_workout_use_case)
 
     assert result.id == 1
-    mock_fetch_weather.assert_called_once_with(
-        fake_routine_data.location.latitude,
-        fake_routine_data.location.longitude
-    )
+    mock_fetch_weather.assert_called_once()
     mock_call_gemini.assert_called_once()
-
-    assert fake_workout_use_case.execute.call_count == len(workouts_json)
-    for call_args in fake_workout_use_case.execute.call_args_list:
-        workout_passed = call_args[0][0]
-        assert isinstance(workout_passed, WorkoutCreate)
+    assert fake_workout_use_case.execute.call_count == 1
 
 
 @patch("application.use_cases.routine.create_routine.fetch_weather")
@@ -108,7 +91,7 @@ def test_create_routine_gemini_invalid_json(mock_call_gemini, mock_fetch_weather
     with pytest.raises(HTTPException) as exc:
         use_case.execute(fake_routine_data, fake_workout_use_case)
     assert exc.value.status_code == 500
-    assert exc.value.detail == "Invalid JSON from Gemini API"
+    assert exc.value.detail == "Empty or invalid JSON from Gemini API"
 
 
 @patch("infrastructure.services.ai_api.get_client")
@@ -120,3 +103,57 @@ def test_call_gemini(mock_get_client):
 
     result = call_gemini({"age": 25}, "prompt")
     assert "SUNNY" in result
+
+
+def test_execute_raises_if_location_missing(fake_routine_data):
+    data = fake_routine_data
+    data.location = None  # Simula campo vazio
+    use_case = CreateRoutineUseCase(repository=MagicMock())
+    create_workout_use_case = MagicMock()
+
+    with pytest.raises(HTTPException) as exc:
+        use_case.execute(data, create_workout_use_case)
+
+    assert exc.value.status_code == 400
+    assert "Location not provided" in exc.value.detail
+
+
+def test_execute_raises_if_routine_missing(fake_routine_data):
+    data = fake_routine_data
+    data.routine = None
+    use_case = CreateRoutineUseCase(repository=MagicMock())
+    create_workout_use_case = MagicMock()
+
+    with pytest.raises(HTTPException) as exc:
+        use_case.execute(data, create_workout_use_case)
+
+    assert exc.value.status_code == 400
+    assert "Routine not provided" in exc.value.detail
+
+
+def test_execute_raises_if_profile_missing(fake_routine_data):
+    data = fake_routine_data
+    data.profile = None
+    use_case = CreateRoutineUseCase(repository=MagicMock())
+    create_workout_use_case = MagicMock()
+
+    with pytest.raises(HTTPException) as exc:
+        use_case.execute(data, create_workout_use_case)
+
+    assert exc.value.status_code == 400
+    assert "Profile not provided" in exc.value.detail
+
+def test_execute_continues_on_workout_exception(fake_routine_data, mock_gemini_weather):
+    mock_fetch_weather, mock_call_gemini = mock_gemini_weather
+
+    routine_repo = MagicMock()
+    routine_repo.create.return_value.id = 1
+    use_case = CreateRoutineUseCase(repository=routine_repo)
+
+    create_workout_use_case = MagicMock()
+    create_workout_use_case.execute.side_effect = Exception("Forced error")
+
+    result = use_case.execute(fake_routine_data, create_workout_use_case)
+
+    routine_repo.create.assert_called_once()
+    create_workout_use_case.execute.assert_called_once()

@@ -14,12 +14,18 @@ class CreateRoutineUseCase:
         self.repository = repository
 
     def execute(self, data: RoutineCreate, create_workout_use_case: CreateWorkoutUseCase):
-        # Cria a rotina
-        routine = self.repository.create(data.routine.model_dump())
-
-        location = data.location
-        if not location:
+        
+        if not data.location:
             raise HTTPException(status_code=400, detail="Location not provided")
+        
+        if not data.routine:
+            raise HTTPException(status_code=400, detail="Routine not provided")
+        
+        if not data.profile:
+            raise HTTPException(status_code=400, detail="Profile not provided")
+
+        routine = self.repository.create(data.routine.model_dump())
+        location = data.location
 
         # Busca informações do clima
         weather_json = fetch_weather(location.latitude, location.longitude)
@@ -31,13 +37,11 @@ class CreateRoutineUseCase:
             data.profile.model_dump(),
             f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}"
         )
-        if not payload_json:
-            raise HTTPException(status_code=500, detail="Failed to generate workouts")
 
         try:
             workouts = json.loads(payload_json)
         except json.JSONDecodeError:
-            raise HTTPException(status_code=500, detail="Invalid JSON from Gemini API")
+            raise HTTPException(status_code=500, detail="Empty or invalid JSON from Gemini API")
 
         for workout in workouts:
             workout['routine_id'] = routine.id
