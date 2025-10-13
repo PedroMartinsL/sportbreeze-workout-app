@@ -5,8 +5,10 @@ from schemas.workout_schema import WorkoutCreate
 import pytest
 from unittest.mock import MagicMock
 
+
 @pytest.fixture
 def fake_repo():
+    """Provides a mock repository that returns a sample workout when created."""
     repo = MagicMock()
     repo.create.return_value = {
         "weather": "Sunny",
@@ -24,6 +26,7 @@ def fake_repo():
 
 
 def test_create_workout_success(fake_repo):
+    """Should successfully create a new workout if there is no conflict and the date is in the future."""
     use_case = CreateWorkoutUseCase(repository=fake_repo)
     use_case.find_workouts_by_routine_use_case = MagicMock(return_value=[])
 
@@ -47,6 +50,7 @@ def test_create_workout_success(fake_repo):
 
 
 def test_create_workout_with_past_date(fake_repo):
+    """Should raise HTTP 400 if the workout date and time are in the past."""
     use_case = CreateWorkoutUseCase(repository=fake_repo)
     use_case.find_workouts_by_routine_use_case = MagicMock(return_value=[])
 
@@ -71,6 +75,7 @@ def test_create_workout_with_past_date(fake_repo):
 
 
 def test_create_workout_conflict(fake_repo):
+    """Should raise an exception if the workout conflicts with an existing workout time."""
     existing_workout = WorkoutCreate(
         weather="Sunny",
         kcal=300,

@@ -1,45 +1,39 @@
-# backend/tests/unit/user/test_find_user_by_email_usecase.py
 import pytest
 from unittest.mock import MagicMock
 from fastapi import HTTPException
 from application.use_cases.user.find_user_by_email import FindUserByEmailUseCase
 from schemas.user_schema import UserFindByEmail
 
-# Fixture do repositório mockado
+
 @pytest.fixture
 def fake_repo():
+    """Provides a mock repository for user data access."""
     return MagicMock()
 
-# Fixture do use case
+
 @pytest.fixture
 def find_user_use_case(fake_repo):
+    """Provides a FindUserByEmailUseCase instance with a mocked repository."""
     return FindUserByEmailUseCase(repository=fake_repo)
 
-# ============================
-# Teste 1: usuário encontrado
-# ============================
+
 def test_user_found(find_user_use_case, fake_repo):
-    # Arrange
+    """Should return the user when the email exists in the repository."""
     request = UserFindByEmail(email="pedro@example.com")
     expected_user = {"username": "pedro", "email": "pedro@example.com"}
     fake_repo.findByEmail.return_value = expected_user
 
-    # Act
     result = find_user_use_case.execute(request)
 
-    # Assert
     fake_repo.findByEmail.assert_called_once_with(request)
     assert result == expected_user
 
-# =======================================
-# Teste 2: usuário não encontrado (404)
-# =======================================
-def test_user_not_found_raises_http_exception(find_user_use_case, fake_repo):
-    # Arrange
+
+def test_user_not_found(find_user_use_case, fake_repo):
+    """Should raise an HTTP 404 error when the user is not found."""
     request = UserFindByEmail(email="pedro@example.com")
     fake_repo.findByEmail.return_value = None
 
-    # Act & Assert
     with pytest.raises(HTTPException) as exc:
         find_user_use_case.execute(request)
 
