@@ -88,7 +88,7 @@ sportsbreeze/
 
 O diagrama abaixo representa os principais casos de uso do **Sportsbreeze**.  
 
-<img width="560" height="495" alt="image" src="https://github.com/user-attachments/assets/99560cfe-7802-489a-afe7-9eb89c38054d" />
+![Sportbreeze  -Diagrama de Casos de Uso](https://github.com/user-attachments/assets/dfcfab56-2d40-4a04-b7eb-4fdb3ec9c814)
 
 
 ## 📊 Diagrama de Classes (UML)
