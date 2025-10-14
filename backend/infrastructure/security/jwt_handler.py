@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+from core.settings import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from domain.entities.user import User
-from main import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from jose import jwt, JWTError
 
 def create_token(user_id, token_duration=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):

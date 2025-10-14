@@ -4,7 +4,6 @@ from typing import List
 
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from application.use_cases.workout.find_workouts_by_routine import FindWorkoutsByRoutineUseCase
-from dependencies import get_session
 from schemas.workout_schema import WorkoutCreate, WorkoutResponse
 
 workout_router = APIRouter(prefix="/workouts", tags=["Workouts"])

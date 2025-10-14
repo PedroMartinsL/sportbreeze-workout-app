@@ -153,7 +153,7 @@ export default function Routine() {
           };
 
           try {
-            const result = await apiFetch("/auth/routines", "POST", payload as any);
+            const result = await apiFetch("/routines/", "POST", payload as any);
             console.log("Workout criado:", result);
             alert(`routine criado: ${result.name}`);
           } catch (err: any) {

@@ -5,7 +5,7 @@ from application.use_cases.user.find_user_by_email import FindUserByEmailUseCase
 from domain.entities.user import User
 from infrastructure.security.jwt_handler import create_token
 from schemas.user_schema import UserLogin
-from main import bcrypt_context
+from core.settings import bcrypt_context
 
 class AuthService:
     def __init__(self, find_user_by_email_use_case: FindUserByEmailUseCase = Depends()):

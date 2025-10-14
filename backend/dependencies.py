@@ -1,14 +1,15 @@
 from fastapi import Depends, HTTPException
+from core.settings import ALGORITHM, SECRET_KEY
 from domain.entities.user import User
-from infrastructure.database.connection import db
+from infrastructure.database.connection import init_db
 from sqlalchemy.orm import sessionmaker, Session 
 from jose import ExpiredSignatureError, jwt, JWTError
 
-from main import ALGORITHM, SECRET_KEY, oauth2_schema
+from core.settings import oauth2_schema
 
 def get_session():
     try:
-        Session = sessionmaker(bind=db)
+        Session = sessionmaker(bind=init_db())
         session = Session()
         yield session
     finally:
