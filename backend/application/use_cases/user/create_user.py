@@ -11,7 +11,10 @@ class CreateUserUseCase:
         self.find_user_by_email_use_case = find_user_by_email_use_case
 
     def execute(self, user_data: UserCreate):
-        user = self.find_user_by_email_use_case.execute(user_data.email)
+        try: 
+            user = self.find_user_by_email_use_case.execute(user_data.email)
+        except:
+            user = None
         if user:
             raise HTTPException(status_code=400, detail="E-mail already registered")
         else:

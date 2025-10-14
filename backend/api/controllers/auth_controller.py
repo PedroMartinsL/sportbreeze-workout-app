@@ -19,11 +19,7 @@ async def create_account(user_schema: UserCreate, create_user_use_case: CreateUs
     
 @auth_router.post("/login")
 async def login(login_schema: UserLogin, auth_service: AuthService = Depends()):
-    try:
-        return auth_service.login(login_schema=login_schema)
-    except HTTPException as e:
-        raise HTTPException(e)
-
+    return auth_service.login(login_schema=login_schema)
     
 @auth_router.get("/refresh")
 async def use_refresh_token(user: User = Depends(verify_token)):
