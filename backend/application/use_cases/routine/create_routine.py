@@ -6,14 +6,16 @@ from infrastructure.services.ai_api import call_gemini
 from infrastructure.services.weather_api import fetch_weather
 from schemas.routine_schema import RoutineCreate
 from schemas.workout_schema import WorkoutCreate
+from datetime import datetime
 
 
 class CreateRoutineUseCase:
     def __init__(self,
-                 repository: RoutineRepository = Depends()):
+                 repository: RoutineRepository = Depends(), create_workout_use_case: CreateWorkoutUseCase = Depends()):
         self.repository = repository
+        self.create_workout_use_case = create_workout_use_case
 
-    def execute(self, data: RoutineCreate, create_workout_use_case: CreateWorkoutUseCase):
+    async def execute(self, data: RoutineCreate):
         
         if not data.location:
             raise HTTPException(status_code=400, detail="Location not provided")
@@ -33,7 +35,7 @@ class CreateRoutineUseCase:
             raise HTTPException(status_code=404, detail="Weather information not found")
 
         # Chamada ao Gemini AI
-        payload_json = call_gemini(
+        payload_json = await call_gemini(
             data.profile.model_dump(),
             f"Generate a plan to workout based on these info for the next 7 days: weather {weather_json}"
         )
@@ -45,9 +47,12 @@ class CreateRoutineUseCase:
 
         for workout in workouts:
             workout['routine_id'] = routine.id
+            workout['date'] = datetime.strptime(workout['date'], "%Y-%m-%d").date()
+            workout['hour'] = datetime.strptime(workout['hour'], "%H:%M").time()
+
             workout_schema = WorkoutCreate(**workout)
             try:
-                create_workout_use_case.execute(workout_schema)
+                self.create_workout_use_case.execute(workout_schema)
             except Exception as e:
                 # Log do erro e continua com os próximos workouts
                 continue

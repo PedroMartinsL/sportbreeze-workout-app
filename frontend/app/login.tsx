@@ -1,8 +1,10 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { apiFetch } from "@/api"; // mantém como está
+import { useStore } from "../store/store";
 
 export default function LoginScreen() {
+  const { login } = useStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,10 +20,12 @@ export default function LoginScreen() {
       // ✅ Forçamos o tipo com “as any” para não alterar o api.js
       const resp = await apiFetch("/auth/login", "POST", { email, password } as any);
 
-      const token = resp?.access_token || resp?.token;
-      if (!token) throw new Error("Token não retornado pelo servidor.");
+      const access_token = resp?.access_token || resp?.token;
+      const refresh_token = resp?.refresh_token || "";
+      const token_type = resp?.token_type || "bearer";
 
-      console.log("LOGIN OK → token:", token);
+      login(access_token, refresh_token, token_type);
+
       Alert.alert("Sucesso", "Login realizado!");
     } catch (e: any) {
       console.error(e);
@@ -57,7 +61,7 @@ export default function LoginScreen() {
 
       <TouchableOpacity onPress={onSubmit} disabled={loading} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Entrar</Text>}
-      </TouchableOpacity>
+      </TouchableOpacity> 
     </View>
   );
 }

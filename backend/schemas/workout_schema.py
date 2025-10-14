@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from datetime import date, time
 
 class WorkoutBase(BaseModel):
     weather: str
@@ -8,8 +8,8 @@ class WorkoutBase(BaseModel):
     temp: float
     duration: int
     planner: str
-    hour: str
-    date: str
+    hour: time
+    date: date
     sport: str
     routine_id: int
 
