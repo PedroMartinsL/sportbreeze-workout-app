@@ -91,6 +91,12 @@ O diagrama abaixo representa os principais casos de uso do **Sportsbreeze**.
 <img width="560" height="495" alt="image" src="https://github.com/user-attachments/assets/99560cfe-7802-489a-afe7-9eb89c38054d" />
 
 
+## 📊 Diagrama de Classes (UML)
+
+Abaixo representa o **Diagrama de Classes** do **Sportsbreeze**.  
+
+<img width="4291" height="2633" alt="image" src="https://github.com/user-attachments/assets/92d37fbd-57d2-489a-9094-eaa1e0500088" />
+
 
 ## 🤝 Contribuição
 
