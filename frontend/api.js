@@ -1,5 +1,5 @@
 // api.js
-const BASE_URL = "http://192.168.1.36:8000"; // backend FastAPI
+const BASE_URL = "http://10.22.70.217:8000"; // backend FastAPI
 
 export async function apiFetch(path, method = "GET", body = null, token = null) {
   const headers = {
