@@ -23,3 +23,6 @@ class WorkoutResponse(WorkoutBase):
         from_attributes=True,
         validate_assignment=True
     )
+
+class WorkoutDelete(BaseModel):
+    id: int

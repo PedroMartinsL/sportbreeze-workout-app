@@ -18,3 +18,10 @@ class WorkoutRepository:
 
     def find_by_routine(self, routine_id) -> List[Workout] | None:
         return self.db.query(Workout).filter(Workout.routine_id == routine_id)
+    
+    def remove(self, workout_id: int):
+        workout = self.db.query(Workout).filter(Workout.id == workout_id).first()
+        if workout:
+            self.db.delete(workout)
+            self.db.commit()
+        return workout

@@ -25,6 +25,7 @@ export default function LoginScreen() {
       const token_type = resp?.token_type || "bearer";
 
       login(access_token, refresh_token, token_type);
+      console.log(resp);
 
       Alert.alert("Sucesso", "Login realizado!");
     } catch (e: any) {
