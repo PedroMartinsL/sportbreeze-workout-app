@@ -1,5 +1,5 @@
 from fastapi import Depends
-from backend.schemas.workout_schema import WorkoutUpdate
+from schemas.workout_schema import WorkoutUpdate
 from domain.repositories.workout_repository import WorkoutRepository
 
 

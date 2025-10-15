@@ -9,7 +9,8 @@ export type TaskCardProps = {
   day: number;
   weather: string;
   kcal: number;
-  routine: string;
+  routine: number;
+  title: string;
   temp: number;
   duration: number;
   planner: string;
