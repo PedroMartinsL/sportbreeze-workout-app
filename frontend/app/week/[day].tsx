@@ -57,7 +57,7 @@ export default function DayScreen() {
   }
 
   return (
-    <View className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-gray-100 p-2">
       <SwipeListView
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
@@ -72,10 +72,10 @@ export default function DayScreen() {
           </Pressable>
         )}
         renderHiddenItem={({ item }) => (
-          <View className="flex-1 flex-row justify-end items-center pr-4 bg-red-100">
+          <View className="flex-1 flex-row justify-end items-center rounded-2xl m-2 mr-6 bg-red-500">
             <Pressable
               onPress={() => openDeleteModal(item)}
-              className="bg-red-500 px-4 py-2 rounded-lg"
+              className="px-4 py-2 rounded-lg"
             >
               <Text className="text-white font-semibold">Deletar</Text>
             </Pressable>
@@ -107,7 +107,7 @@ export default function DayScreen() {
         setModalVisible={closeDeleteModal}
         modalData={deleteData}
         handleDelete={handleDelete}
-        confirmMessage={`${modalData?.hour} - ${modalData?.title}?`}
+        confirmMessage={`Daily Task`}
       />
     </View>
   );

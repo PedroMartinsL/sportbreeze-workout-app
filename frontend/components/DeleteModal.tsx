@@ -51,7 +51,8 @@ export function DeleteModal({
       <View className="flex-1 justify-center items-center bg-black/50">
         <View className="bg-white rounded-2xl p-6 w-4/5 shadow-lg">
           <Text className="text-lg font-bold mb-2">Confirmar exclusão</Text>
-          <Text className="text-gray-500 mb-4">
+          <View className="border-b border-gray-400 mb-5" />
+          <Text className="pl-1 pb-2 justify-center text-gray-500 mb-4">
             {confirmMessage ?? null}
           </Text>
 
