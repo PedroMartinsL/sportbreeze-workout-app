@@ -1,5 +1,4 @@
-// components/DayCard.tsx
-import { Pressable, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 import { TaskCardProps } from "./TaskCard";
 
@@ -17,12 +16,11 @@ export default function DayCard({ day, tasks }: DayCardProps) {
         href={{ pathname: "/week/[day]", params: { day, taskList } }}
         asChild
       >
-        <Pressable
-          android_ripple={{ color: "black" }}
+        <TouchableOpacity
           className="w-full p-4 bg-gray-200 items-center justify-center"
         >
           <Text className="text-lg font-bold">{day}</Text>
-        </Pressable>
+        </TouchableOpacity>
       </Link>
     </View>
   );

@@ -23,7 +23,7 @@ export default function ModalTask({
       onRequestClose={() => setModalVisible(false)}
     >
       {/* Conteúdo do modal */}
-      <View className="flex-1 justify-end ">
+      <View className="flex-1 justify-end bg-black/50">
         <View className="w-full h-4/5 rounded-t-xl p-6 shadow-lg bg-white">
             {/* Botão de fechar no canto */}
             <View className="flex-row justify-between">

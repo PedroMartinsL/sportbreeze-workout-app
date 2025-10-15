@@ -3,6 +3,7 @@ import { View, Text, Switch, Pressable, StyleSheet } from "react-native";
 import { WeatherIcon } from "./WeatherIcon";
 import AlertModal from "./AlertModal";
 import { LinearGradient } from 'expo-linear-gradient';
+import { apiFetch } from "@/api";
 
 export type TaskCardProps = {
   id: number;
@@ -17,6 +18,7 @@ export type TaskCardProps = {
   hour: string;
   date: string;
   sport: string;
+  check: boolean;
 };
 
 type DetachedDataProps = {
@@ -35,7 +37,14 @@ export default function TaskCard(props: TaskCardProps) {
   const [isEnabled, setIsEnabled] = useState(false);
   const [warnModalVisible, setWarnModalVisible] = useState(false);
 
-  const toggleSwitch = () => setIsEnabled((previous) => !previous);
+  async function toggleSwitch() {
+    setIsEnabled((previous) => !previous);
+    const payload = {
+      ...props,        // envia todas as props
+      check: !isEnabled, // atualiza status no payload
+    }
+    await apiFetch(`/workouts/${props.id}`, "UPDATE", payload as any);
+  }
 
   const warn_days = ["frosty", "rainy", "thundering"];
 
