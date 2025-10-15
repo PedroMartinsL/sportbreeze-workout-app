@@ -25,3 +25,15 @@ class WorkoutRepository:
             self.db.delete(workout)
             self.db.commit()
         return workout
+    
+    def update(self, workout_id: int, update_data: dict):
+        workout = self.db.query(Workout).filter(Workout.id == workout_id).first()
+        if not workout:
+            return None
+
+        for field, value in update_data.items():
+            setattr(workout, field, value)
+
+        self.db.commit()
+        self.db.refresh(workout)
+        return workout

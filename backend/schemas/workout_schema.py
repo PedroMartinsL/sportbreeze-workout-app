@@ -26,3 +26,6 @@ class WorkoutResponse(WorkoutBase):
 
 class WorkoutDelete(BaseModel):
     id: int
+
+class WorkoutUpdate(WorkoutBase):
+    pass

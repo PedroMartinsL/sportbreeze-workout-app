@@ -5,7 +5,8 @@ from typing import List
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from application.use_cases.workout.find_workouts_by_routine import FindWorkoutsByRoutineUseCase
 from application.use_cases.workout.delete_workout import DeleteWorkoutUseCase
-from schemas.workout_schema import WorkoutCreate, WorkoutResponse
+from application.use_cases.workout.update_workout_use_case import UpdateWorkoutUseCase
+from schemas.workout_schema import WorkoutCreate, WorkoutResponse, WorkoutUpdate
 
 workout_router = APIRouter(prefix="/workouts", tags=["Workouts"])
 
@@ -27,6 +28,13 @@ async def get_workouts_by_routine(routine_id: int, use_case: FindWorkoutsByRouti
 @workout_router.delete("/{workout_id}", response_model=WorkoutResponse)
 async def delete_workout(workout_id: int, use_case: DeleteWorkoutUseCase = Depends()):
     result = use_case.execute(workout_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="User workout not found")
+    return result
+
+@workout_router.update("/{workout_id}", response_model=WorkoutResponse)
+async def update_workout(workout_id: int, workout_data: WorkoutUpdate, use_case: UpdateWorkoutUseCase = Depends()):
+    result = use_case.execute(workout_id, workout_data)
     if not result:
         raise HTTPException(status_code=404, detail="User workout not found")
     return result
