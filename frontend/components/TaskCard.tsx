@@ -43,7 +43,7 @@ export default function TaskCard(props: TaskCardProps) {
       ...props,        // envia todas as props
       check: !isEnabled, // atualiza status no payload
     }
-    await apiFetch(`/workouts/${props.id}`, "UPDATE", payload as any);
+    await apiFetch(`/workouts/${props.id}`, "PUT", payload as any);
   }
 
   const warn_days = ["frosty", "rainy", "thundering"];

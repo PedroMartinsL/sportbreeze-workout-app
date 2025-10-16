@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from datetime import date, time
 
@@ -13,8 +14,17 @@ class WorkoutBase(BaseModel):
     sport: str
     routine_id: int
 
-class WorkoutCreate(WorkoutBase):
-    pass
+class WorkoutCreate(BaseModel):
+    weather: Optional[str] = None
+    kcal: float
+    title: Optional[str] = None
+    temp: Optional[float] = None
+    duration: int
+    planner: Optional[str] = None
+    hour: time
+    date: date
+    sport: str
+    routine_id: Optional[int] = None
 
 class WorkoutResponse(WorkoutBase):
     id: int

@@ -14,7 +14,7 @@ workout_router = APIRouter(prefix="/workouts", tags=["Workouts"])
 @workout_router.post("/", response_model=WorkoutResponse)
 async def create_workout(workout: WorkoutCreate, use_case: CreateWorkoutUseCase = Depends()):
     try:
-        return use_case.execute(workout)
+        return use_case.execute(workout, True)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -32,7 +32,7 @@ async def delete_workout(workout_id: int, use_case: DeleteWorkoutUseCase = Depen
         raise HTTPException(status_code=404, detail="User workout not found")
     return result
 
-@workout_router.update("/{workout_id}", response_model=WorkoutResponse)
+@workout_router.put("/{workout_id}", response_model=WorkoutResponse)
 async def update_workout(workout_id: int, workout_data: WorkoutUpdate, use_case: UpdateWorkoutUseCase = Depends()):
     result = use_case.execute(workout_id, workout_data)
     if not result:
