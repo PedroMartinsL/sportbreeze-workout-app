@@ -18,7 +18,7 @@ export default function LoginScreen() {
       setLoading(true);
 
       // ✅ Forçamos o tipo com “as any” para não alterar o api.js
-      const resp = await apiFetch("/auth/login", "POST", { email, password } as any);
+      const resp = await apiFetch({path: "/auth/login", method: "POST", body: { email, password } as any});
 
       const access_token = resp?.access_token || resp?.token;
       const refresh_token = resp?.refresh_token || "";

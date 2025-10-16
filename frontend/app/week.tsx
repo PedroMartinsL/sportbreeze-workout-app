@@ -1,4 +1,4 @@
-import { apiFetch } from "@/api";
+import { apiFetch } from "@/services/api";
 import DayCard from "@/components/DayCard";
 import { TaskCardProps } from "@/components/TaskCard";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -15,12 +15,12 @@ export default function Week() {
     useEffect(() => {
         async function fetchTasks() {
             if (!params.routine_id_param) return;
-
+            
             try {
-                const data: TaskCardProps[] = await apiFetch(
-                    `/workouts/${params.routine_id_param}`,
-                    "GET"
-                );
+                const data: TaskCardProps[] = await apiFetch({
+                    path: `/workouts/${params.routine_id_param}`,
+                    method: "GET"
+                });
                 setTasks(data);
             } catch (error) {
                 console.error("Erro ao buscar tasks:", error);

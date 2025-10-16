@@ -30,7 +30,7 @@ export default function RegisterScreen() {
         admin: false,
       };
 
-      const resp = await apiFetch("/auth/sing_up", "POST", payload as any);
+      const resp = await apiFetch({ path: "/auth/sing_up", method: "POST", body: payload as any});
       console.log("CADASTRO OK →", resp);
 
       Alert.alert("Sucesso", "Conta criada! Agora faça login.");

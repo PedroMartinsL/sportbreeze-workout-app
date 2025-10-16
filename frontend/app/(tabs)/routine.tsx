@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
 import * as Location from "expo-location";
-import { apiFetch } from "@/api";
+import { apiFetch } from "@/services/api";
 
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -149,7 +149,7 @@ export default function Routine() {
           };
 
           try {
-            const result = await apiFetch("/routines/", "POST", payload as any);
+            const result = await apiFetch({path: "/routines/", method: "POST", body: payload as any});
             console.log("Workout criado:", result);
             alert(`routine criado: ${result.name}`);
           } catch (err: any) {
