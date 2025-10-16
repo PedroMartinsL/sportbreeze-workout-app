@@ -71,7 +71,6 @@ export default function CreateTask() {
 
   return (
     <View className="flex-1 w-full py-10 px-5 gap-6 mb-4">
-      <Text className="text-4xl font-bold text-gray-800">Create Task</Text>
       <ScrollView>
         <View className="mx-4 gap-5">
           <Text className="text-xl font-bold text-gray-500">Planner</Text>

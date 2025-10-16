@@ -45,14 +45,13 @@ export default function ModalTask({
                 <Text className="text-6xl font-bold text-gray-800">
                   {task.sport}
                 </Text>
-
-                <Text className="text-lg text-gray-800">{task.hour}</Text>
               </View>
 
               <View className="justify-center items-center">
                 <View className="border-b p-1 border-t border-gray-500">
-                  <Text className="text-lg font-light">{task.routine}</Text>
+                  <Text className="text-lg font-light">{task.title}</Text>
                 </View>
+                <Text className="mt-4 border-b rounded-xl border-blue-600 text-lg text-gray-800">{task.hour}</Text>
               </View>
 
               <View className="flex-row justify-around">

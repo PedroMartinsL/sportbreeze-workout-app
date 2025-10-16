@@ -103,11 +103,7 @@ export default function Routine() {
           href={{
             pathname: "/week",
             params: {
-              name,
-              sports: sports.join(","),
-              days: days.join(", "),
-              hoursPerWeek: String(hoursPerWeek),
-              week: "1",
+              routine_id_param: 67,
             },
           }}
           asChild
