@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
 import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
+import { useLocationStore } from "@/store/location";
 
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -27,10 +28,7 @@ export default function Routine() {
   }>();
 
   // estado de localização 
-  const [coords, setCoords] = useState<{ lat: number | null; lon: number | null }>({
-    lat: null,
-    lon: null,
-  });
+  const { coords, setCoords } = useLocationStore();
   const [locLoading, setLocLoading] = useState(false);
 
   // captura a localização uma vez ao abrir a tela 

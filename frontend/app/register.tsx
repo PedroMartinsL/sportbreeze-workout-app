@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import { apiFetch } from "@/api"; // mantém como está
+import { apiFetch } from "@/services/api"; // mantém como está
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");

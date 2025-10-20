@@ -6,7 +6,7 @@ import { ToolsIcons } from "@/components/WeatherIcon";
 import ModalTask from "@/components/ModalTask";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { DeleteModal, useDeleteModal } from "@/components/DeleteModal";
-import { apiFetch } from "@/api";
+import { apiFetch } from "@/services/api";
 
 export default function DayScreen() {
   const navigation = useNavigation();
@@ -52,7 +52,7 @@ export default function DayScreen() {
 
   async function handleDelete(taskId: number) {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    await apiFetch(`/workouts/${taskId}`, "DELETE")
+    await apiFetch({ path: `/workouts/${taskId}`, method: "DELETE"})
     closeDeleteModal();
   }
 

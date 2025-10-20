@@ -3,7 +3,7 @@ import { View, Text, Switch, Pressable, StyleSheet } from "react-native";
 import { WeatherIcon } from "./WeatherIcon";
 import AlertModal from "./AlertModal";
 import { LinearGradient } from 'expo-linear-gradient';
-import { apiFetch } from "@/api";
+import { apiFetch } from "@/services/api";
 
 export type TaskCardProps = {
   id: number;
@@ -43,7 +43,11 @@ export default function TaskCard(props: TaskCardProps) {
       ...props,        // envia todas as props
       check: !isEnabled, // atualiza status no payload
     }
-    await apiFetch(`/workouts/${props.id}`, "PUT", payload as any);
+   await apiFetch({
+    path: `/workouts/${props.id}`,
+    method: "PUT",
+    body: payload as any,  // se precisar, tipar corretamente
+  });
   }
 
   const warn_days = ["frosty", "rainy", "thundering"];
