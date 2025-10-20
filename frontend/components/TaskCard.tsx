@@ -4,6 +4,7 @@ import { WeatherIcon } from "./WeatherIcon";
 import AlertModal from "./AlertModal";
 import { LinearGradient } from 'expo-linear-gradient';
 import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
 
 export type TaskCardProps = {
   id: number;
@@ -34,6 +35,7 @@ export function DetachedData({ children }: DetachedDataProps) {
 }
 
 export default function TaskCard(props: TaskCardProps) {
+  const { accessToken } = useAuthStore();
   const [isEnabled, setIsEnabled] = useState(false);
   const [warnModalVisible, setWarnModalVisible] = useState(false);
 
@@ -46,7 +48,8 @@ export default function TaskCard(props: TaskCardProps) {
    await apiFetch({
     path: `/workouts/${props.id}`,
     method: "PUT",
-    body: payload as any,  // se precisar, tipar corretamente
+    body: payload,  // se precisar, tipar corretamente
+    token: accessToken
   });
   }
 

@@ -5,6 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
 import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
 import { useLocationStore } from "@/store/location";
+import { useAuthStore } from "@/store/auth";
 
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -54,6 +55,7 @@ export default function Routine() {
       }
     })();
   }, []);
+  const { accessToken } = useAuthStore();
 
   const name = params.name || "Athlete";
 
@@ -147,7 +149,7 @@ export default function Routine() {
           };
 
           try {
-            const result = await apiFetch({path: "/routines/", method: "POST", body: payload as any});
+            const result = await apiFetch({path: "/routines/", method: "POST", body: payload, token: accessToken});
             console.log("Workout criado:", result);
             alert(`routine criado: ${result.name}`);
           } catch (err: any) {

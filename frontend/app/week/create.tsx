@@ -12,6 +12,7 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
 
 export default function CreateTask() {
 
@@ -25,6 +26,8 @@ export default function CreateTask() {
       headerTitleAlign: "center"
     });
   }, [navigation]);
+
+  const { accessToken } = useAuthStore();
   
   const params = useLocalSearchParams<{ 
     date_param?: string; 
@@ -58,7 +61,7 @@ export default function CreateTask() {
       date: params.date_param,
       routine_id: params.routine_id_param
     }
-    await apiFetch({ path: `/workouts/`, method: "POST", body: payload as any})
+    await apiFetch({ path: `/workouts/`, method: "POST", body: payload, token: accessToken})
     router.back()
   }
 

@@ -4,6 +4,7 @@ import { TaskCardProps } from "@/components/TaskCard";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
+import { useAuthStore } from "@/store/auth";
 
 export default function Week() {
 
@@ -11,6 +12,7 @@ export default function Week() {
     const params = useLocalSearchParams<{
         routine_id_param?: string;
     }>();
+    const { accessToken } = useAuthStore();
 
     useEffect(() => {
         async function fetchTasks() {
@@ -19,7 +21,8 @@ export default function Week() {
             try {
                 const data: TaskCardProps[] = await apiFetch({
                     path: `/workouts/${params.routine_id_param}`,
-                    method: "GET"
+                    method: "GET",
+                    token: accessToken
                 });
                 setTasks(data);
             } catch (error) {

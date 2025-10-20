@@ -7,6 +7,7 @@ import ModalTask from "@/components/ModalTask";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { DeleteModal, useDeleteModal } from "@/components/DeleteModal";
 import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
 
 export default function DayScreen() {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ export default function DayScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ taskList: string }>();
   let taskList: TaskCardProps[] = [];
+  const { accessToken } = useAuthStore();
 
   if (params.taskList) {
     try {
@@ -52,7 +54,7 @@ export default function DayScreen() {
 
   async function handleDelete(taskId: number) {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    await apiFetch({ path: `/workouts/${taskId}`, method: "DELETE"})
+    await apiFetch({ path: `/workouts/${taskId}`, method: "DELETE", token: accessToken})
     closeDeleteModal();
   }
 
