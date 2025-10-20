@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 class RoutineBase(BaseModel):
@@ -21,6 +22,5 @@ class ProfileSchema(BaseModel):
     pass
 
 class RoutineCreate(BaseModel):
-    routine: RoutineBase
+    name: Optional[str]
     location: LocationSchema
-    profile: ProfileSchema

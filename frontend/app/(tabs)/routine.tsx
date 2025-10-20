@@ -132,20 +132,17 @@ export default function Routine() {
           }
 
           const payload = {
-            routine: {
-              name: "Fiction Train for Woman - Pink October", // por um text para a pessoa por o nome ela mesma na rotina
-              user_id: 1,
-            },
+            name: "Fiction Train for Woman - Pink October",
             location: {
               latitude: coords.lat,
               longitude: coords.lon,
             },
-            profile: {
-              sports: "Running, Marathon",
-              peso: "43 kg",
-              altura: "1,57",
-              frequency: "run all Sundays and thursdays",
-            },
+            // profile: {
+            //   sports: "Running, Marathon",
+            //   peso: "43 kg",
+            //   altura: "1,57",
+            //   frequency: "run all Sundays and thursdays",
+            // },
           };
 
           try {

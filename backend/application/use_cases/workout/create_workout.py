@@ -19,7 +19,7 @@ class CreateWorkoutUseCase:
         self.repository = repository
         self.find_workouts_by_routine_use_case = find_workouts_by_routine_use_case
 
-    def execute(self, workout_data: WorkoutCreate, call_ai = False):
+    def execute(self, workout_data: WorkoutCreate):
         
         # Junta data + hora
         workout_datetime = datetime.combine(workout_data.date, workout_data.hour)
@@ -35,9 +35,6 @@ class CreateWorkoutUseCase:
 
         # Chama a função de verificação
         self.check_workout_conflicts(workout_data, existing_workouts)
-
-        if call_ai:
-            pass
         
         # Se passou, cria o treino
         return self.repository.create(workout_data)

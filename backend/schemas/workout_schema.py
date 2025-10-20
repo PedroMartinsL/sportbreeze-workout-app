@@ -2,6 +2,8 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from datetime import date, time
 
+from schemas.routine_schema import LocationSchema
+
 class WorkoutBase(BaseModel):
     weather: str
     kcal: float
@@ -14,17 +16,8 @@ class WorkoutBase(BaseModel):
     sport: str
     routine_id: int
 
-class WorkoutCreate(BaseModel):
-    weather: Optional[str] = None
-    kcal: float
-    title: Optional[str] = None
-    temp: Optional[float] = None
-    duration: int
-    planner: Optional[str] = None
-    hour: time
-    date: date
-    sport: str
-    routine_id: Optional[int] = None
+class WorkoutCreate(WorkoutBase):
+    pass
 
 class WorkoutResponse(WorkoutBase):
     id: int
@@ -39,3 +32,12 @@ class WorkoutDelete(BaseModel):
 
 class WorkoutUpdate(WorkoutBase):
     pass
+
+class WorkoutGoals(BaseModel):
+    kcal: float
+    hour: time
+    date: date
+    sport: str
+    duration: int
+    location: LocationSchema
+    routine_id: int
