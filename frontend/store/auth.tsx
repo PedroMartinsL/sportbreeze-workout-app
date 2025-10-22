@@ -2,17 +2,18 @@
 import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
 import { apiFetch } from "@/services/api";
+import { jwtDecode } from "jwt-decode";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
+interface JwtPayload {
+  sub: string;
+  role: string;
 }
 
 interface AuthState {
-  user: User | null;
+  user: number | null;
   accessToken: string | null;
   loading: boolean;
+  role: string;
 
   login: (email: string, password: string) => Promise<void>;
   refreshSession: () => Promise<string | null>;
@@ -24,6 +25,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
   loading: true,
+  role: "",
 
   // Login do usuário
   login: async (email: string, password: string) => {
@@ -33,10 +35,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       body: { email, password },
     });
 
-    const { access_token, refresh_token, user } = res;
+    const { access_token, refresh_token } = res;
+    const decoded = jwtDecode<JwtPayload>(access_token);
+    const userId = decoded.sub;
+    const role = decoded.role;
 
     await SecureStore.setItemAsync("refresh_token", refresh_token);
-    set({ accessToken: access_token, user });
+    set({ accessToken: access_token, user: Number(userId), role: role});
   },
 
   // Renova o access token usando o refresh token
@@ -51,8 +56,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         body: { refresh_token: refreshToken },
       });
 
-      const { access_token, user } = res;
-      set({ accessToken: access_token, user });
+      const { access_token } = res;
+      const decoded = jwtDecode<JwtPayload>(access_token);
+
+      set({
+        accessToken: access_token,
+        user: Number(decoded.sub),
+        role: decoded.role,
+      });
       return access_token;
     } catch {
       await get().logout();
@@ -81,8 +92,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         body: { refresh_token: refreshToken },
       });
 
-      const { access_token, user } = res;
-      set({ accessToken: access_token, user, loading: false });
+      const { access_token } = res;
+      const decoded = jwtDecode<JwtPayload>(access_token);
+
+      set({
+        accessToken: access_token,
+        user: Number(decoded.sub),
+        role: decoded.role,
+        loading: false
+      });
     } catch {
       await get().logout();
       set({ loading: false });

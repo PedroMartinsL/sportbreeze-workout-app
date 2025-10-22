@@ -24,8 +24,8 @@ class AuthService:
         if not user:
             raise HTTPException(status_code=400, detail="User not found or invalid credentials")
         else:
-            access_token = create_token(user.id)
-            refresh_token = create_token(user.id, token_duration=timedelta(days=7))
+            access_token = create_token(user)
+            refresh_token = create_token(user, token_duration=timedelta(days=7))
             return {"access_token": access_token,
                     "refresh_token": refresh_token,
                     "token_type": "Bearer"}
