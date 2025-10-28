@@ -6,6 +6,7 @@ import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
 import { useLocationStore } from "@/store/location";
 import { useAuthStore } from "@/store/auth";
+import Toast from 'react-native-toast-message';
 
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -71,7 +72,11 @@ export default function Routine() {
         const routines: Routine[] = await apiFetch({path: "/routines/", method: "GET", token: accessToken});
         setUserRoutines(routines);
       } catch (e: any) {
-        Alert.alert("Não foi possível obter a as rotinas de usuário.");
+        Toast.show({
+        type: 'error',
+        text1: 'Routines not found',
+        text2: e.message || 'Try again later'
+      });
       }
     })();
   }, []);
@@ -91,6 +96,46 @@ export default function Routine() {
 
   // horas/semana: lê hoursPerWeek ou hours
   const hoursPerWeek = Number(params.hoursPerWeek ?? params.hours ?? 5) || 5;
+
+  async function handleCreateRoutine() {
+  if (coords.lat == null || coords.lon == null) {
+    Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
+    return;
+  }
+
+  const payload = {
+    name: "Fiction Train for Woman - Pink October",
+    location: {
+      latitude: coords.lat,
+      longitude: coords.lon,
+    },
+    // profile: {
+    //   sports: "Running, Marathon",
+    //   peso: "43 kg",
+    //   altura: "1,57",
+    //   frequency: "run all Sundays and thursdays",
+    // },
+  };
+
+  try {
+    const result = await apiFetch({
+      path: "/routines/",
+      method: "POST",
+      body: payload,
+      token: accessToken,
+    });
+  } catch (e: any) {
+    Toast.show({
+      type: "error",
+      text1: "Error creating routine",
+      text2: e.message || "Try again later",
+      visibilityTime: 4000,
+      position: "top",
+      topOffset: 50,
+    });
+  }
+}
+
 
   return (
     <View className="flex-1 bg-[#d9f99d] px-6">
@@ -115,7 +160,7 @@ export default function Routine() {
           }
         />
       </View>
-
+          <Toast />
       {/* Weeks */}
       <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5]">
         <FlatList
@@ -154,35 +199,7 @@ export default function Routine() {
       {/* Atualizando: botão que usa latitude/longitude do useState */}
       <TouchableOpacity
         className="mt-6 w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
-        onPress={async () => {
-          if (coords.lat == null || coords.lon == null) {
-            Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
-            return;
-          }
-
-          const payload = {
-            name: "Fiction Train for Woman - Pink October",
-            location: {
-              latitude: coords.lat,
-              longitude: coords.lon,
-            },
-            // profile: {
-            //   sports: "Running, Marathon",
-            //   peso: "43 kg",
-            //   altura: "1,57",
-            //   frequency: "run all Sundays and thursdays",
-            // },
-          };
-
-          try {
-            const result = await apiFetch({path: "/routines/", method: "POST", body: payload, token: accessToken});
-            console.log("Workout criado:", result);
-            alert(`routine criado: ${result.name}`);
-          } catch (err: any) {
-            console.error(err);
-            alert(`Erro ao criar routine: ${err.message}`);
-          }
-        }}
+        onPress={handleCreateRoutine}
       >
         <Text className="text-white text-center font-semibold">Criar Workout (GPS)</Text>
       </TouchableOpacity>

@@ -13,6 +13,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export default function CreateTask() {
 
@@ -61,7 +62,16 @@ export default function CreateTask() {
       date: params.date_param,
       routine_id: params.routine_id_param
     }
-    await apiFetch({ path: `/workouts/`, method: "POST", body: payload, token: accessToken})
+    try {
+      await apiFetch({ path: `/workouts/`, method: "POST", body: payload, token: accessToken})
+    } catch (e: any) {
+      Toast.show({
+        type: 'error',
+        text1: 'We failed creating your routine',
+        text2: e.message || 'Try again later',
+      });
+    }
+    
     router.back()
   }
 
@@ -74,6 +84,7 @@ export default function CreateTask() {
 
   return (
     <View className="flex-1 w-full py-10 px-5 gap-6 mb-4">
+      <Toast />
       <ScrollView>
         <View className="mx-4 gap-5">
           <Text className="text-xl font-bold text-gray-500">Planner</Text>

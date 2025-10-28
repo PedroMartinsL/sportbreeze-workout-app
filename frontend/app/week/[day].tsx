@@ -8,6 +8,7 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import { DeleteModal, useDeleteModal } from "@/components/DeleteModal";
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export default function DayScreen() {
   const navigation = useNavigation();
@@ -54,12 +55,21 @@ export default function DayScreen() {
 
   async function handleDelete(taskId: number) {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    await apiFetch({ path: `/workouts/${taskId}`, method: "DELETE", token: accessToken})
+    try {
+      await apiFetch({ path: `/workouts/${taskId}`, method: "DELETE", token: accessToken})
+    } catch (e: any) {
+      Toast.show({
+        type: 'error',
+        text1: 'Workout not found',
+        text2: e.message || 'Try again later',
+      });
+    }
     closeDeleteModal();
   }
 
   return (
     <View className="flex-1 bg-gray-100 p-2">
+      <Toast />
       <SwipeListView
         data={tasks}
         keyExtractor={(item) => item.id.toString()}

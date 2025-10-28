@@ -5,6 +5,7 @@ import AlertModal from "./AlertModal";
 import { LinearGradient } from 'expo-linear-gradient';
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export type TaskCardProps = {
   id: number;
@@ -45,12 +46,20 @@ export default function TaskCard(props: TaskCardProps) {
       ...props,        // envia todas as props
       check: !isEnabled, // atualiza status no payload
     }
-   await apiFetch({
-    path: `/workouts/${props.id}`,
-    method: "PUT",
-    body: payload,  // se precisar, tipar corretamente
-    token: accessToken
-  });
+    try {
+       await apiFetch({
+        path: `/workouts/${props.id}`,
+        method: "PUT",
+        body: payload,  // se precisar, tipar corretamente
+        token: accessToken
+      });
+    } catch (e: any) {
+        Toast.show({
+          type: 'error',
+          text1: 'Workout not found',
+          text2: e.message || 'Try again later',
+        });
+      }
   }
 
   const warn_days = ["frosty", "rainy", "thundering"];
@@ -76,6 +85,7 @@ export default function TaskCard(props: TaskCardProps) {
     >
       {/* Top row: date/hour + warn */}
       <View className="flex-row justify-between items-center mb-3">
+        <Toast />
         <View className="flex-row gap-3">
           <DetachedData>{formattedDate}</DetachedData>
         </View>

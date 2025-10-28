@@ -5,6 +5,7 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export default function Week() {
 
@@ -25,8 +26,12 @@ export default function Week() {
                     token: accessToken
                 });
                 setTasks(data);
-            } catch (error) {
-                console.error("Erro ao buscar tasks:", error);
+            } catch (e: any) {
+                Toast.show({
+                type: 'error',
+                text1: 'Workout not found',
+                text2: e.message || 'Try again later',
+                });
             }
         }
 
@@ -72,6 +77,7 @@ export default function Week() {
 
     return (
         <View className="flex-1 items-center justify-center bg-gray-150 mt-5">
+            <Toast />
             <View className="w-100 h-50 items-center justify-center bg-white border-1 border-black p-10 rounded-2xl">
                 <Text className="text-2xl font-bold">Routine</Text>
                 <Text className="text-base text-gray-500">What was planned for you</Text>
