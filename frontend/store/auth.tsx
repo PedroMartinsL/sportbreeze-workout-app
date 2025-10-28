@@ -27,33 +27,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   loading: true,
   role: "",
 
-  // Login do usuário
-  login: async (email: string, password: string) => {
+  login: async (email, password) => {
     const res = await apiFetch({
-      path: "auth/login",
+      path: "/auth/login",
       method: "POST",
       body: { email, password },
+      onUnauthorized: get().refreshSession,
+      onLogout: get().logout,
     });
 
     const { access_token, refresh_token } = res;
     const decoded = jwtDecode<JwtPayload>(access_token);
-    const userId = decoded.sub;
-    const role = decoded.role;
 
     await SecureStore.setItemAsync("refresh_token", refresh_token);
-    set({ accessToken: access_token, user: Number(userId), role: role});
+    set({
+      accessToken: access_token,
+      user: Number(decoded.sub),
+      role: decoded.role,
+    });
   },
 
-  // Renova o access token usando o refresh token
   refreshSession: async (): Promise<string | null> => {
     const refreshToken = await SecureStore.getItemAsync("refresh_token");
     if (!refreshToken) return null;
 
     try {
       const res = await apiFetch({
-        path: "auth/refresh",
+        path: "/auth/refresh",
         method: "POST",
         body: { refresh_token: refreshToken },
+        token: null,
+        // Aqui não queremos refresh recursivo
+        onUnauthorized: async () => null,
+        onLogout: get().logout,
       });
 
       const { access_token } = res;
@@ -64,6 +70,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: Number(decoded.sub),
         role: decoded.role,
       });
+
       return access_token;
     } catch {
       await get().logout();
@@ -71,13 +78,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // Logout
   logout: async () => {
     await SecureStore.deleteItemAsync("refresh_token");
-    set({ user: null, accessToken: null });
+    set({ user: null, accessToken: null, role: "" });
   },
 
-  // Inicializa a sessão ao abrir o app
   initAuth: async () => {
     const refreshToken = await SecureStore.getItemAsync("refresh_token");
     if (!refreshToken) {
@@ -87,9 +92,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       const res = await apiFetch({
-        path: "auth/refresh",
+        path: "/auth/refresh",
         method: "POST",
         body: { refresh_token: refreshToken },
+        token: null,
+        onUnauthorized: async () => null,
+        onLogout: get().logout,
       });
 
       const { access_token } = res;
@@ -99,7 +107,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         accessToken: access_token,
         user: Number(decoded.sub),
         role: decoded.role,
-        loading: false
+        loading: false,
       });
     } catch {
       await get().logout();

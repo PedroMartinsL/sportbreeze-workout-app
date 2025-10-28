@@ -10,17 +10,17 @@ export default function Week() {
 
     const navigation = useNavigation();
     const params = useLocalSearchParams<{
-        routine_id_param?: string;
+        routine_id?: string;
     }>();
     const { accessToken } = useAuthStore();
 
     useEffect(() => {
         async function fetchTasks() {
-            if (!params.routine_id_param) return;
+            if (!params.routine_id) return;
             
             try {
                 const data: TaskCardProps[] = await apiFetch({
-                    path: `/workouts/${params.routine_id_param}`,
+                    path: `/workouts/${params.routine_id}`,
                     method: "GET",
                     token: accessToken
                 });
@@ -39,7 +39,7 @@ export default function Week() {
             headerTitleAlign: "center"
         });
 
-    }, [navigation, params.routine_id_param]);
+    }, [navigation, params.routine_id]);
 
 
     const [tasks, setTasks] = useState<TaskCardProps[]>([]);

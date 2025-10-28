@@ -1,10 +1,10 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { apiFetch } from "@/services/api"; // mantém como está
-import { useStore } from "../store/store";
+import { useAuthStore } from "@/store/auth";
 
 export default function LoginScreen() {
-  const { login } = useStore();
+  const { login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function LoginScreen() {
       const refresh_token = resp?.refresh_token || "";
       const token_type = resp?.token_type || "bearer";
 
-      login(access_token, refresh_token, token_type);
+      login(access_token, refresh_token);
       console.log(resp);
 
       Alert.alert("Sucesso", "Login realizado!");

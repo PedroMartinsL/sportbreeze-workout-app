@@ -9,7 +9,7 @@ from schemas.workout_schema import WorkoutCreate
 class AiWeatherClass():
      
      @staticmethod
-     async def api_services(location: LocationSchema, profile, routine_id: int, input: str):
+     async def api_services(location: LocationSchema, profile, routine_id: int, input: str) -> list:
         # Busca informações do clima
         weather_json = fetch_weather(location.latitude, location.longitude)
         if not weather_json:

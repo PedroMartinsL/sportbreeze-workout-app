@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 class RoutineBase(BaseModel):
@@ -12,6 +12,9 @@ class RoutineResponse(RoutineBase):
         from_attributes=True,
         validate_assignment=True
     )
+
+class ListRoutineResponse(RoutineResponse):
+    routines: List[RoutineResponse]
 
 class LocationSchema(BaseModel):
     latitude: float

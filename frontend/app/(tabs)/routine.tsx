@@ -1,7 +1,7 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
+import { Text, TouchableOpacity, View, Alert, FlatList } from "react-native";
 import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
 import { useLocationStore } from "@/store/location";
@@ -18,6 +18,12 @@ const SPORT_LABEL: Record<string, string> = {
   swimming: "Swimming",
 };
 
+type Routine = {
+  id: number;
+  name: string;
+  user_id: number;
+};
+
 export default function Routine() {
   const params = useLocalSearchParams<{
     name?: string;
@@ -28,9 +34,13 @@ export default function Routine() {
     hours?: string;   // compat
   }>();
 
+  //get tokens for auth methods
+  const { accessToken, user } = useAuthStore();
+
   // estado de localização 
   const { coords, setCoords } = useLocationStore();
   const [locLoading, setLocLoading] = useState(false);
+  const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
 
   // captura a localização uma vez ao abrir a tela 
   useEffect(() => {
@@ -54,8 +64,17 @@ export default function Routine() {
         setLocLoading(false);
       }
     })();
+    
+    // Calling routines by access token
+    (async () => {
+      try {
+        const routines: Routine[] = await apiFetch({path: "/routines/", method: "GET", token: accessToken});
+        setUserRoutines(routines);
+      } catch (e: any) {
+        Alert.alert("Não foi possível obter a as rotinas de usuário.");
+      }
+    })();
   }, []);
-  const { accessToken } = useAuthStore();
 
   const name = params.name || "Athlete";
 
@@ -74,7 +93,7 @@ export default function Routine() {
   const hoursPerWeek = Number(params.hoursPerWeek ?? params.hours ?? 5) || 5;
 
   return (
-    <ScrollView className="flex-1 bg-[#d9f99d] px-6">
+    <View className="flex-1 bg-[#d9f99d] px-6">
       <View className="h-5" />
       <Text className="text-2xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
       <Text className="text-[#475569] mt-1">Hello {name}</Text>
@@ -99,27 +118,37 @@ export default function Routine() {
 
       {/* Weeks */}
       <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5]">
-        <Link
-          href={{
-            pathname: "/week",
-            params: {
-              routine_id_param: 67,
-            },
-          }}
-          asChild
-        >
-          <TouchableOpacity className="py-4 px-4 flex-row items-center justify-between">
-            <Text className="text-[#0a0a0a] font-medium">Week 1</Text>
-            <ChevronRight size={18} color="#0a0a0a" />
-          </TouchableOpacity>
-        </Link>
+        <FlatList
+        data={userRoutines}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item, index }) => (
+          <>
+            <Link
+              href={{
+                pathname: "/week",
+                params: {
+                  routine_id: item.id, // 👈 aqui pegamos o valor do state
+                },
+              }}
+              asChild
+            >
+              <TouchableOpacity
+                className="py-4 px-4 flex-row items-center justify-between"
+              >
+                <Text className="text-[#0a0a0a] font-medium">
+                  {item.name}
+                </Text>
+                <ChevronRight size={18} color="#0a0a0a" />
+              </TouchableOpacity>
+            </Link>
 
-        <View className="h-px bg-[#e5e7eb]" />
-
-        <TouchableOpacity className="py-4 px-4 flex-row items-center justify-between" disabled>
-          <Text className="text-[#0a0a0a]/60 font-medium">Week 2</Text>
-          <ChevronRight size={18} color="#0a0a0a" />
-        </TouchableOpacity>
+            {/* Linha divisória */}
+            {index !== userRoutines.length - 1 && (
+              <View className="h-px bg-[#e5e7eb]" />
+            )}
+          </>
+        )}
+      />
       </View>
 
       {/* Atualizando: botão que usa latitude/longitude do useState */}
@@ -166,7 +195,7 @@ export default function Routine() {
       </Link>
 
       <View className="h-8" />
-    </ScrollView>
+    </View>
   );
 }
 
