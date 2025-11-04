@@ -17,6 +17,7 @@ class Workout(Base):
     date = Column(Date, nullable=True)
     sport = Column(String, nullable=True)
     check = Column(Boolean, default=False)
+    notify = Column(Boolean, default=False)
 
     # Relacionamento com Routine
     routine = relationship("Routine", back_populates="workouts")

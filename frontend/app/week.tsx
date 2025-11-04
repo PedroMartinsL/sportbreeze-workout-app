@@ -44,7 +44,7 @@ export default function Week() {
             headerTitleAlign: "center"
         });
 
-    }, [navigation, params.routine_id]);
+    }, [accessToken, navigation, params.routine_id]);
 
 
     const [tasks, setTasks] = useState<TaskCardProps[]>([]);
