@@ -4,12 +4,13 @@ from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = "Users"
-    id = Column("id", Integer, primary_key=True, autoincrement=True)
-    username = Column("username", String)
-    email = Column("email", String, nullable=False)
-    password = Column("password", String, nullable=False)
-    active = Column("active", Boolean, default=True)
-    admin = Column("admin", Boolean, default=False)
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    username = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True, index=True)
+    password = Column(String, nullable=False)
+    active = Column(Boolean, default=True)
+    admin = Column(Boolean, default=False)
 
     devices = relationship("Device", back_populates="user")
     routines = relationship("Routine", back_populates="user")

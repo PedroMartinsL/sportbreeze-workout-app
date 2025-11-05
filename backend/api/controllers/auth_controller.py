@@ -19,7 +19,8 @@ async def create_account(user_schema: UserCreate, create_user_use_case: CreateUs
     
 @auth_router.post("/login")
 async def login(login_schema: UserLogin, auth_service: AuthService = Depends()):
-    return auth_service.login(login_schema=login_schema)
+    var = auth_service.login(login_schema=login_schema)
+    return var
     
 @auth_router.get("/refresh")
 async def use_refresh_token(user: User = Depends(verify_token)):

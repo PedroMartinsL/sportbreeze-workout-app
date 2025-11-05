@@ -2,6 +2,7 @@ import { View, Text, FlatList, Dimensions, ScrollView, TouchableOpacity, Image }
 import React, { useEffect } from "react";
 import { router } from "expo-router";
 import { useAuthStore } from "@/store/auth";
+import { requestNotificationPermission } from "@/utils/requestNotificationPermission";
 
 const { width } = Dimensions.get("window");
 
@@ -21,6 +22,7 @@ export default function Home() {
 
   useEffect(() => {
     initAuth(); 
+    requestNotificationPermission();
   }, [initAuth]);
 
 

@@ -1,5 +1,7 @@
 // src/services/api.ts
-const BASE_URL = "http://192.168.1.36:8000"; // backend FastAPI
+const BASE_URL = process.env.EXPO_PUBLIC_IP_FETCH; // backend FastAPI
+
+console.log(BASE_URL)
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 

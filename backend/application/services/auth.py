@@ -22,7 +22,7 @@ class AuthService:
         user = self.find_user_by_email_use_case.execute(login_schema.email)
         user = self.authenticate_user(user, login_schema.password)
         if not user:
-            raise HTTPException(status_code=400, detail="User not found or invalid credentials")
+            raise HTTPException(status_code=404, detail="User not found or invalid credentials")
         else:
             access_token = create_token(user)
             refresh_token = create_token(user, token_duration=timedelta(days=7))

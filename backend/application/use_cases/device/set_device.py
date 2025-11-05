@@ -1,5 +1,5 @@
 from application.use_cases.device.find_device_by_user import FindDeviceByUserUseCase
-from backend.application.use_cases.device.update_device import UpdateDeviceUseCase
+from application.use_cases.device.update_device import UpdateDeviceUseCase
 from domain.repositories.device_repository import DeviceRepository
 from schemas.device_schema import SetDeviceSchema
 from fastapi import Depends
@@ -17,6 +17,7 @@ class SetDeviceUseCase:
 
     async def execute(self, device_schema: SetDeviceSchema):
         try:
+            print("chegou device")
             device = self.find_device_by_user_use_case.execute(device_schema.user_id)
             if device:
                 return self.update_device_use_case.execute(device.id, device_schema.model_dump())

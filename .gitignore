@@ -38,6 +38,6 @@ venv/
 *$py.class
 
 # Alembic migrations (versions)
-alembic/
+versions/
 
 secrets/

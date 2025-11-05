@@ -25,7 +25,7 @@ def verify_token(token: str = Depends(oauth2_schema), session: Session = Depends
     except JWTError:
         raise HTTPException(status_code=401, detail="Access denied, verify your token validation")
     
-    user = session.filter(User.id==user_id).first()
+    user = session.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="Invalid Access")
     return user 

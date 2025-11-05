@@ -1,6 +1,6 @@
 from fastapi import Depends
 from schemas.workout_schema import WorkoutUpdate
-from domain.repositories.workout_repository import DeviceRepository
+from domain.repositories.device_repository import DeviceRepository
 
 
 class UpdateDeviceUseCase:

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-from infrastructure.database.connection import Base
 from sqlalchemy.orm import relationship
+from infrastructure.database.connection import Base
+
 
 class Routine(Base):
     __tablename__ = "Routines"
@@ -9,7 +10,6 @@ class Routine(Base):
     name = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("Users.id"), nullable=False)
 
-    # Relacionamento opcional com tarefas
+    # Relacionamentos
+    user = relationship("User", back_populates="routines")
     workouts = relationship("Workout", back_populates="routine")
-
-

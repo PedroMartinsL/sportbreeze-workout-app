@@ -1,10 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import { apiFetch } from "@/services/api"; // mantém como está
+import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
+import { getPushToken } from "@/utils/getPushToken";
 
 export default function LoginScreen() {
-  const { login } = useAuthStore();
+  const { accessToken, login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,14 +19,22 @@ export default function LoginScreen() {
       setLoading(true);
 
       // ✅ Forçamos o tipo com “as any” para não alterar o api.js
-      const resp = await apiFetch({path: "/auth/login", method: "POST", body: { email, password } as any});
+      await login(email, password);    
+      
+      const expoPushToken = await getPushToken();
+      console.log(expoPushToken);
 
-      const access_token = resp?.access_token || resp?.token;
-      const refresh_token = resp?.refresh_token || "";
-      const token_type = resp?.token_type || "bearer";
-
-      login(access_token, refresh_token);
-      console.log(resp);
+      if (expoPushToken) {
+        // 🔹 envia o token do celular para o backend junto com o access_token
+        await apiFetch({
+          path: "/device",
+          method: "POST",
+          body: {
+            device_token: expoPushToken,
+          },
+          token: accessToken
+        });
+      }
 
       Alert.alert("Sucesso", "Login realizado!");
     } catch (e: any) {
