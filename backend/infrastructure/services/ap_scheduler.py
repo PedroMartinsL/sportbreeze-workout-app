@@ -1,5 +1,5 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import httpx
 import asyncio
 
@@ -18,30 +18,41 @@ async def send_notification(device_token: str, title: str, body: str):
 
 
 async def check_workouts_to_notify():
-
     notify_before = timedelta(minutes=10)
     
     # cria uma sessão
     for session in get_session():
         now = datetime.now()
-        
-        workouts = session.query(Workout).filter(Workout.hour >= now).all()
+        today = date.today()
+
+        workouts = (
+            session.query(Workout)
+            .filter(
+                (Workout.check != False) |
+                (Workout.date >= today) |  # datas futuras
+                ((Workout.date == today) & (Workout.hour >= now.time()))  # hoje, mas ainda não passou o horário
+            )
+            .all()
+        )
+
         for workout in workouts:
             if workout.notify:
                 continue
-            time_diff = Workout.hour - now
+            workout_datetime = datetime.combine(workout.date, workout.hour)
+            time_diff = workout_datetime - now
             if timedelta(0) <= time_diff <= notify_before:
-                device = session.query(Device).filter(Device.user_id == workout.user_id).first()
+                device = session.query(Device).filter(Device.user_id == workout.routine.user_id).first()
                 if device:
                     asyncio.create_task(send_notification(
                         device.device_token,
                         title="Your workout is up to start!",
-                        body=f"Get ready for: {workout.name} - {workout.sport}"
+                        body=f"Get ready for: {workout.title} - {workout.sport}"
                     ))
                     workout.notify = True
                     session.commit()
 
+
 async def start_scheduler():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(check_workouts_to_notify, "interval", minutes=10)
+    scheduler.add_job(check_workouts_to_notify, "interval", minutes=5)
     scheduler.start()
