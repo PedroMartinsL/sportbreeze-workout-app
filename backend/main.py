@@ -2,11 +2,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-
+from contextlib import asynccontextmanager
+import asyncio
 
 load_dotenv()
 
-app = FastAPI()
+
+
+# --- Lifespan padrão ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    from infrastructure.services.ap_scheduler import start_scheduler
+    asyncio.create_task(start_scheduler())  # inicia task em paralelo
+    yield  # continua inicializando o FastAPI
+    
+    
+app = FastAPI(lifespan=lifespan)
 
 # Run to execute: 
 # uvicorn main:app --reload --host 0.0.0.0 --port 8000
