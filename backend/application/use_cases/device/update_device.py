@@ -1,5 +1,6 @@
 from fastapi import Depends
-from schemas.workout_schema import WorkoutUpdate
+from domain.entities.device import Device
+from schemas.device_schema import SetDeviceSchema
 from domain.repositories.device_repository import DeviceRepository
 
 
@@ -7,7 +8,9 @@ class UpdateDeviceUseCase:
     def __init__(self, repository: DeviceRepository = Depends()):
         self.repository = repository
 
-    def execute(self, device_id: int, update_data: WorkoutUpdate):
+    async def execute(self, device: Device, update_data: SetDeviceSchema):
         data_dict = update_data.model_dump(exclude_unset=True)
-        # exclude_unset=True → só pega campos realmente enviados pelo usuário
-        return self.repo.update(device_id, data_dict)
+        if device.device_token == update_data.device_token:
+            return device
+
+        return self.repository.update(device, data_dict)

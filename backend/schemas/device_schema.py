@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 class DeviceSchema(BaseModel):
-    device_id: int
+    device_token: str
 
 class SetDeviceSchema(DeviceSchema):
     user_id: int
