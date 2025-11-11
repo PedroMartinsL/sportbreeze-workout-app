@@ -1,7 +1,7 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { ChevronRight, User } from "lucide-react-native";
+import { User } from "lucide-react-native";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View, Alert, FlatList } from "react-native";
+import { Text, TouchableOpacity, View, Alert, FlatList, TextInput } from "react-native";
 import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
 import { useLocationStore } from "@/store/location";
@@ -10,6 +10,8 @@ import Toast from 'react-native-toast-message';
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import RoutineCell from "@/components/RoutineCell";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import PlusLine from "@/components/PlusLine";
 
 export type Routine = {
   id: number;
@@ -34,6 +36,7 @@ export default function Routine() {
   const { coords, setCoords } = useLocationStore();
   const [locLoading, setLocLoading] = useState(false);
   const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
+  const [routineName, setRoutineName] = useState("");
 
   // captura a localização uma vez ao abrir a tela 
   useFocusEffect(
@@ -99,7 +102,7 @@ export default function Routine() {
     }
 
     const payload = {
-      name: "Fiction Train for Woman - Pink October",
+      name: routineName,
       location: {
         latitude: coords.lat,
         longitude: coords.lon,
@@ -126,7 +129,7 @@ export default function Routine() {
   }
 
   return (
-    <View className="flex-1 bg-[#d9f99d] px-6">
+    <View className="flex-1  px-6">
       <Toast />
       <View className="h-40 " />
       <View className="flex-row justify-between items-center mt-4 px-6">
@@ -160,13 +163,32 @@ export default function Routine() {
         )}
       </View>
 
-      {/* Atualizando: botão que usa latitude/longitude do useState */}
-      <TouchableOpacity
-        className="mt-6 w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
-        onPress={handleCreateRoutine}
-      >
-        <Text className="text-white text-center font-semibold">Schedule Workout</Text>
-      </TouchableOpacity>
+      <PlusLine/>
+
+      <View className="px-4 flex justify-center items-center gap-y-2">
+
+      {/* Input com ícone */}
+      <View className="flex-row items-center border rounded-lg border-gray-700 mb-6 px-2">
+        <MaterialIcons name="sports-volleyball" size={24} color="black" />
+          <TextInput
+            placeholder="Routine Name"
+            placeholderTextColor="#888"
+            value={routineName}
+            onChangeText={setRoutineName}
+            className="flex-1 text-white py-2"
+          />
+        </View>
+
+        {/* Botão */}
+        <TouchableOpacity
+          className="w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
+          onPress={handleCreateRoutine}
+        >
+          <Text className="text-white text-center font-semibold">
+            Schedule Workout
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <View className="h-8" />
     </View>
