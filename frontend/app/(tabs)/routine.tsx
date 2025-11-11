@@ -1,25 +1,17 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { ChevronRight } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import { ChevronRight, User } from "lucide-react-native";
+import React, { useState } from "react";
 import { Text, TouchableOpacity, View, Alert, FlatList } from "react-native";
 import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
 import { useLocationStore } from "@/store/location";
 import { useAuthStore } from "@/store/auth";
 import Toast from 'react-native-toast-message';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import RoutineCell from "@/components/RoutineCell";
 
-const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
-
-const SPORT_LABEL: Record<string, string> = {
-  running: "Running",
-  cycling: "Cycling",
-  trail: "Trail",
-  gym: "Gym",
-  walking: "Walking",
-  swimming: "Swimming",
-};
-
-type Routine = {
+export type Routine = {
   id: number;
   name: string;
   user_id: number;
@@ -44,7 +36,10 @@ export default function Routine() {
   const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
 
   // captura a localização uma vez ao abrir a tela 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
+    let isActive = true;
+
     (async () => {
       try {
         setLocLoading(true);
@@ -56,144 +51,113 @@ export default function Routine() {
         const pos = await Location.getCurrentPositionAsync({
           accuracy: Location.LocationAccuracy.Balanced,
         });
+
+        if (!isActive) return;
+
         setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-        console.log("Routine → GPS:", pos.coords.latitude, pos.coords.longitude);
       } catch (e: any) {
-        console.warn("Erro ao obter localização:", e?.message ?? e);
         Alert.alert("Não foi possível obter a localização agora.");
       } finally {
-        setLocLoading(false);
+        if (isActive) setLocLoading(false);
       }
     })();
-    
-    // Calling routines by access token
+
     (async () => {
-      try {
-        const routines: Routine[] = await apiFetch({path: "/routines/", method: "GET", token: accessToken});
-        setUserRoutines(routines);
-      } catch (e: any) {
-        Toast.show({
-        type: 'error',
-        text1: 'Routines not found',
-        text2: e.message || 'Try again later'
-      });
+      if (accessToken) {
+        try {
+          const response = await apiFetch({
+            path: "/routines/",
+            method: "GET",
+            token: accessToken,
+          });
+
+          if (!isActive) return;
+
+          setUserRoutines(response.routines);
+        } catch (e: any) {
+          Toast.show({
+            type: "error",
+            text1: "Routines not found",
+            text2: e.message || "Try again later",
+          });
+        }
       }
     })();
-  }, []);
+
+    return () => {
+      isActive = false; // evita setState em tela desmontada
+    };
+  }, [accessToken])
+);
 
   const name = params.name || "Athlete";
 
-  // esportes: usa `sports` CSV; senão cai pro `sport`; senão running
-  const sportsArr = (params.sports?.split(",").map(s => s.trim()).filter(Boolean) || [])
-    .concat(!params.sports && params.sport ? [String(params.sport)] : [])
-    .filter(Boolean);
-  const sports = sportsArr.length ? sportsArr : ["running"];
-  const sportsLabel = sports.map(s => SPORT_LABEL[s] || s).join(", ");
-
-  // dias: parse da string, senão todos os dias
-  const days =
-    params.days?.split(",").map(d => d.trim()).filter(Boolean) || [...ALL_DAYS];
-
-  // horas/semana: lê hoursPerWeek ou hours
-  const hoursPerWeek = Number(params.hoursPerWeek ?? params.hours ?? 5) || 5;
-
   async function handleCreateRoutine() {
-  if (coords.lat == null || coords.lon == null) {
-    Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
-    return;
+    if (coords.lat == null || coords.lon == null) {
+      Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
+      return;
+    }
+
+    const payload = {
+      name: "Fiction Train for Woman - Pink October",
+      location: {
+        latitude: coords.lat,
+        longitude: coords.lon,
+      }
+    };
+
+    try {
+      const result = await apiFetch({
+        path: "/routines/",
+        method: "POST",
+        body: payload,
+        token: accessToken,
+      });
+    } catch (e: any) {
+      Toast.show({
+        type: "error",
+        text1: "Error creating routine",
+        text2: e.message || "Try again later",
+        visibilityTime: 4000,
+        position: "top",
+        topOffset: 50,
+      });
+    }
   }
-
-  const payload = {
-    name: "Fiction Train for Woman - Pink October",
-    location: {
-      latitude: coords.lat,
-      longitude: coords.lon,
-    },
-    // profile: {
-    //   sports: "Running, Marathon",
-    //   peso: "43 kg",
-    //   altura: "1,57",
-    //   frequency: "run all Sundays and thursdays",
-    // },
-  };
-
-  try {
-    const result = await apiFetch({
-      path: "/routines/",
-      method: "POST",
-      body: payload,
-      token: accessToken,
-    });
-  } catch (e: any) {
-    Toast.show({
-      type: "error",
-      text1: "Error creating routine",
-      text2: e.message || "Try again later",
-      visibilityTime: 4000,
-      position: "top",
-      topOffset: 50,
-    });
-  }
-}
-
 
   return (
     <View className="flex-1 bg-[#d9f99d] px-6">
-      <View className="h-5" />
-      <Text className="text-2xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
-      <Text className="text-[#475569] mt-1">Hello {name}</Text>
+      <Toast />
+      <View className="h-40 " />
+      <View className="flex-row justify-between items-center mt-4 px-6">
+        {/* Título */}
+        <Text className="text-2xl font-extrabold text-[#0a0a0a]">
+          Sportsbreeze
+        </Text>
 
-      {/* Resumo */}
-      <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5] p-4">
-        <Row label="Sports" value={sportsLabel} />
-        <Row label="Days" value={days.join(", ")} />
-        <Row label="Hours / week" value={`${hoursPerWeek} h`} />
-        {/*status do GPS */}
-        <Row
-          label="GPS"
-          value={
-            locLoading
-              ? "Obtendo localização..."
-              : coords.lat != null && coords.lon != null
-              ? `Lat: ${coords.lat.toFixed(6)} · Lon: ${coords.lon.toFixed(6)}`
-              : "Sem coordenadas"
-          }
-        />
+        {/* Botão de perfil */}
+        <Link href="/registration" asChild>
+          <TouchableOpacity className="bg-black p-3 rounded-full">
+            <User size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </Link>
       </View>
-          <Toast />
+      
+      
       {/* Weeks */}
       <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5]">
-        <FlatList
-        data={userRoutines}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => (
-          <>
-            <Link
-              href={{
-                pathname: "/week",
-                params: {
-                  routine_id: item.id, // 👈 aqui pegamos o valor do state
-                },
-              }}
-              asChild
-            >
-              <TouchableOpacity
-                className="py-4 px-4 flex-row items-center justify-between"
-              >
-                <Text className="text-[#0a0a0a] font-medium">
-                  {item.name}
-                </Text>
-                <ChevronRight size={18} color="#0a0a0a" />
-              </TouchableOpacity>
-            </Link>
-
-            {/* Linha divisória */}
-            {index !== userRoutines.length - 1 && (
-              <View className="h-px bg-[#e5e7eb]" />
-            )}
-          </>
+        {userRoutines.length === 0 ? (
+          <View className="p-4 items-center">
+            <Text className="text-gray-500">No routines registered yet</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={userRoutines}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={RoutineCell}
+            contentContainerStyle={{ paddingVertical: 8 }}
+          />
         )}
-      />
       </View>
 
       {/* Atualizando: botão que usa latitude/longitude do useState */}
@@ -201,15 +165,8 @@ export default function Routine() {
         className="mt-6 w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
         onPress={handleCreateRoutine}
       >
-        <Text className="text-white text-center font-semibold">Criar Workout (GPS)</Text>
+        <Text className="text-white text-center font-semibold">Schedule Workout</Text>
       </TouchableOpacity>
-
-      {/* CTA opcional */}
-      <Link href="/registration" asChild>
-        <TouchableOpacity className="mt-6 w-full max-w-xs mx-auto bg-black py-3 rounded-xl">
-          <Text className="text-white text-center font-semibold">Edit profile</Text>
-        </TouchableOpacity>
-      </Link>
 
       <View className="h-8" />
     </View>

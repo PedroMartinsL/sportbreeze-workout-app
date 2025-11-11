@@ -9,15 +9,16 @@ from schemas.workout_schema import WorkoutCreate
 class AiWeatherClass():
      
      @staticmethod
-     async def api_services(location: LocationSchema, profile, routine_id: int, input: str) -> list:
+     async def api_services(location: LocationSchema, user, routine_id: int, input: str) -> list:
         # Busca informações do clima
+        profile = user.profile.model_dump() if hasattr(user, "profile") and user.profile else {"profile": "default"}
         weather_json = fetch_weather(location.latitude, location.longitude)
         if not weather_json:
             raise HTTPException(status_code=404, detail="Weather information not found")
 
         # Chamada ao Gemini AI
         payload_json = await call_gemini(
-            profile.model_dump(),
+            profile,
             f"{input}| weather {weather_json}"
         )
 

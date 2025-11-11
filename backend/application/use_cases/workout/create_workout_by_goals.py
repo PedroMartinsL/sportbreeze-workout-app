@@ -12,7 +12,7 @@ class CreateWorkoutByGoalsUseCase:
     def execute(self, workout_goals: WorkoutGoals, user: User):
         workouts = AiWeatherClass.api_services(
             workout_goals.location,
-            user.profile,
+            user,
             workout_goals.routine.id,
             "Generate a single training plan:"
         )
