@@ -1,10 +1,14 @@
-import { View, FlatList, Pressable, Text, Modal } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import TaskCard, { TaskCardProps } from "@/components/TaskCard";
 import { useEffect, useState } from "react";
 import { ToolsIcons } from "@/components/WeatherIcon";
 import ModalTask from "@/components/ModalTask";
-
+import { SwipeListView } from "react-native-swipe-list-view";
+import { DeleteModal, useDeleteModal } from "@/components/DeleteModal";
+import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export default function DayScreen() {
   const navigation = useNavigation();
@@ -14,13 +18,14 @@ export default function DayScreen() {
       title: "Daily tasks",
       headerStyle: { backgroundColor: "#f0f0f0" },
       headerTintColor: "#333",
-      headerTitleAlign: "center"
+      headerTitleAlign: "center",
     });
-  }, []);
-  
+  }, [navigation]);
+
   const router = useRouter();
   const params = useLocalSearchParams<{ taskList: string }>();
   let taskList: TaskCardProps[] = [];
+  const { accessToken } = useAuthStore();
 
   if (params.taskList) {
     try {
@@ -34,36 +39,43 @@ export default function DayScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<TaskCardProps>();
 
-  const [deleteVisible, setDeleteVisible] = useState(false);
-  const [deleteData, setDeleteData] = useState<TaskCardProps>();
-
   const [tasks, setTasks] = useState<TaskCardProps[]>(taskList);
+
+  const {
+    visible: deleteVisible,
+    data: deleteData,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useDeleteModal<TaskCardProps>();
 
   function populateModal(taskData: TaskCardProps) {
     setModalVisible(true);
     setModalData(taskData);
   }
 
-  function openDeleteModal(taskData: TaskCardProps) {
-    setDeleteVisible(true);
-    setDeleteData(taskData);
-  }
-
-  function handleDelete(taskId: number) {
+  async function handleDelete(taskId: number) {
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    setDeleteVisible(false);
+    try {
+      await apiFetch({ path: `/workouts/${taskId}`, method: "DELETE", token: accessToken})
+    } catch (e: any) {
+      Toast.show({
+        type: 'error',
+        text1: 'Workout not found',
+        text2: e.message || 'Try again later',
+      });
+    }
+    closeDeleteModal();
   }
 
   return (
-    <View className="flex-1 bg-gray-100 justify-center items-center">
-      <FlatList
+    <View className="flex-1 bg-gray-100 p-2">
+      <Toast />
+      <SwipeListView
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => populateModal(item)}
-            onLongPress={() => openDeleteModal(item)}
-            delayLongPress={300}
             style={({ pressed }) => [
               pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] },
             ]}
@@ -71,6 +83,19 @@ export default function DayScreen() {
             <TaskCard {...item} />
           </Pressable>
         )}
+        renderHiddenItem={({ item }) => (
+          <View className="flex-1 flex-row justify-end items-center rounded-2xl m-2 mr-6 bg-red-500">
+            <Pressable
+              onPress={() => openDeleteModal(item)}
+              className="px-4 py-2 rounded-lg"
+            >
+              <Text className="text-white font-semibold">Deletar</Text>
+            </Pressable>
+          </View>
+        )}
+        rightOpenValue={-90} // quanto abre pro lado direito
+        disableRightSwipe // só permite arrastar pra esquerda
+        showsVerticalScrollIndicator={false}
       />
 
       {/* Botão flutuante */}
@@ -91,62 +116,12 @@ export default function DayScreen() {
       {/* Modal de deletar */}
       <DeleteModal
         modalVisible={deleteVisible}
-        setModalVisible={setDeleteVisible}
+        setModalVisible={closeDeleteModal}
         modalData={deleteData}
         handleDelete={handleDelete}
+        confirmMessage={`Daily Task`}
       />
     </View>
   );
 }
 
-type DeleteModalProps = {
-  modalVisible: boolean;
-  setModalVisible: (visible: boolean) => void;
-  modalData?: TaskCardProps;
-  handleDelete: (taskId: number) => void;
-};
-
-function DeleteModal({
-  modalVisible,
-  setModalVisible,
-  modalData,
-  handleDelete,
-}: DeleteModalProps) {
-  if (!modalData) return null;
-
-  return (
-    <Modal
-      animationType="fade"
-      transparent
-      visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white rounded-2xl p-6 w-4/5 shadow-lg">
-          <Text className="text-lg font-bold mb-2">Confirmar exclusão</Text>
-          <Text className="text-gray-500 mb-4">
-            {modalData.sport} - {modalData.hour}
-          </Text>
-
-          <View className="flex-row justify-between">
-            <Pressable
-              onPress={() => setModalVisible(false)}
-              className="bg-gray-200 px-4 py-2 rounded-lg"
-              style={({ pressed }) => pressed && { opacity: 0.7 }}
-            >
-              <Text>Cancelar</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={() => handleDelete(modalData.id)}
-              className="bg-red-500 px-4 py-2 rounded-lg"
-              style={({ pressed }) => pressed && { opacity: 0.7 }}
-            >
-              <Text className="text-white">Deletar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-}

@@ -1,9 +1,12 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
+import { Text, TouchableOpacity, View, Alert, FlatList } from "react-native";
 import * as Location from "expo-location";
-import { apiFetch } from "@/api";
+import { apiFetch } from "@/services/api";
+import { useLocationStore } from "@/store/location";
+import { useAuthStore } from "@/store/auth";
+import Toast from 'react-native-toast-message';
 
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -16,6 +19,12 @@ const SPORT_LABEL: Record<string, string> = {
   swimming: "Swimming",
 };
 
+type Routine = {
+  id: number;
+  name: string;
+  user_id: number;
+};
+
 export default function Routine() {
   const params = useLocalSearchParams<{
     name?: string;
@@ -26,12 +35,13 @@ export default function Routine() {
     hours?: string;   // compat
   }>();
 
+  //get tokens for auth methods
+  const { accessToken, user } = useAuthStore();
+
   // estado de localização 
-  const [coords, setCoords] = useState<{ lat: number | null; lon: number | null }>({
-    lat: null,
-    lon: null,
-  });
+  const { coords, setCoords } = useLocationStore();
   const [locLoading, setLocLoading] = useState(false);
+  const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
 
   // captura a localização uma vez ao abrir a tela 
   useEffect(() => {
@@ -55,6 +65,20 @@ export default function Routine() {
         setLocLoading(false);
       }
     })();
+    
+    // Calling routines by access token
+    (async () => {
+      try {
+        const routines: Routine[] = await apiFetch({path: "/routines/", method: "GET", token: accessToken});
+        setUserRoutines(routines);
+      } catch (e: any) {
+        Toast.show({
+        type: 'error',
+        text1: 'Routines not found',
+        text2: e.message || 'Try again later'
+      });
+      }
+    })();
   }, []);
 
   const name = params.name || "Athlete";
@@ -73,8 +97,48 @@ export default function Routine() {
   // horas/semana: lê hoursPerWeek ou hours
   const hoursPerWeek = Number(params.hoursPerWeek ?? params.hours ?? 5) || 5;
 
+  async function handleCreateRoutine() {
+  if (coords.lat == null || coords.lon == null) {
+    Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
+    return;
+  }
+
+  const payload = {
+    name: "Fiction Train for Woman - Pink October",
+    location: {
+      latitude: coords.lat,
+      longitude: coords.lon,
+    },
+    // profile: {
+    //   sports: "Running, Marathon",
+    //   peso: "43 kg",
+    //   altura: "1,57",
+    //   frequency: "run all Sundays and thursdays",
+    // },
+  };
+
+  try {
+    const result = await apiFetch({
+      path: "/routines/",
+      method: "POST",
+      body: payload,
+      token: accessToken,
+    });
+  } catch (e: any) {
+    Toast.show({
+      type: "error",
+      text1: "Error creating routine",
+      text2: e.message || "Try again later",
+      visibilityTime: 4000,
+      position: "top",
+      topOffset: 50,
+    });
+  }
+}
+
+
   return (
-    <ScrollView className="flex-1 bg-[#d9f99d] px-6">
+    <View className="flex-1 bg-[#d9f99d] px-6">
       <View className="h-5" />
       <Text className="text-2xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
       <Text className="text-[#475569] mt-1">Hello {name}</Text>
@@ -96,71 +160,46 @@ export default function Routine() {
           }
         />
       </View>
-
+          <Toast />
       {/* Weeks */}
       <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5]">
-        <Link
-          href={{
-            pathname: "/week",
-            params: {
-              name,
-              sports: sports.join(","),
-              days: days.join(", "),
-              hoursPerWeek: String(hoursPerWeek),
-              week: "1",
-            },
-          }}
-          asChild
-        >
-          <TouchableOpacity className="py-4 px-4 flex-row items-center justify-between">
-            <Text className="text-[#0a0a0a] font-medium">Week 1</Text>
-            <ChevronRight size={18} color="#0a0a0a" />
-          </TouchableOpacity>
-        </Link>
+        <FlatList
+        data={userRoutines}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item, index }) => (
+          <>
+            <Link
+              href={{
+                pathname: "/week",
+                params: {
+                  routine_id: item.id, // 👈 aqui pegamos o valor do state
+                },
+              }}
+              asChild
+            >
+              <TouchableOpacity
+                className="py-4 px-4 flex-row items-center justify-between"
+              >
+                <Text className="text-[#0a0a0a] font-medium">
+                  {item.name}
+                </Text>
+                <ChevronRight size={18} color="#0a0a0a" />
+              </TouchableOpacity>
+            </Link>
 
-        <View className="h-px bg-[#e5e7eb]" />
-
-        <TouchableOpacity className="py-4 px-4 flex-row items-center justify-between" disabled>
-          <Text className="text-[#0a0a0a]/60 font-medium">Week 2</Text>
-          <ChevronRight size={18} color="#0a0a0a" />
-        </TouchableOpacity>
+            {/* Linha divisória */}
+            {index !== userRoutines.length - 1 && (
+              <View className="h-px bg-[#e5e7eb]" />
+            )}
+          </>
+        )}
+      />
       </View>
 
       {/* Atualizando: botão que usa latitude/longitude do useState */}
       <TouchableOpacity
         className="mt-6 w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
-        onPress={async () => {
-          if (coords.lat == null || coords.lon == null) {
-            Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
-            return;
-          }
-
-          const payload = {
-            routine: {
-              name: "Fiction Train for Woman - Pink October", // por um text para a pessoa por o nome ela mesma na rotina
-              user_id: 1,
-            },
-            location: {
-              latitude: coords.lat,
-              longitude: coords.lon,
-            },
-            profile: {
-              sports: "Running, Marathon",
-              peso: "43 kg",
-              altura: "1,57",
-              frequency: "run all Sundays and thursdays",
-            },
-          };
-
-          try {
-            const result = await apiFetch("/auth/routines", "POST", payload as any);
-            console.log("Workout criado:", result);
-            alert(`routine criado: ${result.name}`);
-          } catch (err: any) {
-            console.error(err);
-            alert(`Erro ao criar routine: ${err.message}`);
-          }
-        }}
+        onPress={handleCreateRoutine}
       >
         <Text className="text-white text-center font-semibold">Criar Workout (GPS)</Text>
       </TouchableOpacity>
@@ -173,7 +212,7 @@ export default function Routine() {
       </Link>
 
       <View className="h-8" />
-    </ScrollView>
+    </View>
   );
 }
 

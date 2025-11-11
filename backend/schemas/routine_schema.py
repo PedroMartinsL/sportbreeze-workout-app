@@ -1,3 +1,4 @@
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 class RoutineBase(BaseModel):
@@ -12,6 +13,9 @@ class RoutineResponse(RoutineBase):
         validate_assignment=True
     )
 
+class ListRoutineResponse(RoutineResponse):
+    routines: List[RoutineResponse]
+
 class LocationSchema(BaseModel):
     latitude: float
     longitude: float
@@ -21,6 +25,5 @@ class ProfileSchema(BaseModel):
     pass
 
 class RoutineCreate(BaseModel):
-    routine: RoutineBase
+    name: Optional[str]
     location: LocationSchema
-    profile: ProfileSchema

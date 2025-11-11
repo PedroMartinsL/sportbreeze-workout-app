@@ -10,28 +10,38 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export default function CreateTask() {
 
   const navigation = useNavigation();
   
-    useEffect(() => {
-      navigation.setOptions({
-        title: "Schedule",
-        headerStyle: { backgroundColor: "#f0f0f0" },
-        headerTintColor: "#333",
-        headerTitleAlign: "center"
-      });
-    }, [navigation]);
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Schedule",
+      headerStyle: { backgroundColor: "#f0f0f0" },
+      headerTintColor: "#333",
+      headerTitleAlign: "center"
+    });
+  }, [navigation]);
 
+  const { accessToken } = useAuthStore();
+  
+  const params = useLocalSearchParams<{ 
+    date_param?: string; 
+    routine_id_param?: string; 
+  }>();
   
   const router = useRouter();
-  const [kcalValue, setValue] = useState<string>("0");
-  const [selectedSport, setSelectedSport] = useState<string>("");
+  const [kcalGoal, setKcalGoal] = useState<string>("0");
+  const [sport, setSport] = useState<string>("");
   const [time, setTime] = useState(new Date());
-  const [show, setShow] = useState(false);
   const [duration, setDuration] = useState(30);
+
+  const [show, setShow] = useState(false);
 
   const sports = [
     "Swimming",
@@ -43,6 +53,28 @@ export default function CreateTask() {
     "Marathon",
   ];
 
+  async function handleWorkoutCreate() {
+    const payload = {
+      kcal: kcalGoal,
+      sport: sport,
+      hour: time,
+      duration: duration,
+      date: params.date_param,
+      routine_id: params.routine_id_param
+    }
+    try {
+      await apiFetch({ path: `/workouts/`, method: "POST", body: payload, token: accessToken})
+    } catch (e: any) {
+      Toast.show({
+        type: 'error',
+        text1: 'We failed creating your routine',
+        text2: e.message || 'Try again later',
+      });
+    }
+    
+    router.back()
+  }
+
   const durationOptions = Array.from({ length: 12 }, (_, i) => (i + 1) * 30);
 
   const onChange = (event: any, selectedTime: Date | undefined) => {
@@ -52,7 +84,7 @@ export default function CreateTask() {
 
   return (
     <View className="flex-1 w-full py-10 px-5 gap-6 mb-4">
-      <Text className="text-4xl font-bold text-gray-800">Create Task</Text>
+      <Toast />
       <ScrollView>
         <View className="mx-4 gap-5">
           <Text className="text-xl font-bold text-gray-500">Planner</Text>
@@ -120,11 +152,11 @@ export default function CreateTask() {
 
           <DetachedData>K/cal Goal:</DetachedData>
           <TextInput
-            value={kcalValue}
+            value={kcalGoal}
             onChangeText={(text) => {
               // only allow numerics
               const intText = text.replace(/[^0-9]/g, "");
-              setValue(intText);
+              setKcalGoal(intText);
             }}
             keyboardType="numeric"
             placeholder="0"
@@ -134,8 +166,8 @@ export default function CreateTask() {
           <DetachedData>Sport:</DetachedData>
           <View className="border border-gray-300 rounded-lg overflow-hidden bg-white">
             <Picker
-              selectedValue={selectedSport}
-              onValueChange={(itemValue) => setSelectedSport(itemValue)}
+              selectedValue={sport}
+              onValueChange={(itemValue) => setSport(itemValue)}
               className="bg-white"
             >
               <Picker.Item label="Select a sport..." value="" enabled={false} />
@@ -155,7 +187,7 @@ export default function CreateTask() {
             </Pressable>
 
             <Pressable
-              onPress={() => router.back()}
+              onPress={handleWorkoutCreate}
               className="bg-blue-500 rounded-full p-3 w-32"
             >
               <Text className="text-white text-center">Schedule</Text>

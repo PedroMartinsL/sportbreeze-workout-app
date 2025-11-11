@@ -13,7 +13,7 @@ type WeatherIconProps = {
 };
 
 export function WeatherIcon({ weather, size }: WeatherIconProps) {
-        switch (weather) {
+        switch (weather.toLowerCase()) {
             case "sunny":
                 return (
                     <View>

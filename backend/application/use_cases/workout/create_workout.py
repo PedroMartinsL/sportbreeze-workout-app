@@ -20,23 +20,25 @@ class CreateWorkoutUseCase:
         self.find_workouts_by_routine_use_case = find_workouts_by_routine_use_case
 
     def execute(self, workout_data: WorkoutCreate):
+        
         # Junta data + hora
-        date_str = f"{workout_data.date} {workout_data.hour}"
-        workout_datetime = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+        workout_datetime = datetime.combine(workout_data.date, workout_data.hour)
 
         # Verifica se é no passado
-        if workout_datetime < datetime.now():
+        now = datetime.now()
+        buffer = timedelta(seconds=30)  # ou 60 segundos
+        if workout_datetime < now - buffer:
             raise HTTPException(status_code=400, detail="A data e hora do treino não podem estar no passado.")
-
-        # Busca os treinos da rotina
-        existing_workouts = self.find_workouts_by_routine_use_case(workout_data.routine_id)
+        
+            # Busca os treinos da rotina
+        existing_workouts = self.find_workouts_by_routine_use_case.execute(workout_data.routine_id)
 
         # Chama a função de verificação
         self.check_workout_conflicts(workout_data, existing_workouts)
-
+        
         # Se passou, cria o treino
         return self.repository.create(workout_data)
-    
+
 
     def check_workout_conflicts(self, new_workout: WorkoutCreate, existing_workouts: List[Workout]):
         """
@@ -45,14 +47,13 @@ class CreateWorkoutUseCase:
         """
 
         # Define início e fim do novo treino
-        new_start = datetime.strptime(f"{new_workout.date} {new_workout.hour}", "%Y-%m-%d %H:%M")
+        new_start = datetime.combine(new_workout.date, new_workout.hour)
         new_end = new_start + timedelta(minutes=new_workout.duration)
 
         for w in existing_workouts:
-            existing_start = datetime.strptime(f"{w.date} {w.hour}", "%Y-%m-%d %H:%M")
+            existing_start = datetime.combine(w.date, w.hour)
             existing_end = existing_start + timedelta(minutes=w.duration)
 
-            # Se há sobreposição
             if (new_start < existing_end) and (new_end > existing_start):
                 raise HTTPException(
                     status_code=400,

@@ -37,8 +37,8 @@ def test_create_workout_success(fake_repo):
         temp=20.0,
         duration=60,
         planner="John",
-        hour=(datetime.now() + timedelta(hours=1)).strftime("%H:%M"),
-        date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
+        hour = (datetime.now() + timedelta(hours=1)).time(),
+        date = (datetime.now() + timedelta(days=1)).date(),
         sport="Running",
         routine_id=1
     )

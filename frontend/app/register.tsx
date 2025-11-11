@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import { apiFetch } from "@/api"; 
+import { apiFetch } from "@/services/api"; // mantém como está
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
@@ -12,12 +12,27 @@ export default function RegisterScreen() {
     if (!username || !email || !password) {
       return Alert.alert("Atenção", "Preencha username, e-mail e senha.");
     }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      return Alert.alert("Atenção", "E-mail inválido.");
+    }
+    if (password.length < 6) {
+      return Alert.alert("Atenção", "Senha deve ter pelo menos 6 caracteres.");
+    }
 
     try {
       setLoading(true);
-      const resp = await apiFetch("/auth/sing_up", "POST", { username, email, password } as any);
 
+      const payload = {
+        username,
+        email,
+        password,
+        active: true,
+        admin: false,
+      };
+
+      const resp = await apiFetch({ path: "/auth/sing_up", method: "POST", body: payload as any});
       console.log("CADASTRO OK →", resp);
+
       Alert.alert("Sucesso", "Conta criada! Agora faça login.");
 
     } catch (e: any) {

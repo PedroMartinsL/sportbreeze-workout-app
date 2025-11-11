@@ -5,7 +5,7 @@ from application.use_cases.user.find_user_by_email import FindUserByEmailUseCase
 from domain.entities.user import User
 from infrastructure.security.jwt_handler import create_token
 from schemas.user_schema import UserLogin
-from main import bcrypt_context
+from core.settings import bcrypt_context
 
 class AuthService:
     def __init__(self, find_user_by_email_use_case: FindUserByEmailUseCase = Depends()):
@@ -22,10 +22,10 @@ class AuthService:
         user = self.find_user_by_email_use_case.execute(login_schema.email)
         user = self.authenticate_user(user, login_schema.password)
         if not user:
-            raise HTTPException(status_code=400, detail="User not found or invalid credentials")
+            raise HTTPException(status_code=404, detail="User not found or invalid credentials")
         else:
-            access_token = create_token(user.id)
-            refresh_token = create_token(user.id, token_duration=timedelta(days=7))
+            access_token = create_token(user)
+            refresh_token = create_token(user, token_duration=timedelta(days=7))
             return {"access_token": access_token,
                     "refresh_token": refresh_token,
                     "token_type": "Bearer"}

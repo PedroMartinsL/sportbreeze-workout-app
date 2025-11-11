@@ -3,19 +3,24 @@ import { View, Text, Switch, Pressable, StyleSheet } from "react-native";
 import { WeatherIcon } from "./WeatherIcon";
 import AlertModal from "./AlertModal";
 import { LinearGradient } from 'expo-linear-gradient';
+import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
+import Toast from "react-native-toast-message";
 
 export type TaskCardProps = {
   id: number;
   day: number;
   weather: string;
   kcal: number;
-  routine: string;
+  routine: number;
+  title: string;
   temp: number;
   duration: number;
   planner: string;
   hour: string;
   date: string;
   sport: string;
+  check: boolean;
 };
 
 type DetachedDataProps = {
@@ -31,10 +36,31 @@ export function DetachedData({ children }: DetachedDataProps) {
 }
 
 export default function TaskCard(props: TaskCardProps) {
+  const { accessToken } = useAuthStore();
   const [isEnabled, setIsEnabled] = useState(false);
   const [warnModalVisible, setWarnModalVisible] = useState(false);
 
-  const toggleSwitch = () => setIsEnabled((previous) => !previous);
+  async function toggleSwitch() {
+    setIsEnabled((previous) => !previous);
+    const payload = {
+      ...props,        // envia todas as props
+      check: !isEnabled, // atualiza status no payload
+    }
+    try {
+       await apiFetch({
+        path: `/workouts/${props.id}`,
+        method: "PUT",
+        body: payload,  // se precisar, tipar corretamente
+        token: accessToken
+      });
+    } catch (e: any) {
+        Toast.show({
+          type: 'error',
+          text1: 'Workout not found',
+          text2: e.message || 'Try again later',
+        });
+      }
+  }
 
   const warn_days = ["frosty", "rainy", "thundering"];
 
@@ -59,6 +85,7 @@ export default function TaskCard(props: TaskCardProps) {
     >
       {/* Top row: date/hour + warn */}
       <View className="flex-row justify-between items-center mb-3">
+        <Toast />
         <View className="flex-row gap-3">
           <DetachedData>{formattedDate}</DetachedData>
         </View>

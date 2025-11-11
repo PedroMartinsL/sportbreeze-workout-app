@@ -1,6 +1,8 @@
 import { View, Text, FlatList, Dimensions, ScrollView, TouchableOpacity, Image } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { router } from "expo-router";
+import { useAuthStore } from "@/store/auth";
+import { requestNotificationPermission } from "@/utils/requestNotificationPermission";
 
 const { width } = Dimensions.get("window");
 
@@ -15,6 +17,15 @@ const sports = [
 const cardColors = ["#dcfce7", "#bbf7d0", "#86efac"];
 
 export default function Home() {
+  // tenta restaurar a sessão
+  const { initAuth, loading, user, login, logout } = useAuthStore();
+
+  useEffect(() => {
+    initAuth(); 
+    requestNotificationPermission();
+  }, [initAuth]);
+
+
   return (
     <View className="flex-1 bg-[#d9f99d] px-6 pt-10">
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>

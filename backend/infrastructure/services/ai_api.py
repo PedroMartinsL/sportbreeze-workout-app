@@ -5,20 +5,20 @@ from google.genai import types
 from core.settings import GEMINI_API_KEY
 
 # Inicializa o cliente Gemini
-def get_client():
+async def get_client():
     if not GEMINI_API_KEY:
         raise ValueError("Missing GEMINI_API_KEY")
     return genai.Client(api_key=GEMINI_API_KEY)
 
 
-def call_gemini(profile: dict, prompt_text: str):
+async def call_gemini(profile: dict, prompt_text: str):
     full_prompt = (
         "You are a fitness agent for people who want to exercise outdoors. "
         "Organize detailed workout routines based on the weather forecast for the next 7 days. "
         "If possible, for activities that do not involve a facility, include the route and points of interest in the planner.\n\n"
         "Return the response in JSON with the following format:\n"
         "Rules: weather can only be one of: SUNNY, RAINY, THUNDERING, CLOUDY, FROSTY\n"
-        "Rules: sports can only be one of: SWIMMING, RUNNING, CYCLING, TRAIL, WALKING, GYM, MARATHON\n"
+        "Rules: sports can only be one of - select according to the user profile, which kind of sport he practices: SWIMMING, RUNNING, CYCLING, TRAIL, WALKING, GYM, MARATHON\n"
         "Return pure JSON only, without ```json or ```\n"
         "{\n"
         "  'weather': 'Weather condition at the time of the workout',\n"
@@ -35,7 +35,8 @@ def call_gemini(profile: dict, prompt_text: str):
         f"Profile: {json.dumps(profile, ensure_ascii=False)}"
     )
 
-    response = get_client().models.generate_content(
+    client = await get_client()
+    response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=full_prompt,
         config=types.GenerateContentConfig(

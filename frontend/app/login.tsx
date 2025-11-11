@@ -1,8 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import { apiFetch } from "@/api"; // mantém como está
+import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
+import { getPushToken } from "@/utils/getPushToken";
 
 export default function LoginScreen() {
+  const { accessToken, login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,12 +19,23 @@ export default function LoginScreen() {
       setLoading(true);
 
       // ✅ Forçamos o tipo com “as any” para não alterar o api.js
-      const resp = await apiFetch("/auth/login", "POST", { email, password } as any);
+      await login(email, password);    
+      
+      const expoPushToken = await getPushToken();
+      console.log(expoPushToken);
 
-      const token = resp?.access_token || resp?.token;
-      if (!token) throw new Error("Token não retornado pelo servidor.");
+      if (expoPushToken) {
+        // 🔹 envia o token do celular para o backend junto com o access_token
+        await apiFetch({
+          path: "/device",
+          method: "POST",
+          body: {
+            device_token: expoPushToken,
+          },
+          token: accessToken
+        });
+      }
 
-      console.log("LOGIN OK → token:", token);
       Alert.alert("Sucesso", "Login realizado!");
     } catch (e: any) {
       console.error(e);
@@ -57,7 +71,7 @@ export default function LoginScreen() {
 
       <TouchableOpacity onPress={onSubmit} disabled={loading} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Entrar</Text>}
-      </TouchableOpacity>
+      </TouchableOpacity> 
     </View>
   );
 }
