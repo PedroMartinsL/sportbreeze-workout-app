@@ -1,10 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import { getPushToken } from "@/utils/getPushToken";
 
 export default function LoginScreen() {
+  const router = useRouter();
   const { accessToken, login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +38,26 @@ export default function LoginScreen() {
         });
       }
 
-      Alert.alert("Sucesso", "Login realizado!");
+      // Verificar se o usuário tem perfil
+      try {
+        await apiFetch({
+          path: "/profile/",
+          method: "GET",
+          token: accessToken || "",
+        });
+
+        // Usuário tem perfil - redirecionar para routine
+        router.replace("/(tabs)/routine");
+        setTimeout(() => {
+          Alert.alert("Sucesso", "Login realizado com sucesso!");
+        }, 500);
+      } catch (profileError) {
+        // Usuário não tem perfil - redirecionar para registration
+        router.replace("/(tabs)/registration");
+        setTimeout(() => {
+          Alert.alert("Bem-vindo!", "Vamos criar seu perfil antes de começar.");
+        }, 500);
+      }
     } catch (e: any) {
       console.error(e);
       Alert.alert("Erro no login", e.message ?? "Falha na requisição");

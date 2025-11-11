@@ -1,7 +1,11 @@
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
+import { useAuthStore } from "@/store/auth";
 
 export default function TabLayout() {
+  const { role } = useAuthStore();
+  const isAdmin = role === "admin";
+
   return (
     <Tabs
       screenOptions={{
@@ -62,6 +66,16 @@ export default function TabLayout() {
           title: "GPS",
           tabBarIcon: ({ color, size }) => <FontAwesome name="location-arrow" color={color} size={size} />,
 
+        }}
+      />
+
+      {/* Tab Statistics - Apenas para Admin */}
+      <Tabs.Screen
+        name="statistics"
+        options={{
+          title: "Statistics",
+          tabBarIcon: ({ color, size }) => <FontAwesome name="bar-chart" color={color} size={size} />,
+          href: isAdmin ? "/statistics" : null, // Esconde a tab se não for admin
         }}
       />
     </Tabs>

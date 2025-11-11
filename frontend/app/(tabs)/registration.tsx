@@ -20,6 +20,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuthStore } from "@/store/auth";
+import { apiFetch } from "@/services/api";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 type Day = typeof DAYS[number];
@@ -44,6 +46,9 @@ const SPORT_LIST = [
 ] as const;
 
 export default function Registration() {
+  const { accessToken } = useAuthStore();
+
+  // IMPORTANTE: Todos os hooks devem ser chamados ANTES de qualquer early return
   const [form, setForm] = useState({
     name: "",
     age: "",
@@ -59,6 +64,20 @@ export default function Registration() {
   });
   const [weeklyHours, setWeeklyHours] = useState("5");
 
+  // Verifica se está logado - DEPOIS de todos os hooks
+  if (!accessToken) {
+    return (
+      <View className="flex-1 bg-[#d9f99d] px-6 justify-center items-center">
+        <View className="bg-white rounded-2xl p-6 border border-[#c5e1a5]">
+          <Text className="text-xl font-bold text-center mb-4">Login Required</Text>
+          <Text className="text-center text-[#475569] mb-4">
+            You need to be logged in to create your profile.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   const toggleDay = (d: Day) =>
     setForm((f) => ({ ...f, days: { ...f.days, [d]: !f.days[d] } }));
   const toggleSport = (s: Sport) =>
@@ -69,40 +88,57 @@ export default function Registration() {
         : [...f.sports, s],
     }));
 
-  const save = () => {
-    if (!form.name.trim())
+  const save = async () => {
+    console.log("🔵 Save button clicked!");
+    
+    if (!form.name.trim()) {
+      console.log("❌ Name is empty");
       return Alert.alert("Attention", "Please enter your name.");
+    }
 
     const hrs = Math.min(
       Math.max(Number(weeklyHours.replace(",", ".")) || 0, 1),
       80
     );
-    const daysStr = DAYS.filter((d) => form.days[d]).join(", ") || "none";
-    const sportsStr =
-      form.sports.map((s) => SPORT_LABEL[s]).join(", ") || "none";
-    const primarySport = form.sports[0] ?? "running";
+    const daysStr = DAYS.filter((d) => form.days[d]).join(",");
+    const sportsStr = form.sports.join(",");
 
-    Alert.alert(
-      "Saved ✅",
-      `Name: ${form.name}\nSports: ${sportsStr}\nDays: ${daysStr}\nHours/week: ${hrs}`,
-      [
-        { text: "Edit", style: "cancel" },
-        {
-          text: "Continue",
-          onPress: () =>
-            router.replace({
-              pathname: "/routine",
-              params: {
-                name: form.name,
-                sport: primarySport, // compat
-                sports: form.sports.join(","), // CSV
-                days: daysStr,
-                hoursPerWeek: String(hrs),
-              },
-            }),
-        },
-      ]
-    );
+    const profileData = {
+      age: parseInt(form.age) || 0,
+      weight: parseFloat(form.weight) || 0,
+      height: parseFloat(form.height) || 0,
+      sports: sportsStr,
+      available_days: daysStr,
+      hours_per_week: hrs,
+      alcohol: form.alcohol,
+      substances: form.substances,
+    };
+
+    console.log("📤 Sending profile data:", profileData);
+    console.log("🔑 Token:", accessToken ? "EXISTS" : "MISSING");
+
+    try {
+      // Salvar perfil no backend
+      const response = await apiFetch({
+        path: "/profile/",
+        method: "POST",
+        body: profileData,
+        token: accessToken || "",
+      });
+
+      console.log("✅ Profile created successfully:", response);
+
+      // Redirecionar imediatamente para routine
+      router.replace("/(tabs)/routine");
+      
+      // Mostrar mensagem depois do redirecionamento
+      setTimeout(() => {
+        Alert.alert("Perfil criado! ✅", "Bem-vindo! Agora você pode criar sua rotina de treinos.");
+      }, 500);
+    } catch (error: any) {
+      console.error("❌ Error creating profile:", error);
+      Alert.alert("Erro", error.message || "Não foi possível salvar o perfil.");
+    }
   };
 
   return (

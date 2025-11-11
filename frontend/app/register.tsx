@@ -1,8 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import { apiFetch } from "@/services/api"; // mantém como está
+import { apiFetch } from "@/services/api";
+import { useAuthStore } from "@/store/auth";
+import { useRouter } from "expo-router";
 
 export default function RegisterScreen() {
+  const { login } = useAuthStore();
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +37,16 @@ export default function RegisterScreen() {
       const resp = await apiFetch({ path: "/auth/sing_up", method: "POST", body: payload as any});
       console.log("CADASTRO OK →", resp);
 
-      Alert.alert("Sucesso", "Conta criada! Agora faça login.");
+      // Fazer login automático
+      await login(email, password);
+
+      // Redirecionar direto para registration
+      router.replace("/(tabs)/registration");
+      
+      // Mostrar mensagem de sucesso após redirecionar
+      setTimeout(() => {
+        Alert.alert("Sucesso!", "Conta criada! Agora vamos criar seu perfil.");
+      }, 500);
 
     } catch (e: any) {
       console.error(e);

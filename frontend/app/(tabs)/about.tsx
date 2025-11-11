@@ -1,10 +1,25 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Activity, CalendarDays, Dumbbell, MapPin, Shield, Sunset, Umbrella, Volleyball, Wind } from "lucide-react-native";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
+import { useAuthStore } from "@/store/auth";
 
 export default function About() {
+  const { logout, accessToken } = useAuthStore();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace("/login");
+      setTimeout(() => {
+        Alert.alert("Logout", "Você saiu com sucesso!");
+      }, 500);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível fazer logout");
+    }
+  };
+
   return (
     <ScrollView className="flex-1 bg-[#d9f99d] px-6">
 
@@ -141,6 +156,16 @@ export default function About() {
 
       {/* Buttons (More Implemensts?) */}
       <View className="mt-5 mb-8">
+
+        {/* Botão Logout - Só aparece se estiver logado */}
+        {accessToken && (
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="w-full max-w-xs mx-auto bg-red-600 py-3 rounded-xl mb-3"
+          >
+            <Text className="text-white text-center font-semibold">Logout</Text>
+          </TouchableOpacity>
+        )}
 
         <Link href="/" asChild>
           <TouchableOpacity className="mt-3 w-full max-w-xs mx-auto bg-white py-3 rounded-xl border border-[#c5e1a5]">

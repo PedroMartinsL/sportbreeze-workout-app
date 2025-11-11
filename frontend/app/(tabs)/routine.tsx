@@ -38,6 +38,20 @@ export default function Routine() {
   //get tokens for auth methods
   const { accessToken, user } = useAuthStore();
 
+  // Verifica se está logado
+  if (!accessToken) {
+    return (
+      <View className="flex-1 bg-[#d9f99d] px-6 justify-center items-center">
+        <View className="bg-white rounded-2xl p-6 border border-[#c5e1a5]">
+          <Text className="text-xl font-bold text-center mb-4">Login Required</Text>
+          <Text className="text-center text-[#475569] mb-4">
+            You need to be logged in to access your routines.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   // estado de localização 
   const { coords, setCoords } = useLocationStore();
   const [locLoading, setLocLoading] = useState(false);

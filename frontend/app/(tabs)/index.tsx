@@ -18,7 +18,7 @@ const cardColors = ["#dcfce7", "#bbf7d0", "#86efac"];
 
 export default function Home() {
   // tenta restaurar a sessão
-  const { initAuth, loading, user, login, logout } = useAuthStore();
+  const { initAuth, loading, user, login, logout, accessToken } = useAuthStore();
 
   useEffect(() => {
     initAuth(); 
@@ -48,19 +48,27 @@ export default function Home() {
 
         {/* Ações: Login / Registro */}
         <View className="flex-row justify-center mb-6">
-          <TouchableOpacity
-            onPress={() => router.push("/login")}
-            className="bg-black px-6 py-3 rounded-xl mr-3"
-          >
-            <Text className="text-white font-bold text-base">Entrar</Text>
-          </TouchableOpacity>
+          {!accessToken ? (
+            <>
+              <TouchableOpacity
+                onPress={() => router.push("/login")}
+                className="bg-black px-6 py-3 rounded-xl mr-3"
+              >
+                <Text className="text-white font-bold text-base">Entrar</Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => router.push("/register")}
-            className="bg-white px-6 py-3 rounded-xl border border-gray-300"
-          >
-            <Text className="text-black font-bold text-base">Criar conta</Text>
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/register")}
+                className="bg-white px-6 py-3 rounded-xl border border-gray-300"
+              >
+                <Text className="text-black font-bold text-base">Criar conta</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <View className="bg-green-100 px-6 py-3 rounded-xl border border-green-300">
+              <Text className="text-green-800 font-bold text-base">✓ Logged In</Text>
+            </View>
+          )}
         </View>
 
         {/* Horizontal Sports Carousel */}
