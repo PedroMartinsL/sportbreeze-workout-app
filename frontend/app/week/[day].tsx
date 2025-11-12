@@ -9,9 +9,11 @@ import { DeleteModal, useDeleteModal } from '@/components/DeleteModal';
 import { apiFetch } from '@/services/api';
 import { useAuthStore } from '@/store/auth';
 import Toast from 'react-native-toast-message';
+import { useWorkoutStore } from '@/store/workout';
 
 export default function DayScreen() {
   const navigation = useNavigation();
+  const params = useLocalSearchParams();
 
   useEffect(() => {
     navigation.setOptions({
@@ -23,24 +25,11 @@ export default function DayScreen() {
   }, [navigation]);
 
   const router = useRouter();
-  const params = useLocalSearchParams<{ taskList: string }>();
-  let taskList: TaskCardProps[] = [];
   const { accessToken } = useAuthStore();
-
-  if (params.taskList) {
-    try {
-      taskList = JSON.parse(params.taskList);
-    } catch (e) {
-      console.error('Falha ao parsear tasks:', e);
-      taskList = [];
-    }
-  }
-
+  const {tasks, setTasks} = useWorkoutStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState<TaskCardProps>();
-
-  const [tasks, setTasks] = useState<TaskCardProps[]>(taskList);
-
+  
   const {
     visible: deleteVisible,
     data: deleteData,
@@ -54,7 +43,7 @@ export default function DayScreen() {
   }
 
   async function handleDelete(taskId: number) {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    setTasks(tasks.filter((task: TaskCardProps) => task.id !== taskId));
     try {
       await apiFetch({ path: `/workouts/${taskId}`, method: 'DELETE', token: accessToken });
     } catch (e: any) {
@@ -67,17 +56,23 @@ export default function DayScreen() {
     closeDeleteModal();
   }
 
+  const dailyTasks = tasks.filter((task) => {
+    const taskDate = new Date(task.date);
+    const selectedDay = Number(params.dayKey);
+    return taskDate.getDay() === selectedDay;
+  });
+
   return (
     <View className="flex-1 bg-gray-100 p-2">
       <Toast />
 
-      {tasks.length === 0 ? (
+      {dailyTasks.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <Text className="text-lg font-medium text-gray-500">No tasks available</Text>
         </View>
       ) : (
         <SwipeListView
-          data={tasks}
+          data={dailyTasks}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <Pressable

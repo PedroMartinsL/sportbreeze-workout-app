@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import Toast from "react-native-toast-message";
+import { useWorkoutStore } from "@/store/workout";
 
 export type TaskCardProps = {
   id: number;
@@ -37,8 +38,9 @@ export function DetachedData({ children }: DetachedDataProps) {
 
 export default function TaskCard(props: TaskCardProps) {
   const { accessToken } = useAuthStore();
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(props.check);
   const [warnModalVisible, setWarnModalVisible] = useState(false);
+  const { updateTask } = useWorkoutStore();
 
   async function toggleSwitch() {
     setIsEnabled((previous) => !previous);
@@ -53,6 +55,7 @@ export default function TaskCard(props: TaskCardProps) {
         body: payload,  // se precisar, tipar corretamente
         token: accessToken
       });
+      updateTask(payload);
     } catch (e: any) {
         Toast.show({
           type: 'error',
