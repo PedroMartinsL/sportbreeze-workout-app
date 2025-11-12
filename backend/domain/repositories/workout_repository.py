@@ -30,9 +30,10 @@ class WorkoutRepository:
         workout = self.db.query(Workout).filter(Workout.id == workout_id).first()
         if not workout:
             return None
-
+        
         for field, value in update_data.items():
-            setattr(workout, field, value)
+            if hasattr(Workout, field):
+                setattr(workout, field, value)
 
         self.db.commit()
         self.db.refresh(workout)

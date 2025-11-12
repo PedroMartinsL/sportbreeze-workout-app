@@ -7,10 +7,10 @@ class DeleteWorkoutUseCase:
     def __init__(self, repository: WorkoutRepository = Depends()):
         self.repository = repository
 
-    def delete_workout(self, workout_data: WorkoutDelete):
-        workout = self.repo.remove(workout_data.id)
+    def execute(self, workout_data: int):
+        workout = self.repository.remove(workout_data)
 
         if not workout:
             raise ValueError(f"Treino com ID {workout_data.id} não encontrado.")
-
+    
         return workout

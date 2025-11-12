@@ -10,4 +10,4 @@ class UpdateWorkoutUseCase:
     def execute(self, workout_id: int, update_data: WorkoutUpdate):
         data_dict = update_data.model_dump(exclude_unset=True)
         # exclude_unset=True → só pega campos realmente enviados pelo usuário
-        return self.repo.update(workout_id, data_dict)
+        return self.repository.update(workout_id, data_dict)

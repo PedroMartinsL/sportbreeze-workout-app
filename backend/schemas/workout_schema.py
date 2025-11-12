@@ -14,6 +14,8 @@ class WorkoutBase(BaseModel):
     hour: time
     date: date
     sport: str
+    check: bool
+    notify: bool
     routine_id: int
 
 class WorkoutCreate(WorkoutBase):

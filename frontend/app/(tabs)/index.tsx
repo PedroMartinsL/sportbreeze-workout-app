@@ -17,7 +17,6 @@ const sports = [
   { id: "7", name: "Marathon", color: "#60a5fa", icon: "run-fast" },
 ];
 
-
 const cardColors = ["#dcfce7", "#bbf7d0", "#86efac"];
 
 export default function Home() {
@@ -34,15 +33,18 @@ export default function Home() {
     <View className="flex-1 bg-[#d9f99d] px-6 pt-10">
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {/* Header */}
-        <View className="flex-row items-center justify-center mb-6 mt-4">
-          <View className="h-12 w-12 rounded-xl bg-white border border-[#c5e1a5] items-center justify-center mr-3">
+        <View className="items-center justify-center mb-20 mt-4">
+          {/* Container da logo maior */}
+          <View className="rounded-xl border-[#c5e1a5] items-center justify-center">
             <Image
               source={require("../../assets/images/Sportsbreeze-logo-1.png")}
-              style={{ width: 45, height: 45 }}
+              style={{ width: 100, height: 100 }}
               resizeMode="contain"
             />
           </View>
-          <Text className="text-[#0a0a0a] text-3xl font-extrabold">Sportsbreeze</Text>
+
+          {/* Texto */}
+          <Text className="text-[#0a0a0a] text-4xl font-extrabold">Sportsbreeze</Text>
         </View>
 
         {/* Horizontal Sports Carousel */}
