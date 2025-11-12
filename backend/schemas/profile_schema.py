@@ -7,6 +7,7 @@ class ProfileBase(BaseModel):
     height: Optional[float] = None
     sports: Optional[str] = None  # CSV: "running,cycling,gym"
     available_days: Optional[str] = None  # CSV: "Mon,Wed,Fri"
+    hours_per_day: Optional[int] = None  # Horas disponíveis por dia
 
 class ProfileCreate(ProfileBase):
     user_id: int

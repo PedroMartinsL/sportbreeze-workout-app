@@ -6,19 +6,18 @@ import {
   Dumbbell,
   Footprints,
   Mountain,
-  Timer,
   Waves,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   Pressable,
   ScrollView,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { useAuthStore } from "@/store/auth";
 import { apiFetch } from "@/services/api";
@@ -54,15 +53,65 @@ export default function Registration() {
     age: "",
     weight: "",
     height: "",
-    substances: false,
-    alcohol: false,
+    hoursPerDay: "",
     sports: ["running"] as Sport[],
     days: DAYS.reduce(
       (a, d) => ({ ...a, [d]: false }),
       {} as Record<Day, boolean>
     ),
   });
-  const [weeklyHours, setWeeklyHours] = useState("5");
+
+  const [loading, setLoading] = useState(true);
+  const [profileExists, setProfileExists] = useState(false);
+
+  // Buscar perfil existente ao carregar
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log("🔍 Fetching existing profile...");
+        const profile = await apiFetch({
+          path: "/profile/",
+          method: "GET",
+          token: accessToken,
+        });
+
+        console.log("✅ Profile found:", profile);
+        
+        // Popular os campos com os dados existentes
+        const sportsArray = profile.sports ? profile.sports.split(",") : ["running"];
+        const daysArray = profile.available_days ? profile.available_days.split(",") : [];
+        
+        const daysObj = DAYS.reduce(
+          (acc, day) => ({ ...acc, [day]: daysArray.includes(day) }),
+          {} as Record<Day, boolean>
+        );
+
+        setForm({
+          name: profile.name || "",
+          age: profile.age?.toString() || "",
+          weight: profile.weight?.toString() || "",
+          height: profile.height?.toString() || "",
+          hoursPerDay: profile.hours_per_day?.toString() || "",
+          sports: sportsArray as Sport[],
+          days: daysObj,
+        });
+
+        setProfileExists(true);
+      } catch (error: any) {
+        console.log("ℹ️ No profile found (will create new):", error.message);
+        setProfileExists(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [accessToken]);
 
   // Verifica se está logado - DEPOIS de todos os hooks
   if (!accessToken) {
@@ -74,6 +123,16 @@ export default function Registration() {
             You need to be logged in to create your profile.
           </Text>
         </View>
+      </View>
+    );
+  }
+
+  // Mostrar loading enquanto busca o perfil
+  if (loading) {
+    return (
+      <View className="flex-1 bg-[#d9f99d] justify-center items-center">
+        <ActivityIndicator size="large" color="#000" />
+        <Text className="mt-4 text-[#0a0a0a] font-semibold">Loading profile...</Text>
       </View>
     );
   }
@@ -96,10 +155,6 @@ export default function Registration() {
       return Alert.alert("Attention", "Please enter your name.");
     }
 
-    const hrs = Math.min(
-      Math.max(Number(weeklyHours.replace(",", ".")) || 0, 1),
-      80
-    );
     const daysStr = DAYS.filter((d) => form.days[d]).join(",");
     const sportsStr = form.sports.join(",");
 
@@ -109,34 +164,39 @@ export default function Registration() {
       height: parseFloat(form.height) || 0,
       sports: sportsStr,
       available_days: daysStr,
-      hours_per_week: hrs,
-      alcohol: form.alcohol,
-      substances: form.substances,
+      hours_per_day: parseInt(form.hoursPerDay) || 0,
     };
 
     console.log("📤 Sending profile data:", profileData);
     console.log("🔑 Token:", accessToken ? "EXISTS" : "MISSING");
+    console.log(`📝 Mode: ${profileExists ? "UPDATE" : "CREATE"}`);
 
     try {
-      // Salvar perfil no backend
+      // Se perfil existe, fazer PUT (update), senão POST (create)
+      const method = profileExists ? "PUT" : "POST";
       const response = await apiFetch({
         path: "/profile/",
-        method: "POST",
+        method,
         body: profileData,
         token: accessToken || "",
       });
 
-      console.log("✅ Profile created successfully:", response);
+      console.log(`✅ Profile ${profileExists ? "updated" : "created"} successfully:`, response);
 
       // Redirecionar imediatamente para routine
       router.replace("/(tabs)/routine");
       
       // Mostrar mensagem depois do redirecionamento
       setTimeout(() => {
-        Alert.alert("Perfil criado! ✅", "Bem-vindo! Agora você pode criar sua rotina de treinos.");
+        Alert.alert(
+          profileExists ? "Perfil atualizado! ✅" : "Perfil criado! ✅",
+          profileExists 
+            ? "Suas informações foram atualizadas com sucesso."
+            : "Bem-vindo! Agora você pode criar sua rotina de treinos."
+        );
       }, 500);
     } catch (error: any) {
-      console.error("❌ Error creating profile:", error);
+      console.error(`❌ Error ${profileExists ? "updating" : "creating"} profile:`, error);
       Alert.alert("Erro", error.message || "Não foi possível salvar o perfil.");
     }
   };
@@ -176,6 +236,12 @@ export default function Registration() {
           placeholder: "e.g., 175",
           props: { keyboardType: "numeric" as const, inputMode: "numeric" as const },
         },
+        {
+          k: "hoursPerDay",
+          label: "Hours available per day",
+          placeholder: "e.g., 2",
+          props: { keyboardType: "numeric" as const, inputMode: "numeric" as const },
+        },
       ].map((f) => (
         <Field key={f.k} label={f.label}>
           <TextInput
@@ -187,17 +253,6 @@ export default function Registration() {
           />
         </Field>
       ))}
-
-      <Toggle
-        label="Consume alcoholic beverages? (optional)"
-        value={form.alcohol}
-        onValueChange={(v) => setForm({ ...form, alcohol: v })}
-      />
-      <Toggle
-        label="Use substances? (optional)"
-        value={form.substances}
-        onValueChange={(v) => setForm({ ...form, substances: v })}
-      />
 
       <Text className="text-[#0a0a0a] font-semibold mt-3">Sports</Text>
       <View className="flex-row flex-wrap gap-2 mt-2">
@@ -244,29 +299,13 @@ export default function Registration() {
         })}
       </View>
 
-      <Field label="Hours available per week">
-        <View className="flex-row items-center gap-2">
-          <Timer size={16} color="#0a0a0a" />
-          <TextInput
-            value={weeklyHours}
-            onChangeText={setWeeklyHours}
-            keyboardType="numeric"
-            inputMode="numeric"
-            placeholder="e.g., 5"
-            className="flex-1 bg-white border border-[#c5e1a5] rounded-xl px-3 py-2"
-          />
-          <Text className="text-[#475569]">h</Text>
-        </View>
-        <Text className="text-xs text-[#64748b] mt-1">
-          We’ll distribute these hours across your selected sports.
-        </Text>
-      </Field>
-
       <TouchableOpacity
         onPress={save}
         className="mt-5 bg-black py-3 rounded-xl items-center"
       >
-        <Text className="text-white font-semibold">Save</Text>
+        <Text className="text-white font-semibold">
+          {profileExists ? "Update Profile" : "Save Profile"}
+        </Text>
       </TouchableOpacity>
 
       <View className="h-6" />
@@ -285,23 +324,6 @@ function Field({
     <View className="mt-3">
       <Text className="text-[#0a0a0a] font-semibold mb-1">{label}</Text>
       {children}
-    </View>
-  );
-}
-
-function Toggle({
-  label,
-  value,
-  onValueChange,
-}: {
-  label: string;
-  value: boolean;
-  onValueChange: (v: boolean) => void;
-}) {
-  return (
-    <View className="mt-3 flex-row items-center justify-between">
-      <Text className="text-[#0a0a0a] font-semibold">{label}</Text>
-      <Switch value={value} onValueChange={onValueChange} />
     </View>
   );
 }

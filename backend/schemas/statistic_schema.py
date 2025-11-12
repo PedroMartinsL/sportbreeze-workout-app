@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 class StatisticBase(BaseModel):
     user_id: int
     kcal_burned: Optional[float] = None
-    activity_checked: Optional[str] = None
+    activity_checked: Optional[int] = None
 
 class StatisticCreate(StatisticBase):
     pass

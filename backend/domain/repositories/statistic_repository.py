@@ -19,6 +19,9 @@ class StatisticRepository:
     def find_by_id(self, statistic_id: int) -> Optional[Statistic]:
         return self.db.query(Statistic).filter(Statistic.id == statistic_id).first()
     
+    def find_by_user_id(self, user_id: int) -> List[Statistic]:
+        return self.db.query(Statistic).filter(Statistic.user_id == user_id).all()
+    
     def find_all(self) -> List[Statistic]:
         return self.db.query(Statistic).all()
     

@@ -12,15 +12,17 @@ class Profile(Base):
     height = Column(Float, nullable=True)  # cm
     sports = Column(String, nullable=True)  # CSV: "running,cycling,gym"
     available_days = Column(String, nullable=True)  # CSV: "Mon,Wed,Fri"
+    hours_per_day = Column(Integer, nullable=True)  # Horas disponíveis por dia
     
     # Relacionamento
     user = relationship("User", backref="profile")
 
     def __init__(self, user_id, age=None, weight=None, height=None, sports=None, 
-                 available_days=None):
+                 available_days=None, hours_per_day=None):
         self.user_id = user_id
         self.age = age
         self.weight = weight
         self.height = height
         self.sports = sports
         self.available_days = available_days
+        self.hours_per_day = hours_per_day

@@ -8,7 +8,7 @@ class Statistic(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     user_id = Column(Integer, ForeignKey("Users.id"), nullable=False)
     kcal_burned = Column(Float, nullable=True)
-    activity_checked = Column(String, nullable=True)
+    activity_checked = Column(Integer, nullable=True)
     
     # Relacionamentos
     user = relationship("User", backref="statistics")
