@@ -7,39 +7,34 @@ import {
   Pressable,
   Platform,
   ScrollView,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
-import Toast from "react-native-toast-message";
 import { useWorkoutStore } from "@/store/workout";
 import { useLocationStore } from "@/store/location";
 
 export default function CreateTask() {
   const navigation = useNavigation();
   const { routine, loadTasks } = useWorkoutStore();
-
-  useEffect(() => {
-    navigation.setOptions({
-      title: "Schedule",
-      headerStyle: { backgroundColor: "#f0f0f0" },
-      headerTintColor: "#333",
-      headerTitleAlign: "center",
-    });
-  }, [navigation]);
-
   const { accessToken } = useAuthStore();
   const params = useLocalSearchParams();
   const router = useRouter();
+  const { coords } = useLocationStore();
+
   const [kcalGoal, setKcalGoal] = useState<string>("0");
   const [sport, setSport] = useState<string>("");
   const [time, setTime] = useState(new Date());
   const [duration, setDuration] = useState(30);
-  const { coords } = useLocationStore();
   const [show, setShow] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
+  const [kcalError, setKcalError] = useState(false);
+  const [sportError, setSportError] = useState(false);
+  const [loading, setLoading] = useState(false); // estado de carregamento
 
   const sports = [
     "Swimming",
@@ -51,28 +46,54 @@ export default function CreateTask() {
     "Marathon",
   ];
 
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Schedule",
+      headerStyle: { backgroundColor: "#f0f0f0" },
+      headerTintColor: "#333",
+      headerTitleAlign: "center",
+    });
+  }, [navigation]);
+
+  const durationOptions = Array.from({ length: 12 }, (_, i) => (i + 1) * 30);
+
+  const onChange = (event: any, selectedTime: Date | undefined) => {
+    setShow(Platform.OS === "ios");
+    if (selectedTime) setTime(selectedTime);
+  };
+
   async function handleWorkoutCreate() {
-    const date = new Date(time);
+    setError(null);
+    setKcalError(false);
+    setSportError(false);
 
-    // Hora e minuto locais
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
+    // Validação simples
+    if (!kcalGoal || Number(kcalGoal) <= 0) setKcalError(true);
+    if (!sport) setSportError(true);
+    if (!kcalGoal || !sport) {
+      setError("Please fill all required fields.");
+      return;
+    }
 
-    const time_schedule = `${hours}:${minutes}`;
-
-    const payload = {
-      kcal: Number(kcalGoal),
-      hour: time_schedule,
-      date: `Schedule a date to ${params.date}`,
-      sport: sport,
-      duration: duration,
-      location: coords,
-      routine_id: routine,
-    };
-
-    console.log(payload);
+    setLoading(true); // ativa spinner
 
     try {
+      const date = new Date(time);
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const time_schedule = `${hours}:${minutes}`;
+
+      const payload = {
+        kcal: Number(kcalGoal),
+        hour: time_schedule,
+        date: `Schedule a date to ${params.date}`,
+        sport,
+        duration,
+        location: coords,
+        routine_id: routine,
+      };
+      console.log(payload);
+
       await apiFetch({
         path: `/workouts/`,
         method: "POST",
@@ -82,40 +103,51 @@ export default function CreateTask() {
 
       if (routine && accessToken) {
         loadTasks(`${routine}`, accessToken);
-      } else {
-        console.warn("Routine não definida, não é possível carregar tasks.");
       }
 
       router.back();
     } catch (e: any) {
-      Alert.alert("Erro", e);
+      let detail = "";
+      try {
+        const match = e?.toString().match(/{.*}/);
+        if (match) {
+          const parsed = JSON.parse(match[0]);
+          detail = parsed.detail || "";
+        } else if (e?.message) {
+          detail = e.message;
+        }
+      } catch {
+        detail = e?.toString() || "";
+      }
+      setError(`Failed creating your workout. ${detail || "Try again later."}`);
+    } finally {
+      setLoading(false); // desativa spinner
     }
-
   }
-
-  const durationOptions = Array.from({ length: 12 }, (_, i) => (i + 1) * 30);
-
-  const onChange = (event: any, selectedTime: Date | undefined) => {
-    setShow(Platform.OS === "ios");
-    if (selectedTime) setTime(selectedTime); // salva horário local diretamente
-  };
 
   return (
     <View className="flex-1 w-full py-10 px-5 gap-6 mb-4">
-      <Toast />
       <ScrollView>
         <View className="mx-4 gap-5">
           <Text className="text-xl font-bold text-gray-500">Planner</Text>
-
           <View className="border-b border-gray-300 mb-4" />
+
+          {/* Mensagem geral de erro */}
+          {error && (
+            <View className="flex-row items-center bg-red-100 border border-red-400 rounded-md p-5 mt-2">
+              <Text className="text-red-600 font-semibold mr-2">⚠️</Text>
+              <Text className="text-red-700 font-medium">{error}</Text>
+            </View>
+          )}
 
           <TextInput
             placeholder="Suggest a guidance to your planner"
             placeholderTextColor="gray"
-            className="mb-10"
+            className="mb-10 border border-gray-300 rounded p-2"
           />
 
           <View className="flex-row gap-10">
+            {/* Start time */}
             <View>
               <DetachedData>Start:</DetachedData>
               <View className="flex-row justify-center items-center pt-5 gap-x-4 ml-5">
@@ -167,33 +199,40 @@ export default function CreateTask() {
             </View>
           </View>
 
+          {/* Kcal Goal */}
           <DetachedData>K/cal Goal:</DetachedData>
           <TextInput
             value={kcalGoal}
-            onChangeText={(text) => {
-              const intText = text.replace(/[^0-9]/g, "");
-              setKcalGoal(intText);
-            }}
+            onChangeText={(text) => setKcalGoal(text.replace(/[^0-9]/g, ""))}
             keyboardType="numeric"
             placeholder="0"
-            className="border border-gray-300 rounded p-2 mt-2"
+            className={`border rounded p-2 mt-2 ${
+              kcalError ? "border-red-500" : "border-gray-300"
+            }`}
           />
 
+          {/* Sport */}
           <DetachedData>Sport:</DetachedData>
-          <View className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+          <View
+            className={`border rounded-lg overflow-hidden bg-white mt-2 ${
+              sportError ? "border-red-500" : "border-gray-300"
+            }`}
+          >
             <Picker
               selectedValue={sport}
               onValueChange={(itemValue) => setSport(itemValue)}
               style={{ color: "black" }}
             >
               <Picker.Item label="Select a sport..." value="" enabled={false} />
-              {sports.map((sport) => (
-                <Picker.Item key={sport} label={sport} value={sport} />
+              {sports.map((s) => (
+                <Picker.Item key={s} label={s} value={s} />
               ))}
             </Picker>
           </View>
 
           <View className="border-b border-gray-200 mb-4" />
+
+          {/* Buttons */}
           <View className="flex-row justify-center gap-5 pb-20">
             <Pressable
               onPress={() => router.back()}
@@ -204,9 +243,14 @@ export default function CreateTask() {
 
             <Pressable
               onPress={handleWorkoutCreate}
-              className="bg-blue-500 rounded-full p-3 w-32"
+              className="bg-blue-500 rounded-full p-3 w-32 flex-row justify-center items-center"
+              disabled={loading} // desabilita botão durante o carregamento
             >
-              <Text className="text-white text-center">Schedule</Text>
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text className="text-white text-center">Schedule</Text>
+              )}
             </Pressable>
           </View>
         </View>
