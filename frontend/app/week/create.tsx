@@ -7,6 +7,7 @@ import {
   Pressable,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -14,33 +15,30 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import Toast from "react-native-toast-message";
+import { useWorkoutStore } from "@/store/workout";
+import { useLocationStore } from "@/store/location";
 
 export default function CreateTask() {
-
   const navigation = useNavigation();
-  
+  const { routine, loadTasks } = useWorkoutStore();
+
   useEffect(() => {
     navigation.setOptions({
       title: "Schedule",
       headerStyle: { backgroundColor: "#f0f0f0" },
       headerTintColor: "#333",
-      headerTitleAlign: "center"
+      headerTitleAlign: "center",
     });
   }, [navigation]);
 
   const { accessToken } = useAuthStore();
-  
-  const params = useLocalSearchParams<{ 
-    date_param?: string; 
-    routine_id_param?: string; 
-  }>();
-  
+  const params = useLocalSearchParams();
   const router = useRouter();
   const [kcalGoal, setKcalGoal] = useState<string>("0");
   const [sport, setSport] = useState<string>("");
   const [time, setTime] = useState(new Date());
   const [duration, setDuration] = useState(30);
-
+  const { coords } = useLocationStore();
   const [show, setShow] = useState(false);
 
   const sports = [
@@ -54,32 +52,52 @@ export default function CreateTask() {
   ];
 
   async function handleWorkoutCreate() {
+    const date = new Date(time);
+
+    // Hora e minuto locais
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    const time_schedule = `${hours}:${minutes}`;
+
     const payload = {
-      kcal: kcalGoal,
+      kcal: Number(kcalGoal),
+      hour: time_schedule,
+      date: `Schedule a date to ${params.date}`,
       sport: sport,
-      hour: time,
       duration: duration,
-      date: params.date_param,
-      routine_id: params.routine_id_param
-    }
+      location: coords,
+      routine_id: routine,
+    };
+
+    console.log(payload);
+
     try {
-      await apiFetch({ path: `/workouts/`, method: "POST", body: payload, token: accessToken})
-    } catch (e: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'We failed creating your routine',
-        text2: e.message || 'Try again later',
+      await apiFetch({
+        path: `/workouts/`,
+        method: "POST",
+        body: payload,
+        token: accessToken,
       });
+
+      if (routine && accessToken) {
+        loadTasks(`${routine}`, accessToken);
+      } else {
+        console.warn("Routine não definida, não é possível carregar tasks.");
+      }
+
+      router.back();
+    } catch (e: any) {
+      Alert.alert("Erro", e);
     }
-    
-    router.back()
+
   }
 
   const durationOptions = Array.from({ length: 12 }, (_, i) => (i + 1) * 30);
 
   const onChange = (event: any, selectedTime: Date | undefined) => {
-    setShow(Platform.OS === "ios"); // mantém aberto no iOS
-    if (selectedTime) setTime(selectedTime);
+    setShow(Platform.OS === "ios");
+    if (selectedTime) setTime(selectedTime); // salva horário local diretamente
   };
 
   return (
@@ -92,10 +110,10 @@ export default function CreateTask() {
           <View className="border-b border-gray-300 mb-4" />
 
           <TextInput
-            placeholder="Sugest a guidance to your planner"
+            placeholder="Suggest a guidance to your planner"
             placeholderTextColor="gray"
             className="mb-10"
-          ></TextInput>
+          />
 
           <View className="flex-row gap-10">
             <View>
@@ -103,16 +121,13 @@ export default function CreateTask() {
               <View className="flex-row justify-center items-center pt-5 gap-x-4 ml-5">
                 {time && (
                   <Text>
-                    {time.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {time.getHours().toString().padStart(2, "0")}:
+                    {time.getMinutes().toString().padStart(2, "0")}
                   </Text>
                 )}
-                <Pressable onPress={() => setShow(true)} >
+                <Pressable onPress={() => setShow(true)}>
                   <View className="bg-blue-500 px-3 py-2 border border-blue-300 rounded-3xl">
-
-                  <Text className="text-white">Timer</Text>
+                    <Text className="text-white">Timer</Text>
                   </View>
                 </Pressable>
                 {show && (
@@ -131,16 +146,18 @@ export default function CreateTask() {
             <View className="flex-1">
               <DetachedData>Duration:</DetachedData>
               <View className="flex-1 pt-3 gap-x-4 ml-5">
-                <View className="border border-gray-300 rounded-lg overflow-hidden ">
+                <View className="border border-gray-300 rounded-lg overflow-hidden">
                   <Picker
                     selectedValue={duration}
                     onValueChange={(value) => setDuration(value)}
-                    className="h-20"
+                    style={{ color: "black" }}
                   >
                     {durationOptions.map((minutes) => (
                       <Picker.Item
                         key={minutes}
-                        label={`${Math.floor(minutes / 60)}h ${minutes % 60 === 0 ? "" : (minutes % 60) + "m"}`}
+                        label={`${Math.floor(minutes / 60)}h ${
+                          minutes % 60 === 0 ? "" : minutes % 60 + "m"
+                        }`}
                         value={minutes}
                       />
                     ))}
@@ -154,7 +171,6 @@ export default function CreateTask() {
           <TextInput
             value={kcalGoal}
             onChangeText={(text) => {
-              // only allow numerics
               const intText = text.replace(/[^0-9]/g, "");
               setKcalGoal(intText);
             }}
@@ -168,7 +184,7 @@ export default function CreateTask() {
             <Picker
               selectedValue={sport}
               onValueChange={(itemValue) => setSport(itemValue)}
-              className="bg-white"
+              style={{ color: "black" }}
             >
               <Picker.Item label="Select a sport..." value="" enabled={false} />
               {sports.map((sport) => (

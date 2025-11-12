@@ -12,6 +12,7 @@ import { useCallback } from "react";
 import RoutineCell from "@/components/RoutineCell";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import PlusLine from "@/components/PlusLine";
+import { useWorkoutStore } from "@/store/workout";
 
 export type Routine = {
   id: number;
@@ -37,6 +38,7 @@ export default function Routine() {
   const [locLoading, setLocLoading] = useState(false);
   const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
   const [routineName, setRoutineName] = useState("");
+  const { setRoutine } = useWorkoutStore();
 
   // captura a localização uma vez ao abrir a tela 
   useFocusEffect(
@@ -57,7 +59,7 @@ export default function Routine() {
 
         if (!isActive) return;
 
-        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
       } catch (e: any) {
         Alert.alert("Não foi possível obter a localização agora.");
       } finally {
@@ -96,17 +98,14 @@ export default function Routine() {
   const name = params.name || "Athlete";
 
   async function handleCreateRoutine() {
-    if (coords.lat == null || coords.lon == null) {
+    if (coords.latitude == null || coords.longitude == null) {
       Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
       return;
     }
 
     const payload = {
       name: routineName,
-      location: {
-        latitude: coords.lat,
-        longitude: coords.lon,
-      }
+      location: coords
     };
 
     try {
@@ -157,7 +156,9 @@ export default function Routine() {
           <FlatList
             data={userRoutines}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={RoutineCell}
+            renderItem={({ item }) => (
+              <RoutineCell item={item} setRoutine={setRoutine} />
+            )}
             contentContainerStyle={{ paddingVertical: 8 }}
           />
         )}
@@ -191,15 +192,6 @@ export default function Routine() {
       </View>
 
       <View className="h-8" />
-    </View>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View className="flex-row justify-between py-2">
-      <Text className="text-[#475569]">{label}</Text>
-      <Text className="text-[#0a0a0a] font-semibold text-right">{value}</Text>
     </View>
   );
 }

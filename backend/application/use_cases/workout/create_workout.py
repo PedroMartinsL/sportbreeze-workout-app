@@ -30,12 +30,12 @@ class CreateWorkoutUseCase:
         if workout_datetime < now - buffer:
             raise HTTPException(status_code=400, detail="A data e hora do treino não podem estar no passado.")
         
-            # Busca os treinos da rotina
-        existing_workouts = self.find_workouts_by_routine_use_case.execute(workout_data.routine_id)
+        # Busca os treinos da rotina
+        # existing_workouts = self.find_workouts_by_routine_use_case.execute(workout_data.routine_id)
 
         # Chama a função de verificação
-        self.check_workout_conflicts(workout_data, existing_workouts)
-        
+        # self.check_workout_conflicts(workout_data, existing_workouts)
+
         # Se passou, cria o treino
         return self.repository.create(workout_data)
 

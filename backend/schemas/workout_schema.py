@@ -36,9 +36,9 @@ class WorkoutUpdate(WorkoutBase):
     pass
 
 class WorkoutGoals(BaseModel):
-    kcal: float
+    kcal: int
     hour: time
-    date: date
+    date: str
     sport: str
     duration: int
     location: LocationSchema

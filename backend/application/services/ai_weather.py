@@ -21,19 +21,23 @@ class AiWeatherClass():
             profile,
             f"{input}| weather {weather_json}"
         )
-
         try:
-            workouts = json.loads(payload_json)
+            if isinstance(payload_json, str):
+                workouts = json.loads(payload_json)
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail="Empty or invalid JSON from Gemini API")
         
         workout_schema = []
 
         for workout in workouts:
-            workout['routine_id'] = routine_id
-            workout['date'] = datetime.strptime(workout['date'], "%Y-%m-%d").date()
+            workout['kcal'] = float(workout['kcal'])
+            workout['duration'] = int(workout['duration'])
             workout['hour'] = datetime.strptime(workout['hour'], "%H:%M").time()
+            workout['date'] = datetime.strptime(workout['date'], "%Y-%m-%d").date()
+            workout['check'] = False
+            workout['notify'] = False
+            workout['routine_id'] = routine_id
 
             workout_schema.append(WorkoutCreate(**workout))
-        
+
         return workout_schema

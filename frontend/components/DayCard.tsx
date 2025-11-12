@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 
 type DayCardProps = {
   day: string;
-  dayKey: string;
+  dayKey: string | undefined;
 };
 
 export default function DayCard({ day, dayKey }: DayCardProps) {

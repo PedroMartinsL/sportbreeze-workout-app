@@ -5,14 +5,17 @@ import { create } from "zustand";
 
 interface WorkoutState {
   tasks: TaskCardProps[];
+  routine: number | null;
   loadTasks: (routine_id: string, access_token: string) => Promise<void>;
   setTasks: (tasks: TaskCardProps[]) => void;
   deleteTask: (task_id: number) => void;
   updateTask: (task: TaskCardProps) => void;
+  setRoutine: (id: number) => void;
 }
 
 export const useWorkoutStore = create<WorkoutState>((set) => ({
   tasks: [],
+  routine: null,
   loadTasks: async (routine_id: string, access_token: string) => {
     try {
       const data: TaskCardProps[] = await apiFetch({
@@ -40,4 +43,5 @@ export const useWorkoutStore = create<WorkoutState>((set) => ({
     set((state) => ({
       tasks: state.tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)),
     })),
+  setRoutine: (id: number) => set({ routine: id }),
 }));

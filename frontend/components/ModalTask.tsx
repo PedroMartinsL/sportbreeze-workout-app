@@ -28,11 +28,6 @@ export default function ModalTask({
             {/* Botão de fechar no canto */}
             <View className="flex-row justify-between">
 
-              {/* Atualizar */}
-                  <Pressable className="items-center">
-                    <MaterialIcons name="edit" size={28} color="black" />
-                  </Pressable>
-
               <Pressable onPress={() => setModalVisible(false)}>
                 <MaterialIcons name="cancel" size={28} color="black" />
               </Pressable>

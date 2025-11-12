@@ -40,18 +40,18 @@ export default function Week() {
     }, [accessToken, navigation, params.routine_id]);
 
     const days: Day[] = [
-        { day: "Sunday", key: "0" },
-        { day: "Monday", key: "1" },
-        { day: "Tuesday", key: "2" },
-        { day: "Wednesday", key: "3" },
-        { day: "Thursday", key: "4" },
-        { day: "Friday", key: "5" },
-        { day: "Saturday", key: "6" },
+        { day: "Monday", key: "0" },
+        { day: "Tuesday", key: "1" },
+        { day: "Wednesday", key: "2" },
+        { day: "Thursday", key: "3" },
+        { day: "Friday", key: "4" },
+        { day: "Saturday", key: "5" },
+        { day: "Sunday", key: "6" },
     ];
 
     function taskPerDay(day: Day) {
         return (
-            <DayCard key={day.key} day={day.day} dayKey={day.key} />
+            <DayCard key={day.key} day={day.day} dayKey={day.key}/>
         );
     }
 

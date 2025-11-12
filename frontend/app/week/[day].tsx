@@ -96,7 +96,12 @@ export default function DayScreen() {
 
       {/* Botão flutuante */}
       <Pressable
-        onPress={() => router.push('./create')}
+        onPress={() => router.push({
+          pathname: './create',
+          params: {
+            date: params.day
+          },
+        })}
         className="absolute bottom-20 right-10 rounded-full border border-gray-200 bg-slate-50 p-3 shadow-lg">
         <ToolsIcons tool="create" />
       </Pressable>

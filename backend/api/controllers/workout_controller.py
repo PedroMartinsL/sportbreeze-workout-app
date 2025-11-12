@@ -2,21 +2,20 @@ from application.use_cases.workout.create_workout_by_goals import CreateWorkoutB
 from dependencies import verify_token
 from domain.entities.user import User
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from typing import List
 
 from application.use_cases.workout.find_workouts_by_routine import FindWorkoutsByRoutineUseCase
 from application.use_cases.workout.delete_workout import DeleteWorkoutUseCase
 from application.use_cases.workout.update_workout_use_case import UpdateWorkoutUseCase
-from schemas.workout_schema import WorkoutCreate, WorkoutResponse, WorkoutUpdate
+from schemas.workout_schema import WorkoutGoals, WorkoutResponse, WorkoutUpdate
 
 workout_router = APIRouter(prefix="/workouts", tags=["Workouts"])
 
 
 @workout_router.post("/", response_model=WorkoutResponse)
-async def create_workout(workout: WorkoutCreate, use_case: CreateWorkoutByGoalsUseCase = Depends(), user: User = Depends(verify_token)):
+async def create_workout(workout: WorkoutGoals, use_case: CreateWorkoutByGoalsUseCase = Depends(), user: User = Depends(verify_token)):
     try:
-        return use_case.execute(workout, user)
+        return await use_case.execute(workout, user)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
