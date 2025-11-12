@@ -1,16 +1,23 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import { User } from "lucide-react-native";
-import React, { useState } from "react";
-import { Text, TouchableOpacity, View, Alert, FlatList, TextInput } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+  FlatList,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import * as Location from "expo-location";
 import { apiFetch } from "@/services/api";
 import { useLocationStore } from "@/store/location";
 import { useAuthStore } from "@/store/auth";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
 import RoutineCell from "@/components/RoutineCell";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import PlusLine from "@/components/PlusLine";
 import { useWorkoutStore } from "@/store/workout";
 
@@ -21,91 +28,83 @@ export type Routine = {
 };
 
 export default function Routine() {
-  const params = useLocalSearchParams<{
-    name?: string;
-    sport?: string;   // compat
-    sports?: string;  // CSV ex: "running,cycling"
-    days?: string;    // "Mon, Wed, Fri"
-    hoursPerWeek?: string;
-    hours?: string;   // compat
-  }>();
-
-  //get tokens for auth methods
-  const { accessToken, user } = useAuthStore();
-
-  // estado de localização 
+  const params = useLocalSearchParams<{ name?: string }>();
+  const { accessToken } = useAuthStore();
   const { coords, setCoords } = useLocationStore();
+  const { setRoutine } = useWorkoutStore();
+
   const [locLoading, setLocLoading] = useState(false);
   const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
   const [routineName, setRoutineName] = useState("");
-  const { setRoutine } = useWorkoutStore();
+  const [loading, setLoading] = useState(false); // spinner
 
-  // captura a localização uma vez ao abrir a tela 
+  // captura a localização e rotinas ao abrir a tela
   useFocusEffect(
-  useCallback(() => {
-    let isActive = true;
+    useCallback(() => {
+      let isActive = true;
 
-    (async () => {
-      try {
-        setLocLoading(true);
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permissão de localização negada");
-          return;
-        }
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.LocationAccuracy.Balanced,
-        });
-
-        if (!isActive) return;
-
-        setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-      } catch (e: any) {
-        Alert.alert("Não foi possível obter a localização agora.");
-      } finally {
-        if (isActive) setLocLoading(false);
-      }
-    })();
-
-    (async () => {
-      if (accessToken) {
+      (async () => {
         try {
-          const response = await apiFetch({
-            path: "/routines/",
-            method: "GET",
-            token: accessToken,
+          setLocLoading(true);
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== "granted") {
+            Alert.alert("Permissão de localização negada");
+            return;
+          }
+          const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.LocationAccuracy.Balanced,
           });
-
           if (!isActive) return;
-
-          setUserRoutines(response.routines);
-        } catch (e: any) {
-          Toast.show({
-            type: "error",
-            text1: "Routines not found",
-            text2: e.message || "Try again later",
-          });
+          setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        } catch {
+          Alert.alert("Não foi possível obter a localização agora.");
+        } finally {
+          if (isActive) setLocLoading(false);
         }
-      }
-    })();
+      })();
 
-    return () => {
-      isActive = false; // evita setState em tela desmontada
-    };
-  }, [accessToken])
-);
+      (async () => {
+        if (accessToken) {
+          try {
+            const response = await apiFetch({
+              path: "/routines/",
+              method: "GET",
+              token: accessToken,
+            });
+            if (!isActive) return;
+            setUserRoutines(response.routines);
+          } catch (e: any) {
+            Toast.show({
+              type: "error",
+              text1: "Routines not found",
+              text2: e.message || "Try again later",
+            });
+          }
+        }
+      })();
 
-  const name = params.name || "Athlete";
+      return () => {
+        isActive = false;
+      };
+    }, [accessToken])
+  );
 
   async function handleCreateRoutine() {
-    if (coords.latitude == null || coords.longitude == null) {
+    if (!coords.latitude || !coords.longitude) {
       Alert.alert("GPS", "Ainda não peguei sua localização. Tente novamente em 1–2s.");
       return;
     }
 
+    if (!routineName.trim()) {
+      Alert.alert("Nome da rotina", "Digite um nome válido para a rotina.");
+      return;
+    }
+
+    setLoading(true);
+
     const payload = {
       name: routineName,
-      location: coords
+      location: coords,
     };
 
     try {
@@ -114,6 +113,19 @@ export default function Routine() {
         method: "POST",
         body: payload,
         token: accessToken,
+      });
+
+      // adiciona a nova rotina à lista
+      setUserRoutines((prev) => [result, ...prev]);
+      setRoutineName("");
+
+      Toast.show({
+        type: "success",
+        text1: "Routine created!",
+        text2: `"${result.name}" added to your routines.`,
+        visibilityTime: 2000,
+        position: "top",
+        topOffset: 50,
       });
     } catch (e: any) {
       Toast.show({
@@ -124,30 +136,26 @@ export default function Routine() {
         position: "top",
         topOffset: 50,
       });
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <View className="flex-1  px-6">
+    <View className="flex-1 px-6">
       <Toast />
-      <View className="h-40 " />
-      <View className="flex-row justify-between items-center mt-4 px-6">
-        {/* Título */}
-        <Text className="text-2xl font-extrabold text-[#0a0a0a]">
-          Sportsbreeze
-        </Text>
+      <View className="h-28" />
 
-        {/* Botão de perfil */}
+      <View className="flex-row justify-between items-center mt-4 px-6">
+        <Text className="text-2xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
         <Link href="/registration" asChild>
           <TouchableOpacity className="bg-black p-3 rounded-full">
             <User size={24} color="#ffffff" />
           </TouchableOpacity>
         </Link>
       </View>
-      
-      
-      {/* Weeks */}
-      <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5]">
+
+      <View className="mt-4 rounded-2xl bg-white border border-[#c5e1a5] h-40">
         {userRoutines.length === 0 ? (
           <View className="p-4 items-center">
             <Text className="text-gray-500">No routines registered yet</Text>
@@ -156,38 +164,39 @@ export default function Routine() {
           <FlatList
             data={userRoutines}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <RoutineCell item={item} setRoutine={setRoutine} />
-            )}
-            contentContainerStyle={{ paddingVertical: 8 }}
+            renderItem={({ item }) => <RoutineCell item={item} setRoutine={setRoutine} />}
+            contentContainerStyle={{ paddingVertical: 8, flexGrow: 0 }}
+            showsVerticalScrollIndicator={true}
           />
         )}
       </View>
 
-      <PlusLine/>
+      <PlusLine />
 
       <View className="px-4 flex justify-center items-center gap-y-2">
-
-      {/* Input com ícone */}
-      <View className="flex-row items-center border rounded-lg border-gray-700 mb-6 px-2">
-        <MaterialIcons name="sports-volleyball" size={24} color="black" />
+        {/* Input com ícone */}
+        <View className="flex-row items-center border rounded-lg border-gray-700 mb-6 px-2">
+          <MaterialIcons name="sports-volleyball" size={24} color="black" />
           <TextInput
             placeholder="Routine Name"
             placeholderTextColor="#888"
             value={routineName}
             onChangeText={setRoutineName}
-            className="flex-1 text-white py-2"
+            className="flex-1 py-2"
           />
         </View>
 
-        {/* Botão */}
+        {/* Botão com spinner */}
         <TouchableOpacity
-          className="w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl"
+          className="w-full max-w-xs mx-auto bg-blue-600 py-3 rounded-xl flex-row justify-center items-center"
           onPress={handleCreateRoutine}
+          disabled={loading}
         >
-          <Text className="text-white text-center font-semibold">
-            Schedule Workout
-          </Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-center font-semibold">Schedule Workout</Text>
+          )}
         </TouchableOpacity>
       </View>
 
