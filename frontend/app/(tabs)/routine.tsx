@@ -28,7 +28,6 @@ export type Routine = {
 };
 
 export default function Routine() {
-  const params = useLocalSearchParams<{ name?: string }>();
   const { accessToken } = useAuthStore();
 
   if (!accessToken) {
