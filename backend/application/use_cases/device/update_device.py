@@ -8,9 +8,7 @@ class UpdateDeviceUseCase:
     def __init__(self, repository: DeviceRepository = Depends()):
         self.repository = repository
 
-    async def execute(self, device: Device, update_data: SetDeviceSchema):
-        data_dict = update_data.model_dump(exclude_unset=True)
-        if device.device_token == update_data.device_token:
+    async def execute(self, device: Device, update_data: dict):
+        if device.device_token == update_data.get("device_token", None):
             return device
-
-        return self.repository.update(device, data_dict)
+        return self.repository.update(device, update_data)

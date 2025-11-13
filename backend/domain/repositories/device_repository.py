@@ -23,7 +23,8 @@ class DeviceRepository:
             return None
         
         for field, value in update_data.items():
-            setattr(device, field, value)
+            if hasattr(Device, field):
+                setattr(device, field, value)
 
         self.db.commit()
         self.db.refresh(device)

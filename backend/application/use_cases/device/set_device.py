@@ -3,7 +3,7 @@ from application.use_cases.device.update_device import UpdateDeviceUseCase
 from domain.entities.device import Device
 from domain.repositories.device_repository import DeviceRepository
 from schemas.device_schema import SetDeviceSchema
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 
 class SetDeviceUseCase:
@@ -18,10 +18,12 @@ class SetDeviceUseCase:
 
     async def execute(self, device_schema: SetDeviceSchema):
         try:
-            device : Device | None = await self.find_device_by_user_use_case.execute(device_schema.user_id)
+            device: Device | None = await self.find_device_by_user_use_case.execute(device_schema.user_id)
             if device:
-                return await self.update_device_use_case.execute(device, device_schema)
+                update_data = device_schema.model_dump(exclude_unset=True)
+                return await self.update_device_use_case.execute(device, update_data)
         except Exception as e:
-            raise ValueError("Invalid code")
+            raise HTTPException(status_code=400, detail="Invalid code")
+        
         return self.repository.create(device_schema.model_dump())
 
