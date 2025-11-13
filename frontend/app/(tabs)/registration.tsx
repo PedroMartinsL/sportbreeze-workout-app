@@ -49,7 +49,6 @@ export default function Registration() {
 
   // IMPORTANTE: Todos os hooks devem ser chamados ANTES de qualquer early return
   const [form, setForm] = useState({
-    name: "",
     age: "",
     weight: "",
     height: "",
@@ -92,7 +91,6 @@ export default function Registration() {
         );
 
         setForm({
-          name: profile.name || "",
           age: profile.age?.toString() || "",
           weight: profile.weight?.toString() || "",
           height: profile.height?.toString() || "",
@@ -149,11 +147,6 @@ export default function Registration() {
 
   const save = async () => {
     console.log("🔵 Save button clicked!");
-    
-    if (!form.name.trim()) {
-      console.log("❌ Name is empty");
-      return Alert.alert("Attention", "Please enter your name.");
-    }
 
     const daysStr = DAYS.filter((d) => form.days[d]).join(",");
     const sportsStr = form.sports.join(",");
@@ -212,12 +205,6 @@ export default function Registration() {
       </Text>
 
       {[
-        {
-          k: "name",
-          label: "Name",
-          placeholder: "Your name",
-          props: { autoCapitalize: "words" as const },
-        },
         {
           k: "age",
           label: "Age",
