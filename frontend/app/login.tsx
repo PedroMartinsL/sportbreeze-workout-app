@@ -20,21 +20,19 @@ export default function LoginScreen() {
     try {
       setLoading(true);
 
-      // ✅ Forçamos o tipo com “as any” para não alterar o api.js
-      await login(email, password);    
-      
-      const expoPushToken = await getPushToken();
-      console.log(expoPushToken);
+      await login(email, password);
 
-      if (expoPushToken) {
-        // 🔹 envia o token do celular para o backend junto com o access_token
+      // Pega o access token atualizado direto da store
+      const token = useAuthStore.getState().accessToken;
+
+      const expoPushToken = await getPushToken();
+
+      if (expoPushToken && token) {
         await apiFetch({
           path: "/device",
           method: "POST",
-          body: {
-            device_token: expoPushToken,
-          },
-          token: accessToken
+          body: { device_token: expoPushToken },
+          token: token, // ✅ aqui usamos o token atualizado
         });
       }
 
@@ -65,6 +63,7 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+
 
   return (
     <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>

@@ -9,30 +9,35 @@ from schemas.workout_schema import WorkoutCreate
 class AiWeatherClass():
      
      @staticmethod
-     async def api_services(location: LocationSchema, profile, routine_id: int, input: str) -> list:
+     async def api_services(location: LocationSchema, user, routine_id: int, input: str) -> list:
         # Busca informações do clima
+        profile = user.profile.model_dump() if hasattr(user, "profile") and user.profile else {"profile": "default"}
         weather_json = fetch_weather(location.latitude, location.longitude)
         if not weather_json:
             raise HTTPException(status_code=404, detail="Weather information not found")
 
         # Chamada ao Gemini AI
         payload_json = await call_gemini(
-            profile.model_dump(),
+            profile,
             f"{input}| weather {weather_json}"
         )
-
         try:
-            workouts = json.loads(payload_json)
+            if isinstance(payload_json, str):
+                workouts = json.loads(payload_json)
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail="Empty or invalid JSON from Gemini API")
         
         workout_schema = []
 
         for workout in workouts:
-            workout['routine_id'] = routine_id
-            workout['date'] = datetime.strptime(workout['date'], "%Y-%m-%d").date()
+            workout['kcal'] = float(workout['kcal'])
+            workout['duration'] = int(workout['duration'])
             workout['hour'] = datetime.strptime(workout['hour'], "%H:%M").time()
+            workout['date'] = datetime.strptime(workout['date'], "%Y-%m-%d").date()
+            workout['check'] = False
+            workout['notify'] = False
+            workout['routine_id'] = routine_id
 
             workout_schema.append(WorkoutCreate(**workout))
-        
+
         return workout_schema

@@ -13,8 +13,13 @@ class RoutineResponse(RoutineBase):
         validate_assignment=True
     )
 
-class ListRoutineResponse(RoutineResponse):
+class ListRoutineResponse(BaseModel):
     routines: List[RoutineResponse]
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        validate_assignment=True
+    )
 
 class LocationSchema(BaseModel):
     latitude: float

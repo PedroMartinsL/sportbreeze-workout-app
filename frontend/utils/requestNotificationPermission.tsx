@@ -27,6 +27,4 @@ export async function requestNotificationPermission() {
     Alert.alert("Notificações", "Permissão para notificações negada.");
     return;
   }
-
-  console.log("✅ Permissão de notificação concedida.");
 }

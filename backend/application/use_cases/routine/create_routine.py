@@ -20,9 +20,14 @@ class CreateRoutineUseCase:
         if not data.name:
             data.name = "Default workout"
         
-        routine = self.repository.create(data.routine.model_dump())
+        routine_dict = {
+            "name" : data.name,
+            "user_id" : user.id
+        }
         
-        workouts = await AiWeatherClass.api_services(data.location, user.profile, routine.id, "Generate a plan to workout based on these info for the next 7 days")
+        routine = self.repository.create(routine_dict)
+        
+        workouts = await AiWeatherClass.api_services(data.location, user, routine.id, "Generate a plan to workout based on these info for the next 7 days")
 
         for workout in workouts:
             try:

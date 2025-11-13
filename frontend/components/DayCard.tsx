@@ -1,19 +1,16 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
-import { TaskCardProps } from "./TaskCard";
 
 type DayCardProps = {
   day: string;
-  tasks: TaskCardProps[];
+  dayKey: string | undefined;
 };
 
-export default function DayCard({ day, tasks }: DayCardProps) {
-  const taskList: string = encodeURIComponent(JSON.stringify(tasks));
-
+export default function DayCard({ day, dayKey }: DayCardProps) {
   return (
     <View className="w-60 rounded-full overflow-hidden mb-2">
       <Link
-        href={{ pathname: "/week/[day]", params: { day, taskList } }}
+        href={{ pathname: "/week/[day]", params: { day, dayKey } }}
         asChild
       >
         <TouchableOpacity

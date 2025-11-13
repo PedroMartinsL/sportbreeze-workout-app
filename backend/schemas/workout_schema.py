@@ -14,6 +14,8 @@ class WorkoutBase(BaseModel):
     hour: time
     date: date
     sport: str
+    check: bool
+    notify: bool
     routine_id: int
 
 class WorkoutCreate(WorkoutBase):
@@ -34,9 +36,9 @@ class WorkoutUpdate(WorkoutBase):
     pass
 
 class WorkoutGoals(BaseModel):
-    kcal: float
+    kcal: int
     hour: time
-    date: date
+    date: str
     sport: str
     duration: int
     location: LocationSchema

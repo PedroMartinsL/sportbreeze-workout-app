@@ -9,12 +9,17 @@ class CreateWorkoutByGoalsUseCase:
                  create_workout_use_case: CreateWorkoutUseCase = Depends()):
         self.create_workout_use_case = create_workout_use_case
 
-    def execute(self, workout_goals: WorkoutGoals, user: User):
-        workouts = AiWeatherClass.api_services(
+    async def execute(self, workout_goals: WorkoutGoals, user: User):
+        input = f"""
+            Generate a single training plan there are my suggestion, create based on my goals: 
+            (The date suggested is made for now or next Day - Ex: Sunday - schedule it for the next sunday or now if today is sunday)
+                {workout_goals.model_dump}
+        """
+        workouts = await AiWeatherClass.api_services(
             workout_goals.location,
-            user.profile,
-            workout_goals.routine.id,
-            "Generate a single training plan:"
+            user,
+            workout_goals.routine_id,
+            input
         )
 
         if not workouts:

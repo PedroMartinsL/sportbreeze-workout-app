@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
 interface LocationState {
-  coords: { lat: number | null; lon: number | null };
-  setCoords: (coords: { lat: number; lon: number }) => void;
+  coords: { latitude: number | null; longitude: number | null };
+  setCoords: (coords: { latitude: number; longitude: number }) => void;
 }
 
 export const useLocationStore = create<LocationState>((set) => ({
-  coords: { lat: null, lon: null },
+  coords: { latitude: null, longitude: null },
   setCoords: (coords) => set({ coords }),
 }));
