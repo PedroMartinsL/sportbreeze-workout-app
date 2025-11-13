@@ -16,7 +16,7 @@ def create_token(user: User, token_duration=timedelta(minutes=ACCESS_TOKEN_EXPIR
     return encoded_jwt
 
 def use_token(user: User):
-        access_token = create_token(user.id)
+        access_token = create_token(user)
         return {
             "access_token": access_token,
             "token_type": "Bearer"

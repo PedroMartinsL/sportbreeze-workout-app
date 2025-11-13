@@ -22,7 +22,7 @@ async def login(login_schema: UserLogin, auth_service: AuthService = Depends()):
     var = auth_service.login(login_schema=login_schema)
     return var
     
-@auth_router.get("/refresh")
+@auth_router.post("/refresh")
 async def use_refresh_token(user: User = Depends(verify_token)):
     """
     Verify and generate new access token, every function which uses this function has to auth tokens by header

@@ -94,22 +94,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await apiFetch({
         path: "/auth/refresh",
         method: "POST",
-        body: { refresh_token: refreshToken },
-        token: null,
+        body: {},
+        token: refreshToken,
         onUnauthorized: async () => null,
         onLogout: get().logout,
       });
 
       const { access_token } = res;
       const decoded = jwtDecode<JwtPayload>(access_token);
-
       set({
         accessToken: access_token,
         user: Number(decoded.sub),
         role: decoded.role,
         loading: false,
       });
-    } catch {
+    } catch (err) {
       await get().logout();
       set({ loading: false });
     }
