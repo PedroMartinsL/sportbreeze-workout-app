@@ -5,11 +5,19 @@ import { useAuthStore } from "@/store/auth";
 export default function TabLayout() {
   const { role } = useAuthStore();
   const isAdmin = role === "admin";
+  console.log("role", isAdmin);
+  console.log("role é", role);
 
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
+        headerShown: true, // mostrar header
+        headerTitleAlign: "center", // centraliza o título
+        headerTitleStyle: {
+          fontSize: 20,
+          fontWeight: "700",
+          color: "#111827",
+        },
         tabBarActiveTintColor: "black",
         tabBarInactiveTintColor: "#94a3b8",
         tabBarStyle: {
@@ -17,14 +25,19 @@ export default function TabLayout() {
           borderRadius: 30,
           backgroundColor: "#fff",
           height: 60,
-          paddingBottom: 20,
+          paddingBottom: 10,
           borderTopWidth: 0.5,
           borderTopColor: "#ccc",
           marginBottom: 40,
+          shadowColor: "#000",
+          shadowOpacity: 0.05,
+          shadowRadius: 5,
+          shadowOffset: { width: 0, height: 2 },
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",
+          textAlign: "center",
         },
       }}
     >
@@ -32,6 +45,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
+          headerShown: false, // esconde o header só aqui
           tabBarIcon: ({ color, size }) => <FontAwesome name="home" color={color} size={size} />,
         }}
       />
@@ -65,19 +79,18 @@ export default function TabLayout() {
         options={{
           title: "GPS",
           tabBarIcon: ({ color, size }) => <FontAwesome name="location-arrow" color={color} size={size} />,
-
         }}
       />
-
-      {/* Tab Statistics - Apenas para Admin */}
-      <Tabs.Screen
-        name="statistics"
-        options={{
-          title: "Statistics",
-          tabBarIcon: ({ color, size }) => <FontAwesome name="bar-chart" color={color} size={size} />,
-          href: isAdmin ? "/statistics" : null, // Esconde a tab se não for admin
-        }}
-      />
+      
+      {isAdmin && (
+        <Tabs.Screen
+          name="statistics"
+          options={{
+            title: "Statistics",
+            tabBarIcon: ({ color, size }) => <FontAwesome name="bar-chart" color={color} size={size} />,
+          }}
+        />
+      )}
     </Tabs>
   );
 }
