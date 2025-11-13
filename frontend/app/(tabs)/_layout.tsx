@@ -1,23 +1,32 @@
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useAuthStore } from "@/store/auth";
+import { TextStyle } from "react-native";
 
 export default function TabLayout() {
   const { role } = useAuthStore();
   const isAdmin = role === "admin";
-  console.log("role", isAdmin);
-  console.log("role é", role);
+
+  const defaultHeaderStyle: {
+    headerStyle: { backgroundColor: string };
+    headerTintColor: string;
+    headerTitleAlign: "center";
+    headerTitleStyle: TextStyle;
+  } = {
+    headerStyle: { backgroundColor: "#f0f0f0" },
+    headerTintColor: "#333",
+    headerTitleAlign: "center",
+    headerTitleStyle: {
+      fontSize: 20,
+      fontWeight: "500", // menos bold que "700"
+      color: "#111827",
+    },
+  };
 
   return (
     <Tabs
       screenOptions={{
-        headerShown: true, // mostrar header
-        headerTitleAlign: "center", // centraliza o título
-        headerTitleStyle: {
-          fontSize: 20,
-          fontWeight: "700",
-          color: "#111827",
-        },
+        ...defaultHeaderStyle,
         tabBarActiveTintColor: "black",
         tabBarInactiveTintColor: "#94a3b8",
         tabBarStyle: {
@@ -36,7 +45,7 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: "600",
+          fontWeight: "500" as TextStyle["fontWeight"], // também menos bold
           textAlign: "center",
         },
       }}
@@ -45,11 +54,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          headerShown: false, // esconde o header só aqui
+          headerShown: false,
           tabBarIcon: ({ color, size }) => <FontAwesome name="home" color={color} size={size} />,
         }}
       />
-
       <Tabs.Screen
         name="registration"
         options={{
@@ -57,7 +65,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <FontAwesome name="user-plus" color={color} size={size} />,
         }}
       />
-
       <Tabs.Screen
         name="routine"
         options={{
@@ -65,7 +72,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <FontAwesome name="list" color={color} size={size} />,
         }}
       />
-
       <Tabs.Screen
         name="about"
         options={{
@@ -73,7 +79,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <FontAwesome name="info-circle" color={color} size={size} />,
         }}
       />
-
       <Tabs.Screen
         name="gps"
         options={{
@@ -81,7 +86,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <FontAwesome name="location-arrow" color={color} size={size} />,
         }}
       />
-      
       {isAdmin && (
         <Tabs.Screen
           name="statistics"

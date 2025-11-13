@@ -23,7 +23,26 @@ export default function Layout() {
         translucent={false}  // garante que a cor preencha a barra
       />
 
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack>
+      {/* Tabs */}
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,  // header do Stack para as Tabs
+          title: "Meu App",
+        }}
+        />
+
+        {/* Telas fora das Tabs */}
+        <Stack.Screen
+          name="week/[day]"
+          options={{ title: "Detalhes do Dia" }}
+        />
+        <Stack.Screen
+          name="week/create"
+          options={{ title: "Criar Evento" }}
+        />
+      </Stack>
     </SafeAreaProvider>
   );
 }
