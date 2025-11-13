@@ -55,7 +55,6 @@ class CreateWorkoutUseCase:
             existing_end = existing_start + timedelta(minutes=w.duration)
 
             if (new_start < existing_end) and (new_end > existing_start):
-                print("siiiim")
                 raise HTTPException(
                     status_code=400,
                     detail=(

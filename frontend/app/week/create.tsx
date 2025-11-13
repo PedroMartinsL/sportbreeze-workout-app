@@ -143,7 +143,7 @@ export default function CreateTask() {
           <TextInput
             placeholder="Suggest a guidance to your planner"
             placeholderTextColor="gray"
-            className="mb-10 border border-gray-300 rounded p-2"
+            className="mb-10 border border-gray-300 rounded p-2 text-black"
           />
 
           <View className="flex-row gap-10">

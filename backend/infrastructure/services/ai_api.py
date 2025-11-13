@@ -24,7 +24,7 @@ async def call_gemini(profile: dict, prompt_text: str):
         "  'weather': 'Weather condition at the time of the workout',\n"
         "  'kcal': 'Calories burned',\n"
         "  'title': 'Brief workout description',\n"
-        "  'temp': 'Temperature in Celsius',\n"
+        "  'temp': 'Temperature in Celsius INTEGER',\n"
         "  'duration': 'Workout duration in minutes',\n"
         "  'planner': 'Detailed plan',\n"
         "  'hour': 'Start time in HH:mm',\n"
