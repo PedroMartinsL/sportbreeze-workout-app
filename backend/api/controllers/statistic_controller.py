@@ -8,7 +8,7 @@ from schemas.statistic_schema import StatisticResponse
 
 statistic_router = APIRouter(prefix="/statistics", tags=["Statistics"])
 
-@statistic_router.get("/me", response_model=List[StatisticResponse])
+@statistic_router.get("/me", response_model=StatisticResponse)
 async def get_my_statistics(
     use_case: FindStatisticsByUserUseCase = Depends(),
     user: User = Depends(verify_token)

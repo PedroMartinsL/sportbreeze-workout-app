@@ -15,6 +15,14 @@ class WorkoutRepository:
         self.db.commit()
         self.db.refresh(workout)
         return workout
+    
+    def find_by_user(self, user_id):
+        return (
+            self.db.query(Workout)
+            .join(Workout.routine)
+            .filter(Workout.routine.has(user_id=user_id))
+            .all()
+        )
 
     def find_by_routine(self, routine_id) -> List[Workout] | None:
         return self.db.query(Workout).filter(Workout.routine_id == routine_id)

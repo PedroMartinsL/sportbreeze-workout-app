@@ -1,4 +1,5 @@
 from application.use_cases.workout.create_workout_by_goals import CreateWorkoutByGoalsUseCase
+from application.use_cases.statistic.set_statistics import SetStatisticsUseCase
 from dependencies import verify_token
 from domain.entities.user import User
 from fastapi import APIRouter, Depends, HTTPException
@@ -34,9 +35,10 @@ async def delete_workout(workout_id: int, use_case: DeleteWorkoutUseCase = Depen
     return result
 
 @workout_router.put("/{workout_id}", response_model=WorkoutResponse)
-async def update_workout(workout_id: int, workout_data: WorkoutUpdate, use_case: UpdateWorkoutUseCase = Depends(), user: User = Depends(verify_token)):
+async def update_workout(workout_id: int, workout_data: WorkoutUpdate, use_case: UpdateWorkoutUseCase = Depends(), set_statistics_use_case: SetStatisticsUseCase = Depends(), user: User = Depends(verify_token)):
     result = use_case.execute(workout_id, workout_data)
     if not result:
         raise HTTPException(status_code=404, detail="User workout not found")
+    set_statistics_use_case.execute(user.id)
     return result
 

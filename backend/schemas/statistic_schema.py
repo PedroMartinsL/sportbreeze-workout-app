@@ -17,5 +17,6 @@ class StatisticResponse(StatisticBase):
         validate_assignment=True
     )
 
-class StatisticListResponse(BaseModel):
-    statistics: List[StatisticResponse]
+class StatisticUpdate(BaseModel):
+    kcal_burned: Optional[float] = None
+    activity_checked: Optional[int] = None
