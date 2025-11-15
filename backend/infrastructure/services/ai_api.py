@@ -32,11 +32,9 @@ async def call_gemini(profile: dict, prompt_text: str):
         "  'sport': 'Main activity type'\n"
         "}\n\n"
         f"{prompt_text}\n\n"
-        "\nConsider a routine plan accordingly with user days available, height, weight, etc | Pay attention on users time which he has to practice as it will be shown:"
+        "\nConsider a routine plan accordingly with profile available_days, height, weight, etc | Pay attention on users time which he has to practice as it will be shown:"
         f"Profile: {json.dumps(profile, ensure_ascii=False)}"
     )
-
-    print(full_prompt)
 
     client = await get_client()
     response = client.models.generate_content(

@@ -70,12 +70,17 @@ export default function TaskCard(props: TaskCardProps) {
   const warn = warn_days.includes(props.weather);
 
   // Changing Date format to American
-  const dateObj = new Date(props.date);
+  const parseLocalDate = (dateString: string) => {
+    const [y, m, d] = dateString.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
 
-  const formattedDate: string = dateObj.toLocaleDateString("en-US", {
-    month: "long",   // April
-    day: "numeric",  // 12
-    year: "numeric", // 2025
+  const dateObj = parseLocalDate(props.date);
+
+  const formattedDate = dateObj.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 
   return (

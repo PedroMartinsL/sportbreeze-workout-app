@@ -36,6 +36,7 @@ class CreateWorkoutUseCase:
         # Chama a função de verificação
         self.check_workout_conflicts(workout_data, existing_workouts)
 
+        print(workout_data)
         # Se passou, cria o treino
         return self.repository.create(workout_data)
 
