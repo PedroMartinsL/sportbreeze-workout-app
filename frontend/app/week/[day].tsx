@@ -74,6 +74,7 @@ export default function DayScreen() {
         <SwipeListView
           data={dailyTasks}
           keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
             <Pressable
               onPress={() => populateModal(item)}

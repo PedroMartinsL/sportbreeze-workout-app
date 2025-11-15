@@ -195,7 +195,10 @@ export default function Registration() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-[#d9f99d] px-5">
+    <ScrollView
+      className="flex-1 bg-[#d9f99d] px-5"
+      contentContainerStyle={{ paddingBottom: 120 }}
+    >
       <View className="h-4" />
       <Text className="text-2xl font-extrabold text-[#0a0a0a]">
         Registration Portal

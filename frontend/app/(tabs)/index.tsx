@@ -21,7 +21,8 @@ const cardColors = ["#dcfce7", "#bbf7d0", "#86efac"];
 
 export default function Home() {
   // tenta restaurar a sessão
-  const { initAuth, accessToken } = useAuthStore();
+  const { initAuth, accessToken, role } = useAuthStore();
+  const isAdmin = role === "admin";
 
   useEffect(() => {
     initAuth(); 
@@ -31,7 +32,7 @@ export default function Home() {
 
   return (
     <View className="flex-1 bg-[#d9f99d] px-6 pt-10">
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
         {/* Header */}
         <View className="items-center justify-center mb-10 mt-4">
           {/* Container da logo maior */}
@@ -42,7 +43,7 @@ export default function Home() {
               resizeMode="contain"
             />
           </View>
-
+        
           {/* Texto */}
           <Text className="text-[#0a0a0a] text-4xl font-extrabold">Sportsbreeze</Text>
         </View>
@@ -120,6 +121,23 @@ export default function Home() {
           )}
         />
         </View>
+
+        <View className="flex justify-center items-center">
+          <Text>Statistics</Text>
+          <View className="flex mb-10 p-3 justify-center items-center border-t rounded-lg">
+            {isAdmin && (
+              <>
+                <TouchableOpacity
+                  className="bg-black w-14 h-14 rounded-full justify-center items-center shadow-lg"
+                  onPress={() => router.push("/statistics")}
+                >
+                  <MaterialIcons name="insert-chart" size={28} color="#fff" />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+        
 
         {/* Promotional Cards */}
         {cardColors.map((color, index) => (

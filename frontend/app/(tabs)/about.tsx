@@ -2,7 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import { Activity, CalendarDays, Dumbbell, MapPin, Shield, Sunset, Umbrella, Volleyball, Wind } from "lucide-react-native";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View, Alert } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View, Alert, Image } from "react-native";
 import { useAuthStore } from "@/store/auth";
 
 export default function About() {
@@ -21,13 +21,22 @@ export default function About() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-[#d9f99d] px-6">
+    <ScrollView className="flex-1 bg-[#d9f99d] px-6" contentContainerStyle={{ paddingBottom: 140 }}>
 
       {/* Header */}
       
       <View className="h-5" />
-      <Text className="text-3xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
-      <Text className="text-[#475569] mt-0.5">How it works</Text>
+        <View className="items-center justify-center mt-4">
+          {/* Container da logo maior */}
+          <View className="flex-row rounded-xl border-[#c5e1a5] items-center justify-center">
+            <Image
+              source={require("../../assets/images/Sportsbreeze-logo-1.png")}
+              style={{ width: 50, height: 50 }}
+              resizeMode="contain"
+            />
+            <Text className="text-[#0a0a0a] text-4xl font-extrabold">How it works</Text>
+          </View>
+        </View>
 
       {/*  Hero */}
       <View className="mt-4 rounded-3xl overflow-hidden border border-[#c5e1a5] bg-white">

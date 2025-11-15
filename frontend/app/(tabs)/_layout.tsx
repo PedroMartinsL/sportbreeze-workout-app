@@ -1,12 +1,8 @@
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
-import { useAuthStore } from "@/store/auth";
 import { TextStyle } from "react-native";
 
 export default function TabLayout() {
-  const { role } = useAuthStore();
-  const isAdmin = role === "admin";
-  // console.log(isAdmin); // Remove debug log
 
   const defaultHeaderStyle = {
     headerStyle: { backgroundColor: "#f0f0f0" },
@@ -33,7 +29,7 @@ export default function TabLayout() {
     <Tabs.Screen
       name="registration"
       options={{
-        title: "Registration",
+        title: "Profile",
         tabBarIcon: ({ color, size }) => <FontAwesome name="user-plus" color={color} size={size} />,
       }}
       key="registration"
@@ -63,19 +59,6 @@ export default function TabLayout() {
       key="gps"
     />
   ];
-
-  if (isAdmin) {
-    screens.push(
-      <Tabs.Screen
-        name="statistics"
-        options={{
-          title: "Statistics",
-          tabBarIcon: ({ color, size }) => <FontAwesome name="bar-chart" color={color} size={size} />,
-        }}
-        key="statistics"
-      />
-    );
-  }
 
   return (
     <Tabs
