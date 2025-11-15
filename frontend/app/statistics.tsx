@@ -3,28 +3,38 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "@/store/auth";
 import { apiFetch } from "@/services/api";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import Toast from "react-native-toast-message";
 
 type Statistic = {
   id: number;
   user_id: number;
-  workout_id: number | null;
-  date: string;
-  sport: string | null;
-  duration: number | null;
   kcal_burned: number | null;
-  distance: number | null;
-  notes: string | null;
+  activity_checked: number | null;
 };
 
 export default function StatisticsScreen() {
-  const { accessToken, role, user } = useAuthStore();
+  const { accessToken, role } = useAuthStore();
   const [statistics, setStatistics] = useState<Statistic[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const navigation = useNavigation();
+
   useEffect(() => {
-    // Verifica se é admin - Mas só redireciona se houver um token (usuário logado)
+    navigation.setOptions({
+      title: "Statistics",
+      headerTitleAlign: 'center',
+      headerStyle: {
+        backgroundColor: "#4d7c0f",
+      },
+      headerTitleStyle: {
+        color: "white",
+        fontWeight: "800",
+        fontSize: 20,
+      },
+      headerTintColor: "white",
+    });
+
     if (accessToken && role !== "admin") {
       Toast.show({
         type: "error",
@@ -35,7 +45,6 @@ export default function StatisticsScreen() {
       return;
     }
 
-    // Só busca estatísticas se estiver logado e for admin
     if (accessToken && role === "admin") {
       fetchStatistics();
     }
@@ -71,82 +80,128 @@ export default function StatisticsScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#d9f99d" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#ecfccb" }}>
       <Toast />
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-        {/* Header */}
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 28, fontWeight: "800", color: "#0a0a0a" }}>Admin Panel</Text>
-          <Text style={{ fontSize: 16, color: "#475569", marginTop: 4 }}>
-            All User Statistics ({statistics.length} total)
+
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 80 }}>
+
+        {/* 🔥 HEADER MODERNO */}
+        <View
+          style={{
+            backgroundColor: "#4d7c0f",
+            padding: 22,
+            borderRadius: 20,
+            marginBottom: 25,
+            shadowColor: "#000",
+            shadowOpacity: 0.15,
+            shadowRadius: 6,
+            shadowOffset: { width: 0, height: 3 },
+            elevation: 4,
+          }}
+        >
+          <Text style={{ fontSize: 30, fontWeight: "900", color: "white" }}>
+            Admin Dashboard
           </Text>
+
+          <Text style={{ fontSize: 16, marginTop: 6, color: "#f0fdf4" }}>
+            User Statistics Overview
+          </Text>
+
+          <View
+            style={{
+              marginTop: 14,
+              backgroundColor: "rgba(255,255,255,0.2)",
+              paddingVertical: 6,
+              paddingHorizontal: 14,
+              alignSelf: "flex-start",
+              borderRadius: 30,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "600" }}>
+              {statistics.length} statistics loaded
+            </Text>
+          </View>
         </View>
 
-        {/* Statistics Cards */}
-        {statistics.length === 0 ? (
-          <View style={{ backgroundColor: "white", borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#c5e1a5" }}>
-            <Text style={{ textAlign: "center", color: "#475569" }}>No statistics found</Text>
-          </View>
-        ) : (
-          statistics.map((stat) => (
+        {/* 📊 LISTA DE CARDS ESTILIZADOS */}
+        {statistics.map((stat) => {
+          const ratio =
+            stat.kcal_burned && stat.activity_checked && stat.activity_checked > 0
+              ? (stat.kcal_burned / stat.activity_checked).toFixed(2)
+              : "N/A";
+
+          return (
             <View
               key={stat.id}
               style={{
                 backgroundColor: "white",
-                borderRadius: 20,
-                padding: 16,
-                marginBottom: 12,
+                borderRadius: 18,
+                padding: 20,
+                marginBottom: 16,
                 borderWidth: 1,
-                borderColor: "#c5e1a5",
+                borderColor: "#d4e9c4",
                 shadowColor: "#000",
                 shadowOpacity: 0.05,
                 shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 4,
+                shadowRadius: 5,
+                elevation: 3,
               }}
             >
-              <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
-                <Text style={{ fontWeight: "700", fontSize: 16, color: "#0a0a0a" }}>
-                  {stat.sport || "Unknown Sport"}
+              {/* Header do card */}
+              <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14 }}>
+                <Text style={{ fontWeight: "800", fontSize: 18, color: "#14532d" }}>
+                  User #{stat.user_id}
                 </Text>
-                <Text style={{ color: "#475569", fontSize: 12 }}>User #{stat.user_id}</Text>
+                <View
+                  style={{
+                    backgroundColor: "#bbf7d0",
+                    paddingHorizontal: 12,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                  }}
+                >
+                  <Text style={{ fontWeight: "600", color: "#14532d" }}>
+                    Statistics
+                  </Text>
+                </View>
               </View>
 
-              <View style={{ marginBottom: 4 }}>
-                <Text style={{ color: "#475569", fontSize: 14 }}>
-                  📅 {new Date(stat.date).toLocaleDateString()}
+              {/* Divisor */}
+              <View style={{ height: 1, backgroundColor: "#e2f3d4", marginBottom: 14 }} />
+
+              {/* Conteúdo dos dados */}
+              <View style={{ gap: 6 }}>
+                <Text style={{ fontSize: 15, color: "#475569" }}>
+                  <Text style={{ fontWeight: "700" }}>Kcal burned:</Text> {stat.kcal_burned ?? 0}
+                </Text>
+
+                <Text style={{ fontSize: 15, color: "#475569" }}>
+                  ☑ <Text style={{ fontWeight: "700" }}>Activities checked:</Text> {stat.activity_checked ?? 0}
+                </Text>
+
+                <Text style={{ fontSize: 16, color: "#14532d", marginTop: 8, fontWeight: "800" }}>
+                  ❚█══█❚      Kcal / Activity: {ratio}
                 </Text>
               </View>
-
-              {stat.duration && (
-                <Text style={{ color: "#475569", fontSize: 14 }}>⏱️ Duration: {stat.duration} min</Text>
-              )}
-              {stat.kcal_burned && (
-                <Text style={{ color: "#475569", fontSize: 14 }}>🔥 Calories: {stat.kcal_burned.toFixed(0)} kcal</Text>
-              )}
-              {stat.distance && (
-                <Text style={{ color: "#475569", fontSize: 14 }}>📍 Distance: {stat.distance.toFixed(2)} km</Text>
-              )}
-              {stat.notes && (
-                <Text style={{ color: "#64748b", fontSize: 12, marginTop: 6, fontStyle: "italic" }}>
-                  Note: {stat.notes}
-                </Text>
-              )}
             </View>
-          ))
-        )}
+          );
+        })}
 
-        {/* Back Button */}
+        {/* Botão Voltar */}
         <TouchableOpacity
           onPress={() => router.back()}
           style={{
-            backgroundColor: "#111827",
-            padding: 14,
-            borderRadius: 12,
+            backgroundColor: "#1e293b",
+            padding: 16,
+            borderRadius: 14,
             marginTop: 10,
           }}
         >
-          <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Back</Text>
+          <Text style={{ color: "white", fontWeight: "700", textAlign: "center", fontSize: 16 }}>
+            Back
+          </Text>
         </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );

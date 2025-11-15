@@ -45,7 +45,20 @@ const SPORT_LIST = [
 ] as const;
 
 export default function Registration() {
-  const { accessToken } = useAuthStore();
+  const { logout, accessToken } = useAuthStore();
+
+    const handleLogout = async () => {
+      try {
+        await logout();
+        router.replace("/login");
+        setTimeout(() => {
+          Alert.alert("Logout", "Você saiu com sucesso!");
+        }, 500);
+      } catch (error) {
+        Alert.alert("Erro", "Não foi possível fazer logout");
+      }
+    };
+  
 
   // IMPORTANTE: Todos os hooks devem ser chamados ANTES de qualquer early return
   const [form, setForm] = useState({
@@ -289,14 +302,26 @@ export default function Registration() {
         })}
       </View>
 
-      <TouchableOpacity
-        onPress={save}
-        className="mt-5 bg-black py-3 rounded-xl items-center"
-      >
-        <Text className="text-white font-semibold">
-          {profileExists ? "Update Profile" : "Save Profile"}
-        </Text>
-      </TouchableOpacity>
+        <View className="flex justify-center gap-5">
+        <TouchableOpacity
+          onPress={save}
+          className="w-full max-w-xs mx-auto mt-5 bg-black py-3 rounded-xl items-center"
+        >
+          <Text className="text-white font-semibold">
+            {profileExists ? "Update Profile" : "Save Profile"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Botão Logout - Só aparece se estiver logado */}
+        {accessToken && (
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="w-full max-w-xs mx-auto bg-red-600 py-3 rounded-xl mb-3"
+          >
+            <Text className="text-white text-center font-semibold">Logout</Text>
+          </TouchableOpacity>
+        )}
+       </View>
 
       <View className="h-6" />
     </ScrollView>

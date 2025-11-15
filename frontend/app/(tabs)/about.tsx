@@ -6,20 +6,6 @@ import { ScrollView, Text, TouchableOpacity, View, Alert, Image } from "react-na
 import { useAuthStore } from "@/store/auth";
 
 export default function About() {
-  const { logout, accessToken } = useAuthStore();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.replace("/login");
-      setTimeout(() => {
-        Alert.alert("Logout", "Você saiu com sucesso!");
-      }, 500);
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível fazer logout");
-    }
-  };
-
   return (
     <ScrollView className="flex-1 bg-[#d9f99d] px-6" contentContainerStyle={{ paddingBottom: 140 }}>
 
@@ -165,20 +151,9 @@ export default function About() {
 
       {/* Buttons (More Implemensts?) */}
       <View className="mt-5 mb-8">
-
-        {/* Botão Logout - Só aparece se estiver logado */}
-        {accessToken && (
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="w-full max-w-xs mx-auto bg-red-600 py-3 rounded-xl mb-3"
-          >
-            <Text className="text-white text-center font-semibold">Logout</Text>
-          </TouchableOpacity>
-        )}
-
         <Link href="/" asChild>
           <TouchableOpacity className="mt-3 w-full max-w-xs mx-auto bg-white py-3 rounded-xl border border-[#c5e1a5]">
-            <Text className="text-[#0a0a0a] text-center font-semibold">Back</Text>
+            <Text className="text-[#0a0a0a] text-center font-semibold">Home</Text>
           </TouchableOpacity>
         </Link>
       </View>
