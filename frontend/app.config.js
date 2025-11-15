@@ -7,6 +7,11 @@ export default ({ config }) => ({
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
+  splash: {
+    image: "./assets/images/splash.png",
+    resizeMode: "contain", // ou 'cover' se preferir ocupar a tela toda
+    backgroundColor: "#ffffff"
+  },
   scheme: "sportbreezeworkoutapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
@@ -18,6 +23,7 @@ export default ({ config }) => ({
     }
   },
   android: {
+    label: "SportBreeze",
     adaptiveIcon: {
       foregroundImage: "./assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff"

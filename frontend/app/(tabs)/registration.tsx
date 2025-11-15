@@ -50,9 +50,9 @@ export default function Registration() {
     const handleLogout = async () => {
       try {
         await logout();
-        router.replace("/login");
+        router.replace("/");
         setTimeout(() => {
-          Alert.alert("Logout", "Você saiu com sucesso!");
+          Alert.alert("Logged out", "You have successfully signed out!");
         }, 500);
       } catch (error) {
         Alert.alert("Erro", "Não foi possível fazer logout");
