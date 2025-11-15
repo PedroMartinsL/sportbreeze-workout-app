@@ -3,7 +3,7 @@ from http.client import HTTPException
 import json
 from infrastructure.services.ai_api import call_gemini
 from infrastructure.services.weather_api import fetch_weather
-from schemas.routine_schema import LocationSchema
+from schemas.routine_schema import LocationSchema, ProfileSchema
 from schemas.workout_schema import WorkoutCreate
 
 class AiWeatherClass():
@@ -11,7 +11,15 @@ class AiWeatherClass():
      @staticmethod
      async def api_services(location: LocationSchema, user, routine_id: int, input: str) -> list:
         # Busca informações do clima
-        profile = user.profile.model_dump() if hasattr(user, "profile") and user.profile else {"profile": "default"}
+        if user.profile:
+            profile = {
+                k: v
+                for k, v in vars(user.profile).items()
+                if not k.startswith("_")
+            }
+        else:
+            profile = {"profile": "Average user - standard activities"}
+            
         weather_json = fetch_weather(location.latitude, location.longitude)
         if not weather_json:
             raise HTTPException(status_code=404, detail="Weather information not found")

@@ -87,11 +87,12 @@ export default function Routine() {
             if (!isActive) return;
             setUserRoutines(response.routines);
           } catch (e: any) {
-            Toast.show({
-              type: "error",
-              text1: "Routines not found",
-              text2: e.message || "Try again later",
-            });
+            // Toast.show({
+            //   type: "error",
+            //   text1: "Routines not found",
+            //   text2: e.message || "Try again later",
+            // });
+            console.log("Any routines registered");
           }
         }
       })();
@@ -160,7 +161,7 @@ export default function Routine() {
       <View className="h-28" />
 
       <View className="flex-row justify-between items-center mt-4 px-6">
-        <Text className="text-2xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
+        <Text className="text-2xl font-extrabold text-[#0a0a0a]">Sportbreeze</Text>
         <Link href="/registration" asChild>
           <TouchableOpacity className="bg-black p-3 rounded-full">
             <User size={24} color="#ffffff" />

@@ -14,6 +14,7 @@ class User(Base):
 
     devices = relationship("Device", back_populates="user")
     routines = relationship("Routine", back_populates="user")
+    profile = relationship("Profile", back_populates="user", uselist=False)
 
     def __init__(self, username, email, password, active=True, admin=False):
         self.username = username

@@ -52,7 +52,7 @@ export default function Home() {
           </View>
 
           {/* Texto */}
-          <Text className="text-4xl font-extrabold text-[#0a0a0a]">Sportsbreeze</Text>
+          <Text className="text-4xl font-extrabold text-[#0a0a0a]">Sportbreeze</Text>
         </View>
 
         {/* Ações: Login / Registro */}
@@ -162,7 +162,7 @@ export default function Home() {
             </Text>
             <Text className="text-sm text-gray-700">
               {index === 0 &&
-                'Sportsbreeze helps you find the best outdoor activities based on local weather conditions. Never miss a perfect day to train!'}
+                'Sportbreeze helps you find the best outdoor activities based on local weather conditions. Never miss a perfect day to train!'}
               {index === 1 &&
                 'Schedule your workouts ahead of time and get AI-powered recommendations for optimal performance.'}
               {index === 2 &&

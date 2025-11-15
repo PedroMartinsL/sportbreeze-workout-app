@@ -15,6 +15,16 @@ export default function ModalTask({
   setModalVisible,
 }: TaskProps) {
   if (!task) return null;
+
+  const formatDuration = (minutes: number) => {
+    const totalSeconds = minutes * 60;
+    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, "0");
+    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, "0");
+    const s = (totalSeconds % 60).toString().padStart(2, "0");
+
+    return `${h}:${m}:${s}`;
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -90,7 +100,7 @@ export default function ModalTask({
                   <View className="flex-1 ml-2">
                     <DetachedData>Duration:</DetachedData>
                     <Text className="text-lg font-light ml-5 mt-5">
-                      {task.duration}
+                      {formatDuration(task.duration)}
                     </Text>
                   </View>
                 </View>

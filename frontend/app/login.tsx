@@ -47,13 +47,13 @@ export default function LoginScreen() {
         // Usuário tem perfil - redirecionar para routine
         router.replace("/(tabs)/routine");
         setTimeout(() => {
-          Alert.alert("Sucesso", "Login realizado com sucesso!");
+          Alert.alert("Success", "Welcome to sportbreeze!");
         }, 500);
       } catch (profileError) {
         // Usuário não tem perfil - redirecionar para registration
         router.replace("/(tabs)/registration");
         setTimeout(() => {
-          Alert.alert("Bem-vindo!", "Vamos criar seu perfil antes de começar.");
+          Alert.alert("Welcome!", "Create your own profile.");
         }, 500);
       }
     } catch (e: any) {

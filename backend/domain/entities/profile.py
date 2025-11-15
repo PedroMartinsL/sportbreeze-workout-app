@@ -15,7 +15,7 @@ class Profile(Base):
     hours_per_day = Column(Integer, nullable=True)  # Horas disponíveis por dia
     
     # Relacionamento
-    user = relationship("User", backref="profile")
+    user = relationship("User", back_populates="profile")
 
     def __init__(self, user_id, age=None, weight=None, height=None, sports=None, 
                  available_days=None, hours_per_day=None):

@@ -14,13 +14,13 @@ export default function RegisterScreen() {
 
   const onSubmit = async () => {
     if (!username || !email || !password) {
-      return Alert.alert("Atenção", "Preencha username, e-mail e senha.");
+      return Alert.alert("Attention", "Fill in your username, email and password.");
     }
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-      return Alert.alert("Atenção", "E-mail inválido.");
+      return Alert.alert("Attention", "Invalid email.");
     }
     if (password.length < 6) {
-      return Alert.alert("Atenção", "Senha deve ter pelo menos 6 caracteres.");
+      return Alert.alert("Attention", "Password must be at least 6 characters long.");
     }
 
     try {
@@ -35,22 +35,22 @@ export default function RegisterScreen() {
       };
 
       const resp = await apiFetch({ path: "/auth/sing_up", method: "POST", body: payload as any});
-      console.log("CADASTRO OK →", resp);
+      console.log("REGISTER OK →", resp);
 
-      // Fazer login automático
+      // Auto login
       await login(email, password);
 
-      // Redirecionar direto para registration
+      // Redirect to registration
       router.replace("/(tabs)/registration");
       
-      // Mostrar mensagem de sucesso após redirecionar
+      // Show success message after redirect
       setTimeout(() => {
-        Alert.alert("Sucesso!", "Conta criada! Agora vamos criar seu perfil.");
+        Alert.alert("Success!", "Account created! Now let's build your profile.");
       }, 500);
 
     } catch (e: any) {
       console.error(e);
-      Alert.alert("Erro no cadastro", e.message ?? "Falha na requisição");
+      Alert.alert("Registration error", e.message ?? "Request failed");
     } finally {
       setLoading(false);
     }
@@ -58,21 +58,21 @@ export default function RegisterScreen() {
 
   return (
     <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "800", marginBottom: 8 }}>Criar conta</Text>
-      <Text style={{ color: "#6b7280", marginBottom: 18 }}>Comece sua jornada com o Sportsbreeze.</Text>
+      <Text style={{ fontSize: 24, fontWeight: "800", marginBottom: 8 }}>Create account</Text>
+      <Text style={{ color: "#6b7280", marginBottom: 18 }}>Start your journey with Sportbreeze.</Text>
 
       <Text style={{ marginBottom: 6, fontWeight: "600" }}>Username</Text>
       <TextInput
-        placeholder="seu_usuario"
+        placeholder="your_username"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
         style={{ backgroundColor: "white", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, padding: 12, marginBottom: 12 }}
       />
 
-      <Text style={{ marginBottom: 6, fontWeight: "600" }}>E-mail</Text>
+      <Text style={{ marginBottom: 6, fontWeight: "600" }}>Email</Text>
       <TextInput
-        placeholder="voce@exemplo.com"
+        placeholder="you@example.com"
         autoCapitalize="none"
         keyboardType="email-address"
         value={email}
@@ -80,7 +80,7 @@ export default function RegisterScreen() {
         style={{ backgroundColor: "white", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 12, padding: 12, marginBottom: 12 }}
       />
 
-      <Text style={{ marginBottom: 6, fontWeight: "600" }}>Senha</Text>
+      <Text style={{ marginBottom: 6, fontWeight: "600" }}>Password</Text>
       <TextInput
         placeholder="••••••••"
         secureTextEntry
@@ -90,7 +90,11 @@ export default function RegisterScreen() {
       />
 
       <TouchableOpacity onPress={onSubmit} disabled={loading} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Cadastrar</Text>}
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Register</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
