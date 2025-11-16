@@ -11,10 +11,9 @@ async def get_client():
     return genai.Client(api_key=GEMINI_API_KEY)
 
 
-async def call_gemini(profile: dict, prompt_text: str):
+async def call_gemini(prompt_text: str):
     full_prompt = (
         "You are a fitness agent for people who want to exercise outdoors. "
-        "Organize detailed workout routines based on the weather forecast for the next 7 days. "
         "If possible, for activities that do not involve a facility, include the route and points of interest in the planner.\n\n"
         "Return the response in JSON with the following format:\n"
         "Rules: weather can only be one of: SUNNY, RAINY, THUNDERING, CLOUDY, FROSTY\n"
@@ -32,8 +31,6 @@ async def call_gemini(profile: dict, prompt_text: str):
         "  'sport': 'Main activity type'\n"
         "}\n\n"
         f"{prompt_text}\n\n"
-        "\nConsider a routine plan accordingly with profile available_days, height, weight, etc | Pay attention on users time which he has to practice as it will be shown:"
-        f"Profile: {json.dumps(profile, ensure_ascii=False)}"
     )
 
     client = await get_client()
@@ -45,6 +42,7 @@ async def call_gemini(profile: dict, prompt_text: str):
             thinking_config=types.ThinkingConfig(thinking_budget=0)
         ),
     )
+    print(response.text)
     return response.text
 
 

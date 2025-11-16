@@ -10,14 +10,31 @@ class CreateWorkoutByGoalsUseCase:
         self.create_workout_use_case = create_workout_use_case
 
     async def execute(self, workout_goals: WorkoutGoals, user: User):
+
+        if user.profile:
+            profile = {
+                k: v
+                for k, v in vars(user.profile).items()
+                if not k.startswith("_") and k != "available_days"
+            }
+        else:
+            profile = {"profile": "Average user - standard activities"}
+
         input = f"""
-            Generate a single training plan there are my suggestion, create based on my goals: 
-            (The date suggested is made for today or today + week [after 7 days])
-                {workout_goals.model_dump}
+            See user profile for details:
+            {profile}
+
+            Generate a single training plan based on my suggestion, create based on my goals: 
+
+            User GOALS:
+                {workout_goals.model_dump()}
+
+            RULE: OBEY THE DAY FIELD (The date field suggested is made for someday or someday on the next week if the date is in the past)
+            ['Example': 'date': Schedule a date to Saturday] -> then select the next saturday
         """
+
         workouts = await AiWeatherClass.api_services(
             workout_goals.location,
-            user,
             workout_goals.routine_id,
             input
         )

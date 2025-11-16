@@ -26,8 +26,22 @@ class CreateRoutineUseCase:
         }
         
         routine = self.repository.create(routine_dict)
+
+        if user.profile:
+            profile = {
+                k: v
+                for k, v in vars(user.profile).items()
+                if not k.startswith("_")
+            }
+        else:
+            profile = {"profile": "Average user - standard activities"}
+
+        input = f"""
+            Generate a plan to workout based on these info for the next 7 days based on profile properties, approach only his available days following his aptitude:
+            {profile}
+        """
         
-        workouts = await AiWeatherClass.api_services(data.location, user, routine.id, "Generate a plan to workout based on these info for the next 7 days")
+        workouts = await AiWeatherClass.api_services(data.location, routine.id, input)
 
         for workout in workouts:
             try:
