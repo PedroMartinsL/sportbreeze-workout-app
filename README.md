@@ -317,7 +317,7 @@ App (Expo Router)
 <img width="2285" height="1900" alt="Sportbreeze - Diagrama de Caso de Uso-1" src="https://github.com/user-attachments/assets/726b2933-8ece-4db4-bd29-37ac3ea52e52" />
 
 ### Diagrama de Classes (UML)
-<img width="912" height="914" alt="UML - Sportsbreeze drawio" src="https://github.com/user-attachments/assets/138254d7-b741-4419-a117-d6dcc190345a" />
+<img width="1172" height="914" alt="UML - Sportsbreeze drawio (1)" src="https://github.com/user-attachments/assets/7e9d62eb-ad7a-4e15-8e67-269951b85fe9" />
 
 ---
 
