@@ -7,6 +7,6 @@ class Device(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("Users.id"), nullable=False)
-    device_token = Column(String, unique=True, index=True)
+    device_token = Column(String, index=True)
 
     user = relationship("User", back_populates="devices")
