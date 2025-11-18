@@ -54,5 +54,5 @@ async def check_workouts_to_notify():
 
 async def start_scheduler():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(check_workouts_to_notify, "interval", minutes=5)
+    scheduler.add_job(check_workouts_to_notify, "interval", minutes=2)
     scheduler.start()

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { apiFetch } from "@/services/api";
 import { useAuthStore } from "@/store/auth";
 import { useRouter } from "expo-router";
+import { getPushToken } from "@/utils/getPushToken";
 
 export default function RegisterScreen() {
   const { login } = useAuthStore();
@@ -39,6 +40,19 @@ export default function RegisterScreen() {
 
       // Auto login
       await login(email, password);
+
+      const token = useAuthStore.getState().accessToken;
+      
+      const expoPushToken = await getPushToken();
+
+      if (expoPushToken && token) {
+        await apiFetch({
+          path: "/device",
+          method: "POST",
+          body: { device_token: expoPushToken },
+          token: token, // ✅ aqui usamos o token atualizado
+        });
+      }
 
       // Redirect to registration
       router.replace("/(tabs)/registration");
