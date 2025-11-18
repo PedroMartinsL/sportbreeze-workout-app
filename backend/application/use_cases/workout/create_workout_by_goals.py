@@ -29,7 +29,7 @@ class CreateWorkoutByGoalsUseCase:
             User GOALS:
                 {workout_goals.model_dump()}
 
-            RULE: OBEY THE DAY FIELD (The date field suggested is made for someday or someday on the next week if the date is in the past)
+            RULE: OBEY THE DAY and hour FIELD (If the date and hour fields suggested has passed, schedule for the next week)
             ['Example': 'date': Schedule a date to Saturday] -> then select the next saturday
         """
 
