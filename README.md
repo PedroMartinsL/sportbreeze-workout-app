@@ -315,10 +315,10 @@ App (Expo Router)
 ## 📊 Diagramas
 
 ### Diagrama de Casos de Uso
-![Sportbreeze - Diagrama de Casos de Uso](https://github.com/user-attachments/assets/dfcfab56-2d40-4a04-b7eb-4fdb3ec9c814)
+<img width="2285" height="1900" alt="Sportbreeze - Diagrama de Caso de Uso-1" src="https://github.com/user-attachments/assets/726b2933-8ece-4db4-bd29-37ac3ea52e52" />
 
 ### Diagrama de Classes (UML)
-<img width="4291" height="2633" alt="SportBreeze - Diagrama de Classes" src="https://github.com/user-attachments/assets/92d37fbd-57d2-489a-9094-eaa1e0500088" />
+<img width="912" height="914" alt="UML - Sportsbreeze drawio" src="https://github.com/user-attachments/assets/138254d7-b741-4419-a117-d6dcc190345a" />
 
 ---
 
