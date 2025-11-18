@@ -1,5 +1,4 @@
-# SportBreeze Workout App
-
+ # SportBreeze Workout App 
 O **SportBreeze** é um aplicativo mobile completo desenvolvido em **React Native (Expo)** com backend **FastAPI** que auxilia usuários a organizarem suas rotinas de treino e atividades esportivas de forma inteligente e personalizada.
 
 O app combina **autenticação segura**, **gestão de perfil**, **planejamento de rotinas semanais**, **monitoramento GPS**, **recomendações climáticas via IA** e **painel administrativo** para controle e análise de estatísticas.
@@ -408,8 +407,8 @@ Contribuições são muito bem-vindas! Para colaborar:
 
 O **SportBreeze** foi desenvolvido com dedicação por estudantes de Engenharia de Software da UPE:
 
-- [Pedro Martins de Lemos](https://github.com/PedroMartinsL)
-- [Gabriel Lopes de Albuquerque](https://github.com/gabriellopes-eng)
+- [Pedro Martins de Lemos](https://github.com/PedroMartinsL) 
+- [Gabriel Lopes de Albuquerque](https://github.com/gabriellopes-eng) 
 
 ---
 
