@@ -31,4 +31,4 @@ class ProfileSchema(BaseModel):
 
 class RoutineCreate(BaseModel):
     name: Optional[str]
-    location: LocationSchema
+    location: Optional[LocationSchema] = None

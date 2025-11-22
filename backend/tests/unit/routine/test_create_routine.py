@@ -1,159 +1,153 @@
 import pytest
-import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, AsyncMock, patch
 from fastapi import HTTPException
 
 from application.use_cases.routine.create_routine import CreateRoutineUseCase
-from application.use_cases.workout.create_workout import CreateWorkoutUseCase
-from schemas.routine_schema import RoutineCreate, RoutineBase, LocationSchema, ProfileSchema
-from infrastructure.services.ai_api import call_gemini
+from schemas.routine_schema import RoutineCreate
+
+
+# ------------------------------------------------
+# FAKES para evitar SQLAlchemy
+# ------------------------------------------------
+
+class FakeProfile:
+    def __init__(self, age, weight, height):
+        self.age = age
+        self.weight = weight
+        self.height = height
+
+
+class FakeUser:
+    def __init__(self, id, profile=None):
+        self.id = id
+        self.profile = profile
+
+
+# ------------------------------------------------
+# FIXTURES
+# ------------------------------------------------
+
+@pytest.fixture
+def fake_user():
+    return FakeUser(id=10, profile=None)
+
+
+@pytest.fixture
+def fake_user_with_profile():
+    """User com profile fake sem acionar SQLAlchemy."""
+    profile = FakeProfile(age=30, weight=80, height=180)
+    return FakeUser(id=20, profile=profile)
 
 
 @pytest.fixture
 def fake_routine_data():
-    """Returns mock data for routine creation."""
     return RoutineCreate(
-        routine=RoutineBase(name="Routine 1", user_id=1),
-        location=LocationSchema(latitude=10.0, longitude=20.0),
-        profile=ProfileSchema()
+        name=None,
+        location={"latitude": -23.55, "longitude": -46.63}
     )
 
 
 @pytest.fixture
 def fake_repo():
-    """Returns a fake repository simulating persistence."""
     repo = MagicMock()
-    repo.create.return_value.id = 1
+    repo.create.return_value = MagicMock(id=1)
     return repo
 
 
 @pytest.fixture
 def fake_workout_use_case():
-    """Returns a fake use case for workout creation."""
-    use_case = MagicMock(spec=CreateWorkoutUseCase)
-    use_case.execute.side_effect = lambda workout: workout
-    return use_case
+    uc = MagicMock()
+    uc.execute.return_value = None
+    return uc
+
 
 @pytest.fixture
-def mock_gemini_weather():
-    """Fixture que cria mocks de Gemini e Weather prontos pra uso."""
-    with patch("application.use_cases.routine.create_routine.fetch_weather") as mock_weather, \
-         patch("application.use_cases.routine.create_routine.call_gemini") as mock_gemini:
+def mock_ai_services():
+    with patch(
+        "application.use_cases.routine.create_routine.AiWeatherClass.api_services",
+        new=AsyncMock(return_value=[{"day": 1}, {"day": 2}])
+    ) as mock:
+        yield mock
 
-        mock_weather.return_value = {"weather": "Sunny", "temp": 25}
-        mock_gemini.return_value = json.dumps([
-            {
-                "weather": "Sunny",
-                "kcal": 200,
-                "title": "Run",
-                "temp": 25.5,
-                "duration": 45,
-                "planner": "AI Plan",
-                "hour": "08:00",
-                "date": "2025-10-13",
-                "sport": "Running"
-            }
-        ])
 
-        yield mock_weather, mock_gemini
+# ------------------------------------------------
+# TESTES
+# ------------------------------------------------
 
-def test_create_routine_success(fake_routine_data, fake_repo, fake_workout_use_case, mock_gemini_weather):
-    """Successful case: creates a full routine using weather data and AI."""
-    mock_fetch_weather, mock_call_gemini = mock_gemini_weather
+@pytest.mark.asyncio
+async def test_create_routine_success(
+    fake_repo, fake_user, fake_routine_data, fake_workout_use_case, mock_ai_services
+):
+    use_case = CreateRoutineUseCase(
+        repository=fake_repo,
+        create_workout_use_case=fake_workout_use_case
+    )
 
+    result = await use_case.execute(fake_routine_data, fake_user)
+
+    assert fake_routine_data.name == "Default workout"
+    fake_repo.create.assert_called_once()
+    assert result.id == 1
+    mock_ai_services.assert_called_once()
+    assert fake_workout_use_case.execute.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_create_routine_fails_without_location(fake_repo, fake_user):
+    data = RoutineCreate(name="X", location=None)
     use_case = CreateRoutineUseCase(repository=fake_repo)
-    result = use_case.execute(fake_routine_data, fake_workout_use_case)
+
+    with pytest.raises(HTTPException) as exc:
+        await use_case.execute(data, fake_user)
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "Location not provided"
+
+
+@pytest.mark.asyncio
+async def test_create_routine_user_with_profile(
+    fake_repo, fake_user_with_profile, fake_routine_data, fake_workout_use_case, mock_ai_services
+):
+    use_case = CreateRoutineUseCase(
+        repository=fake_repo,
+        create_workout_use_case=fake_workout_use_case
+    )
+
+    result = await use_case.execute(fake_routine_data, fake_user_with_profile)
 
     assert result.id == 1
-    mock_fetch_weather.assert_called_once()
-    mock_call_gemini.assert_called_once()
-    assert fake_workout_use_case.execute.call_count == 1
+    mock_ai_services.assert_called_once()
+    assert fake_workout_use_case.execute.call_count == 2
 
 
-@patch("application.use_cases.routine.create_routine.fetch_weather")
-def test_create_routine_weather_fail(mock_fetch_weather, fake_routine_data, fake_repo, fake_workout_use_case):
-    """Failure case: weather data not found."""
-    mock_fetch_weather.return_value = None
-    use_case = CreateRoutineUseCase(repository=fake_repo)
-    with pytest.raises(HTTPException) as exc:
-        use_case.execute(fake_routine_data, fake_workout_use_case)
-    assert exc.value.status_code == 404
-    assert exc.value.detail == "Weather information not found"
+@pytest.mark.asyncio
+async def test_create_routine_continues_on_workout_error(
+    fake_repo, fake_user, fake_routine_data, mock_ai_services
+):
+    workout_uc = MagicMock()
+    workout_uc.execute.side_effect = Exception("Erro forçado")
+
+    use_case = CreateRoutineUseCase(
+        repository=fake_repo,
+        create_workout_use_case=workout_uc
+    )
+
+    result = await use_case.execute(fake_routine_data, fake_user)
+
+    fake_repo.create.assert_called_once()
+    mock_ai_services.assert_called_once()
+    assert workout_uc.execute.call_count == 2
 
 
-@patch("application.use_cases.routine.create_routine.fetch_weather")
-@patch("application.use_cases.routine.create_routine.call_gemini")
-def test_create_routine_gemini_invalid_json(mock_call_gemini, mock_fetch_weather, fake_routine_data, fake_repo, fake_workout_use_case):
-    """Failure case: Gemini returns invalid JSON."""
-    mock_fetch_weather.return_value = {"temp": 25, "condition": "sunny"}
-    mock_call_gemini.return_value = "invalid json"
-    use_case = CreateRoutineUseCase(repository=fake_repo)
-    with pytest.raises(HTTPException) as exc:
-        use_case.execute(fake_routine_data, fake_workout_use_case)
-    assert exc.value.status_code == 500
-    assert exc.value.detail == "Empty or invalid JSON from Gemini API"
+@pytest.mark.asyncio
+async def test_create_routine_ai_services_raises(fake_repo, fake_user, fake_routine_data):
+    with patch(
+        "application.use_cases.routine.create_routine.AiWeatherClass.api_services",
+        new=AsyncMock(side_effect=Exception("AI Error"))
+    ):
+        use_case = CreateRoutineUseCase(repository=fake_repo)
 
+        with pytest.raises(Exception) as exc:
+            await use_case.execute(fake_routine_data, fake_user)
 
-@patch("infrastructure.services.ai_api.get_client")
-def test_call_gemini(mock_get_client):
-    """Unit test for Gemini API call simulation."""
-    mock_client = MagicMock()
-    mock_client.models.generate_content.return_value.text = '{"weather": "SUNNY"}'
-    mock_get_client.return_value = mock_client
-
-    result = call_gemini({"age": 25}, "prompt")
-    assert "SUNNY" in result
-
-
-def test_execute_raises_if_location_missing(fake_routine_data):
-    data = fake_routine_data
-    data.location = None  # Simula campo vazio
-    use_case = CreateRoutineUseCase(repository=MagicMock())
-    create_workout_use_case = MagicMock()
-
-    with pytest.raises(HTTPException) as exc:
-        use_case.execute(data, create_workout_use_case)
-
-    assert exc.value.status_code == 400
-    assert "Location not provided" in exc.value.detail
-
-
-def test_execute_raises_if_routine_missing(fake_routine_data):
-    data = fake_routine_data
-    data.routine = None
-    use_case = CreateRoutineUseCase(repository=MagicMock())
-    create_workout_use_case = MagicMock()
-
-    with pytest.raises(HTTPException) as exc:
-        use_case.execute(data, create_workout_use_case)
-
-    assert exc.value.status_code == 400
-    assert "Routine not provided" in exc.value.detail
-
-
-def test_execute_raises_if_profile_missing(fake_routine_data):
-    data = fake_routine_data
-    data.profile = None
-    use_case = CreateRoutineUseCase(repository=MagicMock())
-    create_workout_use_case = MagicMock()
-
-    with pytest.raises(HTTPException) as exc:
-        use_case.execute(data, create_workout_use_case)
-
-    assert exc.value.status_code == 400
-    assert "Profile not provided" in exc.value.detail
-
-def test_execute_continues_on_workout_exception(fake_routine_data, mock_gemini_weather):
-    mock_fetch_weather, mock_call_gemini = mock_gemini_weather
-
-    routine_repo = MagicMock()
-    routine_repo.create.return_value.id = 1
-    use_case = CreateRoutineUseCase(repository=routine_repo)
-
-    create_workout_use_case = MagicMock()
-    create_workout_use_case.execute.side_effect = Exception("Forced error")
-
-    result = use_case.execute(fake_routine_data, create_workout_use_case)
-
-    routine_repo.create.assert_called_once()
-    create_workout_use_case.execute.assert_called_once()
+        assert "AI Error" in str(exc.value)

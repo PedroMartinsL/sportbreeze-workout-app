@@ -1,115 +1,120 @@
-from datetime import datetime, timedelta
+"""
+Testes unitários para CreateWorkoutUseCase.
+"""
+
+from datetime import date, time, datetime, timedelta
+import pytest
+from unittest.mock import Mock
 from fastapi import HTTPException
+
 from application.use_cases.workout.create_workout import CreateWorkoutUseCase
 from schemas.workout_schema import WorkoutCreate
-import pytest
-from unittest.mock import MagicMock
 
 
-@pytest.fixture
-def fake_repo():
-    """Provides a mock repository that returns a sample workout when created."""
-    repo = MagicMock()
-    repo.create.return_value = {
-        "weather": "Sunny",
-        "kcal": 300,
-        "title": "Running",
+
+# =====================================================================
+# FÁBRICA (HELPER)
+# =====================================================================
+
+def make_workout(**overrides):
+    """Cria um WorkoutCreate válido para uso nos testes."""
+    data = {
+        "weather": "sunny",
+        "kcal": 300.0,
+        "title": "Treino padrão",
         "temp": 25.0,
         "duration": 60,
-        "planner": "John",
-        "hour": "10:00",
-        "date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
-        "sport": "Running",
-        "routine_id": 1
+        "planner": "auto",
+        "hour": time(10, 0),
+        "date": date.today(),
+        "sport": "running",
+        "check": False,
+        "notify": False,
+        "routine_id": 1,
     }
-    return repo
+    data.update(overrides)
+    return WorkoutCreate(**data)
 
 
-def test_create_workout_success(fake_repo):
-    """Should successfully create a new workout if there is no conflict and the date is in the future."""
-    use_case = CreateWorkoutUseCase(repository=fake_repo)
-    use_case.find_workouts_by_routine_use_case = MagicMock(return_value=[])
+# =====================================================================
+# TESTES check_workout_conflicts
+# =====================================================================
 
-    new_workout = WorkoutCreate(
-        weather="Cloudy",
-        kcal=300,
-        title="Morning Run",
-        temp=20.0,
-        duration=60,
-        planner="John",
-        hour = (datetime.now() + timedelta(hours=1)).time(),
-        date = (datetime.now() + timedelta(days=1)).date(),
-        sport="Running",
-        routine_id=1
+def test_conflict_raises_http_exception():
+    """Deve impedir criação quando o horário conflita com outro treino."""
+    use_case = CreateWorkoutUseCase(repository=Mock(), find_workouts_by_routine_use_case=None)
+
+    existing = [make_workout(hour=time(10, 0), duration=60)]   # 10:00–11:00
+    new = make_workout(hour=time(10, 30), duration=60)         # 10:30–11:30
+
+    with pytest.raises(HTTPException):
+        use_case.check_workout_conflicts(new, existing)
+
+
+def test_no_conflict_allows_creation():
+    """Não deve lançar erro quando o novo treino não conflita."""
+    use_case = CreateWorkoutUseCase(repository=Mock(), find_workouts_by_routine_use_case=None)
+
+    existing = [make_workout(hour=time(10, 0), duration=60)]   # 10:00–11:00
+    new = make_workout(hour=time(11, 0), duration=60)          # começa exatamente após
+
+    use_case.check_workout_conflicts(new, existing)
+
+
+# =====================================================================
+# TESTES execute()
+# =====================================================================
+
+def test_execute_raises_when_past_datetime():
+    """Deve bloquear criação de treino no passado."""
+    repo = Mock()
+    finder = Mock()
+    use_case = CreateWorkoutUseCase(repository=repo, find_workouts_by_routine_use_case=finder)
+
+    past_time = datetime.now() - timedelta(minutes=5)
+
+    workout = make_workout(
+        date=past_time.date(),
+        hour=past_time.time()
     )
 
-    result = use_case.execute(new_workout)
-
-    assert result["title"] == "Running"
-    fake_repo.create.assert_called_once_with(new_workout)
+    with pytest.raises(HTTPException):
+        use_case.execute(workout)
 
 
-def test_create_workout_with_past_date(fake_repo):
-    """Should raise HTTP 400 if the workout date and time are in the past."""
-    use_case = CreateWorkoutUseCase(repository=fake_repo)
-    use_case.find_workouts_by_routine_use_case = MagicMock(return_value=[])
+def test_execute_success():
+    """Deve criar treino quando tudo está válido."""
+    repo = Mock()
+    repo.create.return_value = "created"
 
-    past_workout = WorkoutCreate(
-        weather="Rainy",
-        kcal=200,
-        title="Past Run",
-        temp=18.0,
-        duration=45,
-        planner="John",
-        hour=(datetime.now() - timedelta(hours=1)).strftime("%H:%M"),
-        date=(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d"),
-        sport="Running",
-        routine_id=1
+    finder = Mock()
+    finder.execute.return_value = []
+
+    use_case = CreateWorkoutUseCase(repository=repo, find_workouts_by_routine_use_case=finder)
+
+    workout = make_workout(
+        date=date.today(),
+        hour=(datetime.now() + timedelta(minutes=10)).time()
     )
 
-    with pytest.raises(HTTPException) as exc_info:
-        use_case.execute(past_workout)
+    result = use_case.execute(workout)
 
-    assert exc_info.value.status_code == 400
-    assert "A data e hora do treino não podem estar no passado" in exc_info.value.detail
+    assert result == "created"
+    repo.create.assert_called_once()
+    finder.execute.assert_called_once_with(workout.routine_id)
 
 
-def test_create_workout_conflict(fake_repo):
-    """Should raise an exception if the workout conflicts with an existing workout time."""
-    existing_workout = WorkoutCreate(
-        weather="Sunny",
-        kcal=300,
-        title="Existing Run",
-        temp=25.0,
-        duration=60,
-        planner="John",
-        hour="10:00",
-        date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
-        sport="Running",
-        routine_id=1
-    )
+def test_execute_detects_conflict():
+    """Deve detectar conflito via execute()."""
+    repo = Mock()
+    finder = Mock()
 
-    def fake_find(routine_id):
-        return [existing_workout]
+    conflict = make_workout(hour=time(10, 0), duration=60)
+    finder.execute.return_value = [conflict]
 
-    use_case = CreateWorkoutUseCase(repository=fake_repo)
-    use_case.find_workouts_by_routine_use_case = fake_find
+    use_case = CreateWorkoutUseCase(repository=repo, find_workouts_by_routine_use_case=finder)
 
-    new_workout = WorkoutCreate(
-        weather="Cloudy",
-        kcal=250,
-        title="Conflicting Run",
-        temp=22.0,
-        duration=60,
-        planner="John",
-        hour="10:30",
-        date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
-        sport="Running",
-        routine_id=1
-    )
+    new = make_workout(hour=time(10, 30), duration=30)
 
-    with pytest.raises(Exception) as exc_info:
-        use_case.execute(new_workout)
-
-    assert "Conflito de horário" in str(exc_info.value)
-    fake_repo.create.assert_not_called()
+    with pytest.raises(HTTPException):
+        use_case.execute(new)

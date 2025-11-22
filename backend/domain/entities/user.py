@@ -16,9 +16,20 @@ class User(Base):
     routines = relationship("Routine", back_populates="user")
     profile = relationship("Profile", back_populates="user", uselist=False)
 
-    def __init__(self, username, email, password, active=True, admin=False):
-        self.username = username
-        self.email = email
-        self.password = password
+    def __init__(
+        self,
+        id=None,
+        username=None,
+        email=None,
+        password=None,
+        active=True,
+        admin=False,
+        profile=None,
+    ):
+        self.id = id
+        self.username = username or ""
+        self.email = email or ""
+        self.password = password or ""
         self.active = active
         self.admin = admin
+        self.profile = profile
