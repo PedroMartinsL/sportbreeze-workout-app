@@ -250,6 +250,322 @@ sportbreeze-workout-app/
 
 ---
 
+## 🔌 API Endpoints - Documentação Completa
+
+### 📋 Convenções
+- 🔓 **Público** - Não requer autenticação
+- 🔒 **Autenticado** - Requer token JWT no header
+- 👑 **Admin** - Requer token JWT + role admin
+- 🌐 **Serviço Externo** - Utiliza API de terceiros
+- 💻 **Lógica Própria** - Implementação interna
+
+---
+
+### 🔐 Autenticação (`/auth`)
+
+#### `POST /auth/sing_up` 🔓
+**Descrição:** Criar nova conta de usuário  
+**Caso de Uso:** `CreateUserUseCase`  
+**Lógica:** 💻 Própria - Hash de senha (Bcrypt), validação de dados  
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "senha123"
+}
+```
+**Response:** Dados do usuário criado
+
+---
+
+#### `POST /auth/login` 🔓
+**Descrição:** Autenticar usuário e gerar tokens JWT  
+**Caso de Uso:** `AuthService.login()`  
+**Lógica:** 💻 Própria - Autenticação JWT (Python-JOSE), geração de access + refresh token  
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "senha123"
+}
+```
+**Response:**
+```json
+{
+  "access_token": "eyJ0eXAi...",
+  "refresh_token": "eyJ0eXAi...",
+  "token_type": "bearer",
+  "user": { "id": 1, "email": "user@example.com", "admin": false }
+}
+```
+
+---
+
+#### `POST /auth/refresh` 🔒
+**Descrição:** Renovar access token usando refresh token  
+**Caso de Uso:** Token refresh automático  
+**Lógica:** 💻 Própria - Validação e geração de novo JWT  
+**Headers:** `Authorization: Bearer <refresh_token>`  
+**Response:** Novo access token
+
+---
+
+#### `POST /auth/login-form` 🔓
+**Descrição:** Login via OAuth2 Form (para Swagger /docs)  
+**Caso de Uso:** `AuthService` (mesma lógica do /login)  
+**Lógica:** 💻 Própria - Compatibilidade com OAuth2PasswordRequestForm  
+
+---
+
+### 👤 Perfil (`/profile`)
+
+#### `POST /profile/` 🔒
+**Descrição:** Criar perfil do usuário autenticado  
+**Caso de Uso:** `CreateProfileUseCase`  
+**Lógica:** 💻 Própria - Associação automática com user_id do token  
+**Request Body:**
+```json
+{
+  "name": "João Silva",
+  "age": 25,
+  "weight": 75.5,
+  "height": 1.75,
+  "activity_level": "moderate"
+}
+```
+**Response:** Dados do perfil criado
+
+---
+
+#### `GET /profile/` 🔒
+**Descrição:** Buscar perfil do usuário autenticado  
+**Caso de Uso:** `FindProfileByUserUseCase`  
+**Lógica:** 💻 Própria - Query no banco de dados  
+**Response:** Dados do perfil
+
+---
+
+#### `PUT /profile/` 🔒
+**Descrição:** Atualizar perfil do usuário autenticado  
+**Caso de Uso:** `UpdateProfileUseCase`  
+**Lógica:** 💻 Própria - Update no banco de dados  
+**Request Body:** Mesma estrutura do POST (campos opcionais)  
+**Response:** Perfil atualizado
+
+---
+
+### 📅 Rotinas (`/routines`)
+
+#### `POST /routines/` 🔒
+**Descrição:** Criar nova rotina semanal  
+**Caso de Uso:** `CreateRoutineUseCase`  
+**Lógica:** 💻 Própria - Associação com user_id, validação de dia da semana  
+**Request Body:**
+```json
+{
+  "day": "monday"
+}
+```
+**Response:** Rotina criada com ID
+
+---
+
+#### `GET /routines/` 🔒
+**Descrição:** Buscar todas as rotinas do usuário autenticado  
+**Caso de Uso:** `FindRoutinesByUserUseCase`  
+**Lógica:** 💻 Própria - Query filtrada por user_id  
+**Response:** Lista de rotinas agrupadas por dia da semana
+
+---
+
+### 🏋️ Workouts (`/workouts`)
+
+#### `POST /workouts/` 🔒
+**Descrição:** Criar workout com recomendações de IA baseadas no clima  
+**Caso de Uso:** `CreateWorkoutByGoalsUseCase`  
+**Lógica:**  
+- 💻 **Própria:** Validação, persistência no banco  
+- 🌐 **WeatherAPI:** Consulta clima atual por localização  
+- 🌐 **Google Gemini AI:** Geração de sugestões de treino baseadas no clima  
+
+**Request Body:**
+```json
+{
+  "routine_id": 1,
+  "goals": "Perder peso e ganhar resistência",
+  "location": "Recife, PE"
+}
+```
+**Response:** Workout criado com sugestões da IA
+
+**Fluxo:**
+1. Sistema consulta **WeatherAPI** com localização
+2. Envia clima + objetivos para **Gemini AI**
+3. IA retorna recomendação personalizada
+4. Sistema salva workout no banco
+
+---
+
+#### `GET /workouts/{routine_id}` 🔒
+**Descrição:** Buscar todos os workouts de uma rotina  
+**Caso de Uso:** `FindWorkoutsByRoutineUseCase`  
+**Lógica:** 💻 Própria - Query no banco de dados  
+**Response:** Lista de workouts da rotina
+
+---
+
+#### `PUT /workouts/{workout_id}` 🔒
+**Descrição:** Atualizar workout (marcar como concluído, editar dados)  
+**Caso de Uso:** `UpdateWorkoutUseCase` + `SetStatisticsUseCase`  
+**Lógica:** 💻 Própria - Update no banco + cálculo automático de estatísticas  
+**Request Body:**
+```json
+{
+  "activity": "Corrida",
+  "duration": 30,
+  "completed": true
+}
+```
+**Response:** Workout atualizado
+
+**Efeito Colateral:** Ao marcar como `completed: true`, o sistema atualiza automaticamente as estatísticas do usuário (calorias queimadas, atividades completadas).
+
+---
+
+#### `DELETE /workouts/{workout_id}` 🔒
+**Descrição:** Deletar workout  
+**Caso de Uso:** `DeleteWorkoutUseCase`  
+**Lógica:** 💻 Própria - Soft delete ou hard delete  
+**Response:** Workout deletado
+
+---
+
+### 📱 Dispositivo (`/device`)
+
+#### `POST /device/` 🔒
+**Descrição:** Registrar token do dispositivo para notificações push  
+**Caso de Uso:** `SetDeviceUseCase`  
+**Lógica:**  
+- 💻 **Própria:** Associação device_token com user_id  
+- 🌐 **OneSignal:** Token usado posteriormente para enviar push notifications  
+
+**Request Body:**
+```json
+{
+  "device_token": "ExponentPushToken[xxxxxx]"
+}
+```
+**Response:** Device registrado
+
+**Integração:** Este token é usado pelo **APScheduler** para enviar notificações via **OneSignal**.
+
+---
+
+### 📊 Estatísticas (`/statistics`)
+
+#### `GET /statistics/me` 🔒
+**Descrição:** Buscar estatísticas do usuário autenticado  
+**Caso de Uso:** `FindStatisticsByUserUseCase`  
+**Lógica:** 💻 Própria - Agregação de dados de workouts completados  
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "kcal_burned": 1250.5,
+  "activity_checked": 15
+}
+```
+
+**Cálculo:**
+- `kcal_burned`: Soma das calorias de todos os workouts completados
+- `activity_checked`: Contador de workouts marcados como `completed: true`
+
+---
+
+#### `GET /statistics/` 👑
+**Descrição:** Buscar estatísticas de TODOS os usuários (apenas admin)  
+**Caso de Uso:** `FindAllStatisticsUseCase`  
+**Lógica:** 💻 Própria - Query sem filtro de user_id + validação de role  
+**Response:** Lista com estatísticas de todos os usuários
+
+**Validação:** Endpoint retorna `403 Forbidden` se usuário não for admin.
+
+---
+
+## 🔄 Fluxo de Integração com Serviços Externos
+
+### 1️⃣ **Criação de Workout com IA**
+```
+Frontend → POST /workouts/
+    ↓
+Backend (CreateWorkoutByGoalsUseCase)
+    ↓
+WeatherAPI ← Consulta clima por localização
+    ↓
+Google Gemini AI ← Envia (clima + objetivos)
+    ↓
+Gemini retorna recomendação
+    ↓
+Backend salva workout no PostgreSQL
+    ↓
+Response para Frontend
+```
+
+**Lógica Própria:** Orquestração do fluxo, validação, persistência  
+**Lógica Terceiros:** Dados climáticos (WeatherAPI) + Geração de texto (Gemini)
+
+---
+
+### 2️⃣ **Notificações Push Agendadas**
+```
+Backend (APScheduler) → Agenda job diário
+    ↓
+Job executa → Busca usuários com workouts pendentes
+    ↓
+OneSignal API ← Envia push notification
+    ↓
+Dispositivo do usuário recebe notificação
+```
+
+**Lógica Própria:** Agendamento (APScheduler), query de workouts pendentes  
+**Lógica Terceiros:** Envio de push (OneSignal)
+
+---
+
+### 3️⃣ **Atualização Automática de Estatísticas**
+```
+Frontend → PUT /workouts/{id} (completed: true)
+    ↓
+Backend (UpdateWorkoutUseCase)
+    ↓
+SetStatisticsUseCase → Recalcula estatísticas
+    ↓
+Atualiza tabela statistics (kcal_burned, activity_checked)
+    ↓
+Response para Frontend
+```
+
+**Lógica Própria:** Cálculo agregado, transações atômicas no banco
+
+---
+
+## 📊 Resumo: Lógica Própria vs Terceiros
+
+| Endpoint | Lógica Própria | Serviços Externos |
+|----------|----------------|-------------------|
+| `POST /auth/sing_up` | ✅ Hash senha, validação | ❌ |
+| `POST /auth/login` | ✅ JWT, autenticação | ❌ |
+| `POST /profile/` | ✅ CRUD perfil | ❌ |
+| `POST /routines/` | ✅ CRUD rotinas | ❌ |
+| `POST /workouts/` | ✅ Orquestração, persistência | 🌐 WeatherAPI + Gemini AI |
+| `PUT /workouts/{id}` | ✅ Update + estatísticas | ❌ |
+| `POST /device/` | ✅ Registro token | 🌐 OneSignal (usado depois) |
+| `GET /statistics/me` | ✅ Agregação dados | ❌ |
+| `GET /statistics/` | ✅ Query admin + validação | ❌ |
+
+---
+
 ## 🏗️ Arquitetura
 
 ### Backend - Clean Architecture
