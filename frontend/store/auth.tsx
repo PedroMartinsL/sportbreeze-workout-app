@@ -3,11 +3,31 @@ import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
 import { apiFetch } from "@/services/api";
 import { jwtDecode } from "jwt-decode";
+import { Platform } from "react-native";
 
 interface JwtPayload {
   sub: string;
   role: string;
 }
+
+// STORAGE ADAPTER (Mobile → SecureStore | Web → localStorage) ---
+const storage = {
+  setItem: async (key: string, value: string) => {
+    if (Platform.OS === "web") return localStorage.setItem(key, value);
+    return SecureStore.setItemAsync(key, value);
+  },
+
+  getItem: async (key: string): Promise<string | null> => {
+    if (Platform.OS === "web") return localStorage.getItem(key);
+    return SecureStore.getItemAsync(key);
+  },
+
+  deleteItem: async (key: string) => {
+    if (Platform.OS === "web") return localStorage.removeItem(key);
+    return SecureStore.deleteItemAsync(key);
+  }
+};
+
 
 interface AuthState {
   user: number | null;
@@ -39,7 +59,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { access_token, refresh_token } = res;
     const decoded = jwtDecode<JwtPayload>(access_token);
 
-    await SecureStore.setItemAsync("refresh_token", refresh_token);
+    await storage.setItem("refresh_token", refresh_token);
+
     set({
       accessToken: access_token,
       user: Number(decoded.sub),
@@ -48,7 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   refreshSession: async (): Promise<string | null> => {
-    const refreshToken = await SecureStore.getItemAsync("refresh_token");
+    const refreshToken = await storage.getItem("refresh_token");
     if (!refreshToken) return null;
 
     try {
@@ -57,7 +78,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         method: "POST",
         body: { refresh_token: refreshToken },
         token: null,
-        // Aqui não queremos refresh recursivo
         onUnauthorized: async () => null,
         onLogout: get().logout,
       });
@@ -79,12 +99,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
-    await SecureStore.deleteItemAsync("refresh_token");
+    await storage.deleteItem("refresh_token");
     set({ user: null, accessToken: null, role: "" });
   },
 
   initAuth: async () => {
-    const refreshToken = await SecureStore.getItemAsync("refresh_token");
+    const refreshToken = await storage.getItem("refresh_token");
     if (!refreshToken) {
       set({ loading: false });
       return;
@@ -102,13 +122,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const { access_token } = res;
       const decoded = jwtDecode<JwtPayload>(access_token);
+
       set({
         accessToken: access_token,
         user: Number(decoded.sub),
         role: decoded.role,
         loading: false,
       });
-    } catch (err) {
+    } catch {
       await get().logout();
       set({ loading: false });
     }
