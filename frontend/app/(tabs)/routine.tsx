@@ -209,7 +209,7 @@ export default function Routine() {
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text className="text-white text-center font-semibold">Schedule Workout</Text>
+            <Text className="text-white text-center font-semibold">Schedule Routine</Text>
           )}
         </TouchableOpacity>
       </View>

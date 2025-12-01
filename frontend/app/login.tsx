@@ -67,12 +67,12 @@ export default function LoginScreen() {
 
   return (
     <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "800", marginBottom: 8 }}>Entrar</Text>
+      <Text style={{ fontSize: 24, fontWeight: "800", marginBottom: 8 }}>Login</Text>
       <Text style={{ color: "#6b7280", marginBottom: 18 }}>Acesse sua conta para continuar.</Text>
 
       <Text style={{ marginBottom: 6, fontWeight: "600" }}>E-mail</Text>
       <TextInput
-        placeholder="voce@exemplo.com"
+        placeholder="email@example.com"
         autoCapitalize="none"
         keyboardType="email-address"
         value={email}
@@ -90,7 +90,7 @@ export default function LoginScreen() {
       />
 
       <TouchableOpacity onPress={onSubmit} disabled={loading} style={{ backgroundColor: "#111827", padding: 14, borderRadius: 12 }}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Entrar</Text>}
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700", textAlign: "center" }}>Sign in</Text>}
       </TouchableOpacity> 
     </View>
   );
