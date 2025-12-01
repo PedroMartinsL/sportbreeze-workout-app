@@ -11,6 +11,6 @@ class DeleteWorkoutUseCase:
         workout = self.repository.remove(workout_data)
 
         if not workout:
-            raise ValueError(f"Treino com ID {workout_data.id} não encontrado.")
+            raise ValueError(f"Treino com ID {workout_data} não encontrado.")
     
         return workout

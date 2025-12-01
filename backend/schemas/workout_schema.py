@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict
 from datetime import date, time
 
@@ -32,8 +32,19 @@ class WorkoutResponse(WorkoutBase):
 class WorkoutDelete(BaseModel):
     id: int
 
-class WorkoutUpdate(WorkoutBase):
-    pass
+class WorkoutUpdate(BaseModel):
+    weather: Optional[str] = None
+    kcal: Optional[float] = None
+    title: Optional[str] = None
+    temp: Optional[float] = None
+    duration: Optional[int] = None
+    planner: Optional[str] = None
+    hour: Optional[time] = None
+    date: Optional[Any] = None
+    sport: Optional[str] = None
+    check: Optional[bool] = None
+    notify: Optional[bool] = None
+    routine_id: Optional[int] = None
 
 class WorkoutGoals(BaseModel):
     kcal: int
