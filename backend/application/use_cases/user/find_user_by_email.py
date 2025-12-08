@@ -10,5 +10,5 @@ class FindUserByEmailUseCase:
     def execute(self, request: UserFindByEmail):
         user = self.repository.findByEmail(request)
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            return None
         return user

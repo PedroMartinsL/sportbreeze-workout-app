@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import MagicMock
-from fastapi import HTTPException
 from application.use_cases.user.find_user_by_email import FindUserByEmailUseCase
 from schemas.user_schema import UserFindByEmail
 
@@ -30,13 +29,11 @@ def test_user_found(find_user_use_case, fake_repo):
 
 
 def test_user_not_found(find_user_use_case, fake_repo):
-    """Should raise an HTTP 404 error when the user is not found."""
+    """Should return None when the user is not found."""
     request = UserFindByEmail(email="pedro@example.com")
     fake_repo.findByEmail.return_value = None
 
-    with pytest.raises(HTTPException) as exc:
-        find_user_use_case.execute(request)
+    result = find_user_use_case.execute(request)
 
-    assert exc.value.status_code == 404
-    assert exc.value.detail == "User not found"
     fake_repo.findByEmail.assert_called_once_with(request)
+    assert result is None

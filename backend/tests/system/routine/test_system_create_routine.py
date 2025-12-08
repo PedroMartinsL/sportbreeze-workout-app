@@ -49,7 +49,7 @@ routine_tab = driver.find_element(By.XPATH, "(//*[text()='Routine'])[last()]")
 routine_tab.click()
 time.sleep(2)
 
-routine_name_input = "Tata ta malhando"
+routine_name_input = "Routine Test"
 
 routine_name = driver.find_element(By.XPATH, "//input[@placeholder='Routine Name']")
 routine_name.send_keys(routine_name_input)
