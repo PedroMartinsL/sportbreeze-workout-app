@@ -74,6 +74,37 @@ O app combina **autenticação segura**, **gestão de perfil**, **planejamento d
 
 ---
 
+## 🧪 Testes
+
+O projeto utiliza diferentes tipos de testes para garantir a qualidade do código:
+
+- **Testes Unitários:** Validação de regras de negócio e casos de uso isolados (Pytest, com mocks).
+- **Testes de Integração:** Validação do funcionamento entre componentes reais (Pytest, banco SQLite/PostgreSQL).
+- **Testes de Sistema:** Automação de cenários completos simulando o uso real da aplicação. Para estes, foi utilizado **Selenium**.
+
+### Instruções para execução dos testes
+
+1. **Testes Unitários e de Integração (backend):**
+   - Acesse a pasta do backend:
+     ```powershell
+     cd backend
+     ```
+   - Execute os testes:
+     ```powershell
+     pytest
+     ```
+
+2. **Testes de Sistema:**
+   - Certifique-se de que o backend está rodando:
+     ```powershell
+     start.bat
+     ```
+   - Execute os scripts de teste com Selenium conforme instruções na pasta de testes de sistema.
+
+> **Observação:** Não é necessário iniciar o frontend ou o Docker para rodar os testes unitários/integrados. Para testes de sistema, o backend deve estar ativo.
+
+---
+
 ## 📦 Instalação e Configuração
 
 ### Pré-requisitos
